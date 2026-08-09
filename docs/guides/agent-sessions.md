@@ -10,6 +10,17 @@ directory. Claude Code and Codex default to `interactive_login`; OpenClaw defaul
 `credential_binding` and therefore requires `credentialBindingId`. A pagination cursor is
 opaque and should only be passed back to `list`.
 
+Call `createTerminalConnection(agentSessionId, options)` to request one short-lived
+terminal connection grant. `clientInstanceId` is a stable identity for the calling Runa
+client, and an optional `resumeHandle` requests a new attachment generation from a
+previous grant. `idempotencyKey` is caller-owned: reuse it only when retrying the same
+intent and choose a new key for a new intent.
+
+The returned `connectToken` is one-use secret material. Hand the grant directly to the
+separate terminal runtime, do not log or persist it, and do not add it to `connectUrl`.
+The SDK validates the complete five-capability record and the expiry but deliberately
+does not open, resume, or monitor the connection.
+
 See [`examples/guides/agent-sessions.ts`](../../examples/guides/agent-sessions.ts).
 This SDK surface intentionally does not open a PTY, perform provider login, or synchronize
 local files.

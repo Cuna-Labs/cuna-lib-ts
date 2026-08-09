@@ -3,6 +3,10 @@ import type {
   AgentAuthenticationStatus,
   AssignedWorkspace,
   CapabilitySnapshot,
+  Problem,
+  TerminalConnectionCapability,
+  TerminalConnectionCreateOptions,
+  TerminalConnectionGrant,
   Workspace,
 } from "../../src/index.js";
 
@@ -38,12 +42,50 @@ type CapabilitySnapshotIsClosed = Assert<
     | "capabilities"
   >
 >;
+type ProblemIsClosed = Assert<
+  Equal<
+    keyof Problem,
+    | "type"
+    | "title"
+    | "status"
+    | "code"
+    | "requestId"
+    | "retryable"
+    | "detail"
+    | "action"
+  >
+>;
+type TerminalConnectionCapabilityIsClosed = Assert<
+  Equal<keyof TerminalConnectionCapability, "name" | "availability">
+>;
+type TerminalConnectionCreateOptionsIsClosed = Assert<
+  Equal<
+    keyof TerminalConnectionCreateOptions,
+    "idempotencyKey" | "clientInstanceId" | "protocol" | "resumeHandle"
+  >
+>;
+type TerminalConnectionGrantIsClosed = Assert<
+  Equal<
+    keyof TerminalConnectionGrant,
+    | "terminalSessionId"
+    | "resumeHandle"
+    | "connectUrl"
+    | "connectToken"
+    | "protocol"
+    | "capabilities"
+    | "expiresAt"
+  >
+>;
 
 export type {
   AgentAuthenticationStatusIsClosed,
   CapabilitySnapshotIsClosed,
+  ProblemIsClosed,
   AssignedDiscriminantIsLiteral,
   StderrHelperContract,
   StdoutHelperContract,
+  TerminalConnectionCapabilityIsClosed,
+  TerminalConnectionCreateOptionsIsClosed,
+  TerminalConnectionGrantIsClosed,
   WorkspaceDiscriminantIsClosed
 };

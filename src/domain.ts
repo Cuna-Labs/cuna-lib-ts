@@ -229,9 +229,12 @@ export function decodeTerminalConnectionGrant(value: unknown): TerminalConnectio
     "terminal_session_id", "resume_handle", "connect_url", "connect_token",
     "protocol", "capabilities", "expires_at",
   ]);
+  const terminalSessionId = uuid(source.terminal_session_id);
   const connectUrl = string(source.connect_url);
   const connectToken = string(source.connect_token);
-  if (!TERMINAL_CONNECTION_URL.test(connectUrl) ||
+  const expectedConnectUrl =
+    `wss://api.runacode.io/v1/terminal-connections/${terminalSessionId}/stream`;
+  if (!TERMINAL_CONNECTION_URL.test(connectUrl) || connectUrl !== expectedConnectUrl ||
       !TERMINAL_CONNECTION_TOKEN.test(connectToken) ||
       connectUrl.includes(connectToken) || source.protocol !== "runa.terminal.v1" ||
       !Array.isArray(source.capabilities) || source.capabilities.length !== 5) malformed();
@@ -250,7 +253,7 @@ export function decodeTerminalConnectionGrant(value: unknown): TerminalConnectio
   if (new Set(names).size !== TERMINAL_CAPABILITY_NAMES.size ||
       [...TERMINAL_CAPABILITY_NAMES].some((name) => !names.includes(name))) malformed();
   return Object.freeze({
-    terminalSessionId: uuid(source.terminal_session_id),
+    terminalSessionId,
     resumeHandle: uuid(source.resume_handle),
     connectUrl,
     connectToken,
@@ -401,7 +404,8 @@ export function decodeCapabilitySnapshot(value: unknown): CapabilitySnapshot {
   );
   if (source.schema_version !== "1.0") malformed();
   const subjectScope = string(source.subject_scope);
-  if (subjectScope !== "account" && subjectScope !== "machine") malformed();
+  if (subjectScope !== "account" && subjectScope !== "machine" &&
+      subjectScope !== "agent_session") malformed();
   const observedAt = dateTime(source.observed_at);
   const expiresAt = dateTime(source.expires_at);
   if (Date.parse(expiresAt) <= Date.parse(observedAt)) malformed();

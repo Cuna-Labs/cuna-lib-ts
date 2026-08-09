@@ -132,6 +132,7 @@ test("terminal connection input and grant decoding are closed and effect-bounded
     const invalid = [
       terminalGrant({ tenant_id: MACHINE_ID }),
       terminalGrant({ connect_url: `wss://api.runacode.io/v1/terminal-connections/${TERMINAL_SESSION_ID}/stream?token=x` }),
+      terminalGrant({ connect_url: "wss://api.runacode.io/v1/terminal-connections/77777777-7777-4777-8777-777777777777/stream" }),
       terminalGrant({ connect_token: "invalid" }),
       terminalGrant({ protocol: "future" }),
       terminalGrant({ capabilities: terminalGrant().capabilities.slice(0, 4) }),
@@ -147,7 +148,7 @@ test("terminal connection input and grant decoding are closed and effect-bounded
         return jsonResponse(invalid.shift(), 201);
       },
     });
-    for (let index = 0; index < 6; index += 1) {
+    for (let index = 0; index < 7; index += 1) {
       await assert.rejects(
         runa.agentSessions.createTerminalConnection(AGENT_SESSION_ID, {
           idempotencyKey: `terminal-invalid-${index}`,
@@ -167,7 +168,7 @@ test("terminal connection input and grant decoding are closed and effect-bounded
         TypeError,
       );
     }
-    assert.equal(calls, 6);
+    assert.equal(calls, 7);
     assert.equal(webSocketCalls, 0);
     await runa.close();
   } finally {
@@ -210,6 +211,35 @@ test("terminal connection Problem responses remain typed without exposing raw fi
       });
       assert.equal(Object.isFrozen(error.problem), true);
       assert.equal("provider" in error.problem, false);
+      return true;
+    },
+  );
+  await runa.close();
+});
+
+test("malformed Problem metadata is discarded instead of widening the public error", async () => {
+  const runa = new Runa({
+    apiKey: API_KEY,
+    fetch: async () => jsonResponse({
+      type: "https://api.runacode.io/problems/attachment_conflict",
+      title: "Attachment conflict",
+      status: 409,
+      code: "attachment_conflict",
+      request_id: "66666666-6666-4666-8666-666666666666",
+      retryable: false,
+      provider: "internal",
+    }, 409),
+  });
+  await assert.rejects(
+    runa.agentSessions.createTerminalConnection(AGENT_SESSION_ID, {
+      idempotencyKey: "terminal-conflict-2",
+      clientInstanceId: "typescript-sdk.test",
+    }),
+    (error) => {
+      assert(error instanceof ApiError);
+      assert.equal(error.status, 409);
+      assert.equal(error.code, "api_error");
+      assert.equal(error.problem, undefined);
       return true;
     },
   );
