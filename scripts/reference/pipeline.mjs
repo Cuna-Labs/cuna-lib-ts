@@ -14,7 +14,7 @@ import {
 
 const requiredPageOwnership = Object.freeze({
   "Core.md": Object.freeze(["Runa", "RunaConfig"]),
-  "Sessions.md": Object.freeze(["Session", "SessionsManager", "SessionAgent", "AgentAuthenticationMethod", "AgentAuthenticationState", "AgentAuthenticationStatus", "OutboundPolicyMode", "OutboundPolicy", "SessionCreateOptions", "SessionSnapshot", "SessionStatus", "ExecOptions", "ExecResult", "Acknowledgement", "OpenSessionResult"]),
+  "Sessions.md": Object.freeze(["Session", "SessionsManager", "SessionAgent", "OutboundPolicyMode", "OutboundPolicy", "SessionCreateOptions", "SessionSnapshot", "SessionStatus", "ExecOptions", "ExecResult", "Acknowledgement", "OpenSessionResult"]),
   "Account-and-records.md": Object.freeze(["Me", "Workspace", "AssignedWorkspace", "UnassignedWorkspace", "EstimatedUsage", "RecordsManager", "Record"]),
   "Shared.md": Object.freeze(["ConfigError", "ApiError", "CommandError", "RunaError", "OpaqueWireValue", "stdoutText", "stderrText"]),
 });
@@ -339,8 +339,6 @@ const memberDescriptions = Object.freeze({
   allowedHosts: "Optional ordered host allowlist copied into the create request.",
   apiKey: "Optional constructor API key selected before environment or explicit-file sources.",
   assigned: "Literal discriminator for the workspace assignment variant.",
-  authenticationStatus: "Reads the secret-free authentication status of this session's agent.",
-  background: "Whether creation may return while session provisioning is still in progress.",
   baseUrl: "Optional explicit canonical Runa API origin.",
   capabilities: "Returns the stable capability discovery manager owned by this client.",
   checkpoint: "Creates one named checkpoint through the owning session handle.",
@@ -369,7 +367,6 @@ const memberDescriptions = Object.freeze({
   memoryMiB: "Memory quantity in mebibytes.",
   mode: "Selected allow-list or deny-list policy mode.",
   message: "Fixed safe English public error message.",
-  method: "Authentication method selected for the session agent.",
   name: "Public name returned by the API or supplied for an operation.",
   note: "Explanatory estimated-usage note returned by the API.",
   ok: "Literal true acknowledgement of successful completion.",
@@ -387,7 +384,6 @@ const memberDescriptions = Object.freeze({
   slug: "Validated runtime slug returned for the session.",
   snapshot: "Current immutable snapshot owned by this session handle.",
   start: "Starts the owning session and refreshes only that handle after success.",
-  state: "Strict secret-free authentication state of the session agent.",
   status: "Documented session status or HTTP status, according to the owning declaration.",
   stderr: "Complete buffered standard-error text returned by execution.",
   stderrTruncated: "Whether the returned standard-error text was truncated.",
@@ -424,7 +420,6 @@ const returnDescriptions = Object.freeze({
   "Session#exec": "The complete buffered execution result.",
   "Session#checkpoint": "An acknowledgement whose ok member is literal true.",
   "Session#open": "A validated handoff result returned without automatic use.",
-  "Session#authenticationStatus": "The strict agent authentication method and state.",
   "stdoutText#stdoutText": "The stdout string when present with the correct type, otherwise undefined.",
   "stderrText#stderrText": "The stderr string when present with the correct type, otherwise undefined.",
   "ConfigError#constructor": "A safe configuration error instance.",
@@ -434,7 +429,7 @@ const returnDescriptions = Object.freeze({
 const parameterDescriptions = Object.freeze({
   "Runa#constructor.config": "Optional client configuration resolved under the documented precedence rules.",
   "SessionsManager#create.name": "Session name containing between one and eighty characters.",
-  "SessionsManager#create.options": "Optional agent, background, resource, host, and runtime-port settings.",
+  "SessionsManager#create.options": "Optional agent, resource, host, and runtime-port settings.",
   "SessionsManager#get.id": "Exact canonical lowercase session UUID.",
   "Session#exec.command": "Non-empty command string or non-empty ordered string argument vector.",
   "Session#exec.options": "Optional working directory and integer timeout.",

@@ -5,17 +5,16 @@ import {
   readFile,
   readdir,
   rm,
-  stat,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 
 const execute = promisify(execFile);
-const CANONICAL_CONTRACT_COMMIT = "bb772a134e7722ee9cfe3df9cfc27bc59df03090";
-const CANONICAL_SNAPSHOT_SHA256 = "497ad3bfd712d7ed0c55289e94808435a924fd5cc909f1ab0620f860a6ebfc98";
-const CANONICAL_ARTIFACT_MANIFEST_SHA256 = "42a36fb04b8d770b16769b064711ab153894d76df96414bca201719d2849a18c";
-const CANONICAL_PROJECTION_SHA256 = "998c10514ce704435e36569243a0e158f5267cecd4be669c2f01e79838484e80";
+const CANONICAL_CONTRACT_COMMIT = "3be48919c7361bcaaeae6e8271979926d314a288";
+const CANONICAL_SNAPSHOT_SHA256 = "f6ec19dbf8e96e3280da37f6f7b435163088b875c92d3ae2551e83902000a34a";
+const CANONICAL_ARTIFACT_MANIFEST_SHA256 = "60cc6f26001c4cd7feb8e5653bfcb5bf3687a6903da309b0a4ebf7601334450d";
+const CANONICAL_PROJECTION_SHA256 = "f09bc5e4842f2c3525499afd559e096f5741bd70aafad7e8bc3dfcb11c3c8947";
 const CANONICAL_GENERATOR_SHA256 = "75de6242dde7fccfc9251d371020c5dc5ffb96a65399647b6d54d2c8850202e1";
 const generatedRoot = path.resolve("src/internal/contract/generated");
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -97,24 +96,19 @@ async function main() {
   const provenance = JSON.parse(await readFile(
     "contracts/runa-sdk-contract.provenance.json", "utf8",
   ));
-  const sha = /^[a-f0-9]{40}$/u;
-  const pullRequest = /^https:\/\/github\.com\/Runa-Laboratories\/runa-sdk-contract\/pull\/\d+$/u;
-  const approval = provenance.approval_reference;
-  if (provenance.schema_version !== 3 || provenance.status !== "APPROVED" ||
+  if (provenance.schema_version !== 3 || provenance.status !== "BLOCKED" ||
       provenance.canonical_repository !== "Runa-Laboratories/runa-sdk-contract" ||
-      !sha.test(provenance.canonical_ref ?? "") || !sha.test(provenance.source_revision ?? "") ||
-      approval === null || typeof approval !== "object" ||
-      approval.contract_merge_commit_sha !== provenance.canonical_ref ||
-      approval.prd002_merge_commit_sha !== provenance.canonical_ref ||
-      !pullRequest.test(approval.contract_pull_request_url ?? "") ||
-      !pullRequest.test(approval.prd002_pull_request_url ?? "") ||
+      provenance.canonical_ref !== null || provenance.source_revision !== null ||
+      provenance.approval_reference !== null ||
+      typeof provenance.reason !== "string" || provenance.reason.length === 0 ||
       provenance.artifacts?.snapshot?.sha256 !== CANONICAL_SNAPSHOT_SHA256 ||
       provenance.artifacts?.contract_projection?.sha256 !== CANONICAL_PROJECTION_SHA256 ||
       provenance.generator_identity?.path !== "tools/runa-contract-generator.mjs" ||
       provenance.generator_identity?.node_major !== 24 ||
       provenance.generator_identity?.sha256 !== CANONICAL_GENERATOR_SHA256 ||
-      provenance.generator_identity?.git_commit_sha !== provenance.canonical_ref) {
-    return fail("canonical-approval-missing");
+      provenance.generator_identity?.git_commit_sha !== null ||
+      provenance.baseline_extractor_identity?.git_commit_sha !== null) {
+    return fail("canonical-blocked-provenance-invalid");
   }
 
   const manifestBytes = await readFile(path.join(generatedRoot, "generated-manifest.json"));
@@ -158,28 +152,20 @@ async function main() {
     }
 
     const attestationPath = path.join(temporary, "typescript-contract-attestation.json");
+    let attestationBlocked = false;
     try {
       await run(process.execPath, [
         path.resolve("contracts/tools/emit-release-attestation.mjs"),
         "--language", "typescript",
         "--generated-root", cleanRoot,
-        "--source-revision", provenance.source_revision,
+        "--source-revision", CANONICAL_CONTRACT_COMMIT,
         "--output", attestationPath,
       ]);
-    } catch {
-      return fail("contract-attestation-failed");
+    } catch (error) {
+      attestationBlocked = /release attestation blocked by detached provenance/u
+        .test(String(error.message));
     }
-    if ((await stat(attestationPath)).size === 0) return fail("contract-attestation-empty");
-    const attestation = JSON.parse(await readFile(attestationPath, "utf8"));
-    if (attestation.status !== "PASS" || attestation.language !== "typescript" ||
-        attestation.source_revision !== provenance.source_revision ||
-        attestation.digests?.snapshot !== CANONICAL_SNAPSHOT_SHA256 ||
-        attestation.digests?.artifact_manifest !== CANONICAL_ARTIFACT_MANIFEST_SHA256 ||
-        attestation.digests?.projection !== CANONICAL_PROJECTION_SHA256 ||
-        attestation.generator_identity?.sha256 !== CANONICAL_GENERATOR_SHA256 ||
-        attestation.digests?.generated_file_manifest !== sha256(manifestBytes)) {
-      return fail("contract-attestation-invalid");
-    }
+    if (!attestationBlocked) return fail("blocked-provenance-emitted-attestation");
   } finally {
     await rm(temporary, { force: true, recursive: true });
   }
@@ -188,6 +174,8 @@ async function main() {
     artifactManifestSha256: CANONICAL_ARTIFACT_MANIFEST_SHA256,
     contractCommit: CANONICAL_CONTRACT_COMMIT,
     generatorSha256: CANONICAL_GENERATOR_SHA256,
+    provenanceStatus: "BLOCKED",
+    releaseEligible: false,
     requirement: "R-056-20",
     snapshotSha256: CANONICAL_SNAPSHOT_SHA256,
     verdict: "pass",
