@@ -9,8 +9,9 @@ const CAPABILITIES_GET = Object.freeze({
   successStatus: 200,
 } as const);
 
-// Handwritten exact projection of infra/contracts/runa-api.openapi.json
-// SHA-256 2fdc0a74c3125ed76295c91c9ea8d1e8b55ac9cbe98ea6a353ac976d02279978.
+// Handwritten exact projection of infra/contracts/runa-api.openapi.json 1.4.0.
+// Canonical artifact SHA-256 7206b5413e2007651b26cda11770cd028b20a3b533a2228465f46f3ed0fc662d;
+// SDK projection SHA-256 065c1588db506ffee69cda9ae5fa5bd5398bef9305e4de18c49a1a0e19abf6c4.
 const AGENT_SESSION_OPERATIONS = Object.freeze({
   "agentSessions.list": Object.freeze({
     hasRequestBody: false,
@@ -52,10 +53,18 @@ const AGENT_SESSION_OPERATIONS = Object.freeze({
     pathTemplate: "/v1/agent-sessions/:id/terminate",
     successStatus: 200,
   }),
+  "agentSessions.createTerminalConnection": Object.freeze({
+    hasRequestBody: true,
+    method: "POST",
+    operationKey: "agentSessions.createTerminalConnection",
+    pathParameters: ["id"],
+    pathTemplate: "/v1/agent-sessions/:id/terminal-connections",
+    successStatus: 201,
+  }),
 } as const);
 
-// The generated root remains bound to its approved PRD-002 snapshot. This
-// additive descriptor is bound to infra OpenAPI contract 1.2.0.
+// The generated root remains bound to its approved PRD-002 snapshot. These
+// additive descriptors are bound to the separately digested Infra projection.
 const CANONICAL_OPERATIONS = Object.freeze({
   "capabilities.get": CAPABILITIES_GET,
   ...AGENT_SESSION_OPERATIONS,
@@ -70,6 +79,7 @@ type ResponseKind =
   | "agent-authentication-status"
   | "agent-session"
   | "agent-session-page"
+  | "terminal-connection-grant"
   | "capability-snapshot"
   | "exec"
   | "me"
@@ -77,10 +87,22 @@ type ResponseKind =
   | "records"
   | "session"
   | "sessions";
+type ErrorKind = "legacy" | "problem";
 
 export type OperationDescriptor = CanonicalOperationDescriptor & {
   readonly responseKind: ResponseKind;
+  readonly errorKind: ErrorKind;
 };
+
+const PROBLEM_OPERATIONS = new Set<OperationKey>([
+  "capabilities.get",
+  "agentSessions.list",
+  "agentSessions.create",
+  "agentSessions.get",
+  "agentSessions.rename",
+  "agentSessions.terminate",
+  "agentSessions.createTerminalConnection",
+]);
 
 // The canonical contract owns transport metadata. This private bridge only
 // selects the existing handwritten decoder for each canonical operation.
@@ -91,6 +113,7 @@ const RESPONSE_KINDS = Object.freeze({
   "agentSessions.list": "agent-session-page",
   "agentSessions.rename": "agent-session",
   "agentSessions.terminate": "agent-session",
+  "agentSessions.createTerminalConnection": "terminal-connection-grant",
   "me.get": "me",
   "records.list": "records",
   "sessions.agentAuth": "agent-authentication-status",
@@ -113,6 +136,9 @@ const OPERATIONS = Object.freeze(Object.fromEntries(
     Object.freeze({
       ...descriptor,
       responseKind: RESPONSE_KINDS[operationKey as OperationKey],
+      errorKind: PROBLEM_OPERATIONS.has(operationKey as OperationKey)
+        ? "problem"
+        : "legacy",
     }),
   ]),
 )) as Readonly<Record<OperationKey, OperationDescriptor>>;

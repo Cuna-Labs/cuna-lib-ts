@@ -27,7 +27,8 @@ const decodeExports = [...sources["src/domain.ts"].matchAll(
 assert.deepEqual(decodeExports, [
   "decodeAcknowledgement", "decodeAgentAuthenticationStatus", "decodeAgentSession",
   "decodeAgentSessionPage", "decodeCapabilitySnapshot", "decodeExec", "decodeMe", "decodeOpen",
-  "decodeRecords", "decodeSession", "decodeSessions",
+  "decodeProblem", "decodeRecords", "decodeSession", "decodeSessions",
+  "decodeTerminalConnectionGrant",
 ]);
 assert.equal(occurrences(/export function decode[A-Za-z]+\(/g,
   files.filter((file) => file !== "src/domain.ts")), 0);

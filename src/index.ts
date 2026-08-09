@@ -18,7 +18,15 @@ export type {
   AgentSessionProcessState,
   AgentSessionRequestState,
   AgentSessionsManager,
+  TerminalConnectionCapability,
+  TerminalConnectionCapabilityAvailability,
+  TerminalConnectionCapabilityName,
+  TerminalConnectionCreateOptions,
+  TerminalConnectionGrant,
+  TerminalConnectionProtocol,
 } from "./agent-sessions.js";
+
+export type { Problem, ProblemAction } from "./errors.js";
 
 export type { CapabilitiesManager, RecordsManager, SessionsManager } from "./client.js";
 export type {

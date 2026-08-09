@@ -8,7 +8,7 @@ export type OpaqueWireValue = unknown;
 export type CapabilityScope = "account" | "machine" | "agent_session";
 
 /** Scope represented by a successful capability snapshot. */
-export type CapabilitySubjectScope = Exclude<CapabilityScope, "agent_session">;
+export type CapabilitySubjectScope = CapabilityScope;
 
 /** Current availability reported for a capability. */
 export type CapabilityAvailability =
@@ -312,6 +312,7 @@ export interface Me {
 
 export type OperationKey =
   | "agentSessions.create"
+  | "agentSessions.createTerminalConnection"
   | "agentSessions.get"
   | "agentSessions.list"
   | "agentSessions.rename"

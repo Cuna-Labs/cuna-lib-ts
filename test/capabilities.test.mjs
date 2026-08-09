@@ -68,34 +68,32 @@ test("machine discovery binds the resource query to the returned subject", async
   await runa.close();
 });
 
-test("agent-session discovery remains an explicit unsupported API outcome", async () => {
+test("agent-session discovery binds the resource query to the returned subject", async () => {
   let target;
+  const value = capabilitySnapshotFixture({
+    subject_scope: "agent_session",
+    subject_id: SESSION_ID,
+  });
   const runa = new Runa({
     apiKey: API_KEY,
     fetch: async (url) => {
       target = new URL(url);
-      return jsonResponse({
-        type: "https://api.runacode.io/problems/capability_scope_not_available",
-        title: "Capability scope not available",
-        status: 501,
-        code: "capability_scope_not_available",
-        request_id: SESSION_ID,
-        retryable: false,
-      }, 501);
+      return capabilityResponse(value);
     },
   });
-  await assert.rejects(
-    runa.capabilities.get("agent_session", SESSION_ID),
-    (error) => error instanceof ApiError && error.status === 501 && error.code === "api_error",
+  const snapshot = await runa.capabilities.get("agent_session", SESSION_ID);
+  assert.equal(snapshot.subjectScope, "agent_session");
+  assert.equal(snapshot.subjectId, SESSION_ID);
+  assert.equal(
+    target.href,
+    `https://api.runacode.io/v1/capabilities?scope=agent_session&resource_id=${SESSION_ID}`,
   );
-  assert.match(target.search, /scope=agent_session/);
   await runa.close();
 });
 
 test("capability requests and decoders fail closed without provider leakage", async () => {
   let calls = 0;
   const invalid = [
-    capabilitySnapshotFixture({ subject_scope: "agent_session" }),
     capabilitySnapshotFixture({ capabilities: [{
       ...capabilitySnapshotFixture().capabilities[0], availability: "future",
     }] }),
@@ -111,7 +109,7 @@ test("capability requests and decoders fail closed without provider leakage", as
       return capabilityResponse(invalid.shift());
     },
   });
-  for (let index = 0; index < 4; index += 1) {
+  for (let index = 0; index < 3; index += 1) {
     await assert.rejects(
       runa.capabilities.get("account"),
       (error) => error instanceof ApiError && error.code === "malformed_response",
@@ -121,7 +119,7 @@ test("capability requests and decoders fail closed without provider leakage", as
   await assert.rejects(runa.capabilities.get("machine"), TypeError);
   await assert.rejects(runa.capabilities.get("machine", SESSION_ID.toUpperCase()), TypeError);
   await assert.rejects(runa.capabilities.get("future"), TypeError);
-  assert.equal(calls, 4);
+  assert.equal(calls, 3);
   await runa.close();
 });
 

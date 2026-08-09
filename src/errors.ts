@@ -16,6 +16,27 @@ export abstract class RunaError extends Error {
     | "command_error";
 }
 
+export type ProblemAction =
+  | "retry"
+  | "sign_in"
+  | "open_web"
+  | "contact_support"
+  | "none";
+
+/** Closed, safe Problem metadata returned by current Runa API operations. */
+export interface Problem {
+  readonly type: string;
+  readonly title: string;
+  readonly status: number;
+  readonly code: string;
+  readonly requestId: string;
+  readonly retryable: boolean;
+  readonly detail?: string;
+  readonly action?: ProblemAction;
+}
+
+const API_PROBLEMS = new WeakMap<ApiError, Problem>();
+
 /**
  * Safe public error raised when selected client configuration is invalid.
  * @runa-contract configerror-summary PRD-024#R-024-01
@@ -56,6 +77,10 @@ export class ApiError extends RunaError {
   override readonly message:
     | "The Runa API request failed."
     | "The Runa API returned an invalid response.";
+  /** Validated Problem metadata when the operation uses the Problem error model. */
+  get problem(): Problem | undefined {
+    return API_PROBLEMS.get(this);
+  }
 
   /**
    * Constructs a safe API error.
@@ -82,6 +107,13 @@ export class ApiError extends RunaError {
     this.message = message;
     this.stack = `${this.name}: ${this.message}`;
   }
+}
+
+/** @internal Constructs an API error with already validated Problem metadata. */
+export function apiErrorWithProblem(status: number, problem: Problem): ApiError {
+  const error = new ApiError(status);
+  API_PROBLEMS.set(error, problem);
+  return error;
 }
 
 /**

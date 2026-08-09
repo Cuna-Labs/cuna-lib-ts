@@ -346,7 +346,7 @@ class CapabilitiesManagerImplementation implements CapabilitiesManager {
       }),
     })) as CapabilitySnapshot;
     if (snapshot.subjectScope !== scope ||
-        (scope === "machine" && snapshot.subjectId !== resourceId)) {
+        (scope !== "account" && snapshot.subjectId !== resourceId)) {
       throw new ApiError(200, "malformed_response");
     }
     return snapshot;

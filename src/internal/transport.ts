@@ -7,6 +7,8 @@ import {
   decodeAgentAuthenticationStatus,
   decodeAgentSession,
   decodeAgentSessionPage,
+  decodeProblem,
+  decodeTerminalConnectionGrant,
   decodeCapabilitySnapshot,
   decodeExec,
   decodeMe,
@@ -16,7 +18,7 @@ import {
   decodeSessions,
   DecodeFailure,
 } from "../domain.js";
-import { ApiError, ConfigError } from "../errors.js";
+import { ApiError, ConfigError, apiErrorWithProblem } from "../errors.js";
 import type {
   Acknowledgement,
   AgentAuthenticationStatus,
@@ -28,6 +30,7 @@ import type {
   SessionSnapshot,
 } from "../types.js";
 import type { AgentSession, AgentSessionPage } from "../agent-sessions.js";
+import type { TerminalConnectionGrant } from "../agent-sessions.js";
 import {
   operationDescriptor,
   type OperationKey,
@@ -62,6 +65,7 @@ export type DispatchResult =
   | AgentAuthenticationStatus
   | AgentSession
   | AgentSessionPage
+  | TerminalConnectionGrant
   | CapabilitySnapshot
   | ExecResult
   | Me
@@ -136,7 +140,8 @@ function prepare(
   } else if (input.body !== undefined) {
     throw new TypeError("The Runa request body is invalid.");
   }
-  const needsIdempotencyKey = operationKey === "agentSessions.create";
+  const needsIdempotencyKey = operationKey === "agentSessions.create" ||
+    operationKey === "agentSessions.createTerminalConnection";
   if (needsIdempotencyKey !== (input.idempotencyKey !== undefined)) {
     throw new TypeError("The Runa idempotency key is invalid.");
   }
@@ -247,10 +252,14 @@ async function disposition(
     throw new ApiError(response.status, "malformed_response");
   }
   if (response.status !== descriptor.successStatus) {
-    cancelResponseBody(response);
     if (response.status >= 200 && response.status < 300) {
+      cancelResponseBody(response);
       throw new ApiError(response.status, "malformed_response");
     }
+    if (descriptor.errorKind === "problem") {
+      throw await problemFailure(response, signal);
+    }
+    cancelResponseBody(response);
     throw new ApiError(response.status, "api_error");
   }
   if (signal.aborted) throw cancellationFailure();
@@ -282,6 +291,8 @@ async function disposition(
         return decodeAgentSession(value);
       case "agent-session-page":
         return decodeAgentSessionPage(value);
+      case "terminal-connection-grant":
+        return decodeTerminalConnectionGrant(value);
       case "capability-snapshot": {
         const snapshot = decodeCapabilitySnapshot(value);
         const etag = response.headers.get("etag");
@@ -308,6 +319,31 @@ async function disposition(
       throw new ApiError(response.status, "malformed_response");
     }
     throw error;
+  }
+}
+
+async function problemFailure(
+  response: Response,
+  signal: AbortSignal,
+): Promise<ApiError> {
+  const contentType = response.headers.get("content-type");
+  if (contentType?.split(";", 1)[0]?.trim().toLowerCase() !== "application/json") {
+    cancelResponseBody(response);
+    return new ApiError(response.status);
+  }
+  try {
+    const bytes = await readLimited(response, signal);
+    if (signal.aborted) throw cancellationFailure();
+    const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    const value = sanitizeWire(JSON.parse(text));
+    return apiErrorWithProblem(
+      response.status,
+      decodeProblem(value, response.status),
+    );
+  } catch (error) {
+    if (signal.aborted) throw cancellationFailure();
+    if (error instanceof DOMException && error.name === "AbortError") throw error;
+    return new ApiError(response.status);
   }
 }
 

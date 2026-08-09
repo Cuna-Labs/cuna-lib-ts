@@ -12,7 +12,12 @@ import type {
   AgentSessionPage,
   AgentSessionProcessState,
   AgentSessionRequestState,
+  TerminalConnectionCapability,
+  TerminalConnectionCapabilityAvailability,
+  TerminalConnectionCapabilityName,
+  TerminalConnectionGrant,
 } from "./agent-sessions.js";
+import type { Problem, ProblemAction } from "./errors.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const SLUG = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
@@ -55,6 +60,19 @@ const AGENT_SESSION_PROCESS_STATES = new Set<AgentSessionProcessState>([
   "unknown", "starting", "ready", "running", "exited", "failed", "terminating", "terminated",
 ]);
 const AGENT_SESSION_CWD = /^\/workspace(?:\/.*)?$/u;
+const TERMINAL_CONNECTION_URL = /^wss:\/\/api\.runacode\.io\/v1\/terminal-connections\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/stream$/u;
+const TERMINAL_CONNECTION_TOKEN = /^runa_tc_[A-Za-z0-9_-]{43}$/u;
+const TERMINAL_CAPABILITY_NAMES = new Set<TerminalConnectionCapabilityName>([
+  "acknowledgement", "heartbeat", "live_resize", "resume", "signals",
+]);
+const TERMINAL_CAPABILITY_AVAILABILITIES = new Set<TerminalConnectionCapabilityAvailability>([
+  "supported", "unsupported", "unknown",
+]);
+const PROBLEM_CODE = /^[a-z][a-z0-9_]{2,63}$/u;
+const PROBLEM_TYPE = /^https:\/\/api\.runacode\.io\/problems\/[a-z][a-z0-9_]{2,63}$/u;
+const PROBLEM_ACTIONS = new Set<ProblemAction>([
+  "retry", "sign_in", "open_web", "contact_support", "none",
+]);
 
 export class DecodeFailure {
   readonly kind = "decode_failure";
@@ -202,6 +220,74 @@ export function decodeAgentSessionPage(value: unknown): AgentSessionPage {
   return Object.freeze({
     items: Object.freeze(source.items.map(decodeAgentSession)),
     ...(nextCursor === undefined ? {} : { nextCursor }),
+  });
+}
+
+export function decodeTerminalConnectionGrant(value: unknown): TerminalConnectionGrant {
+  const source = object(value);
+  exact(source, [
+    "terminal_session_id", "resume_handle", "connect_url", "connect_token",
+    "protocol", "capabilities", "expires_at",
+  ]);
+  const connectUrl = string(source.connect_url);
+  const connectToken = string(source.connect_token);
+  if (!TERMINAL_CONNECTION_URL.test(connectUrl) ||
+      !TERMINAL_CONNECTION_TOKEN.test(connectToken) ||
+      connectUrl.includes(connectToken) || source.protocol !== "runa.terminal.v1" ||
+      !Array.isArray(source.capabilities) || source.capabilities.length !== 5) malformed();
+  const capabilities = source.capabilities.map((item): TerminalConnectionCapability => {
+    const capability = object(item);
+    exact(capability, ["name", "availability"]);
+    return Object.freeze({
+      name: enumValue(capability.name, TERMINAL_CAPABILITY_NAMES),
+      availability: enumValue(
+        capability.availability,
+        TERMINAL_CAPABILITY_AVAILABILITIES,
+      ),
+    });
+  });
+  const names = capabilities.map((capability) => capability.name);
+  if (new Set(names).size !== TERMINAL_CAPABILITY_NAMES.size ||
+      [...TERMINAL_CAPABILITY_NAMES].some((name) => !names.includes(name))) malformed();
+  return Object.freeze({
+    terminalSessionId: uuid(source.terminal_session_id),
+    resumeHandle: uuid(source.resume_handle),
+    connectUrl,
+    connectToken,
+    protocol: "runa.terminal.v1",
+    capabilities: Object.freeze(capabilities),
+    expiresAt: dateTime(source.expires_at),
+  });
+}
+
+export function decodeProblem(value: unknown, expectedStatus: number): Problem {
+  const source = object(value);
+  exact(
+    source,
+    ["type", "title", "status", "code", "request_id", "retryable"],
+    ["detail", "action"],
+  );
+  const type = string(source.type);
+  const title = boundedString(source.title, 1, 120);
+  const status = safeInteger(source.status, 400);
+  const code = string(source.code);
+  if (status > 599 || status !== expectedStatus || !PROBLEM_CODE.test(code) ||
+      !PROBLEM_TYPE.test(type) || typeof source.retryable !== "boolean") malformed();
+  const detail = Object.hasOwn(source, "detail")
+    ? boundedString(source.detail, 0, 500)
+    : undefined;
+  const action = Object.hasOwn(source, "action")
+    ? enumValue(source.action, PROBLEM_ACTIONS)
+    : undefined;
+  return Object.freeze({
+    type,
+    title,
+    status,
+    code,
+    requestId: uuid(source.request_id),
+    retryable: source.retryable,
+    ...(detail === undefined ? {} : { detail }),
+    ...(action === undefined ? {} : { action }),
   });
 }
 export function decodeExec(value: unknown): ExecResult {

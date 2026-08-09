@@ -63,6 +63,45 @@ export interface AgentSessionCreateOptions {
   readonly credentialBindingId?: string;
 }
 
+export type TerminalConnectionProtocol = "runa.terminal.v1";
+export type TerminalConnectionCapabilityName =
+  | "acknowledgement"
+  | "heartbeat"
+  | "live_resize"
+  | "resume"
+  | "signals";
+export type TerminalConnectionCapabilityAvailability =
+  | "supported"
+  | "unsupported"
+  | "unknown";
+
+export interface TerminalConnectionCapability {
+  readonly name: TerminalConnectionCapabilityName;
+  readonly availability: TerminalConnectionCapabilityAvailability;
+}
+
+/** Metadata required to issue a short-lived terminal connection grant. */
+export interface TerminalConnectionCreateOptions {
+  readonly idempotencyKey: string;
+  readonly clientInstanceId: string;
+  readonly protocol?: TerminalConnectionProtocol;
+  readonly resumeHandle?: string;
+}
+
+/**
+ * One-use connection metadata. The SDK never consumes this grant or opens its
+ * WebSocket URL; terminal runtimes must own that separate boundary.
+ */
+export interface TerminalConnectionGrant {
+  readonly terminalSessionId: string;
+  readonly resumeHandle: string;
+  readonly connectUrl: string;
+  readonly connectToken: string;
+  readonly protocol: TerminalConnectionProtocol;
+  readonly capabilities: readonly TerminalConnectionCapability[];
+  readonly expiresAt: string;
+}
+
 /** Typed AgentSession operations. This manager does not open a terminal or perform provider login. */
 export interface AgentSessionsManager {
   list(machineId: string, options?: AgentSessionListOptions): Promise<AgentSessionPage>;
@@ -70,6 +109,10 @@ export interface AgentSessionsManager {
   get(agentSessionId: string): Promise<AgentSession>;
   rename(agentSessionId: string, name: string): Promise<AgentSession>;
   terminate(agentSessionId: string): Promise<AgentSession>;
+  createTerminalConnection(
+    agentSessionId: string,
+    options: TerminalConnectionCreateOptions,
+  ): Promise<TerminalConnectionGrant>;
 }
 
 const AGENTS = new Set<SessionAgent>(["claude-code", "codex", "openclaw"]);
@@ -88,6 +131,14 @@ const CREATE_FIELDS = new Set([
   "credentialBindingId",
 ]);
 const LIST_FIELDS = new Set(["limit", "cursor"]);
+const TERMINAL_CONNECTION_FIELDS = new Set([
+  "idempotencyKey",
+  "clientInstanceId",
+  "protocol",
+  "resumeHandle",
+]);
+const CLIENT_INSTANCE_ID = /^[A-Za-z0-9._:-]{1,256}$/u;
+const TERMINAL_PROTOCOL: TerminalConnectionProtocol = "runa.terminal.v1";
 
 function length(value: string): number {
   return [...value].length;
@@ -203,6 +254,32 @@ class AgentSessionsManagerImplementation implements AgentSessionsManager {
 
   async terminate(agentSessionId: string): Promise<AgentSession> {
     return await this.#one("agentSessions.terminate", agentSessionId);
+  }
+
+  async createTerminalConnection(
+    agentSessionId: string,
+    options: TerminalConnectionCreateOptions,
+  ): Promise<TerminalConnectionGrant> {
+    assertUuid(agentSessionId);
+    if (options === null || typeof options !== "object" ||
+        Object.keys(options).some((key) => !TERMINAL_CONNECTION_FIELDS.has(key)) ||
+        typeof options.idempotencyKey !== "string" || !IDEMPOTENCY_KEY.test(options.idempotencyKey) ||
+        typeof options.clientInstanceId !== "string" || !CLIENT_INSTANCE_ID.test(options.clientInstanceId) ||
+        (options.protocol !== undefined && options.protocol !== TERMINAL_PROTOCOL)) {
+      throw new TypeError("Invalid terminal connection options.");
+    }
+    if (options.resumeHandle !== undefined) assertUuid(options.resumeHandle);
+    return (await this.#owner.invoke("agentSessions.createTerminalConnection", {
+      id: agentSessionId,
+      idempotencyKey: options.idempotencyKey,
+      body: Object.freeze({
+        protocol: TERMINAL_PROTOCOL,
+        client_instance_id: options.clientInstanceId,
+        ...(options.resumeHandle === undefined
+          ? {}
+          : { resume_handle: options.resumeHandle }),
+      }),
+    })) as TerminalConnectionGrant;
   }
 
   async #one(
