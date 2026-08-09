@@ -122,6 +122,15 @@
         ]
       },
       {
+        "name": "problem",
+        "kind": "accessor",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "problem: Problem | undefined"
+        ]
+      },
+      {
         "name": "constructor",
         "kind": "constructor",
         "optional": false,

@@ -376,6 +376,7 @@ const memberDescriptions = Object.freeze({
   open: "Acquires and returns a validated session handoff without using it automatically.",
   outboundPolicy: "Optional explicit outbound network policy copied into the create request.",
   pause: "Pauses the owning session and refreshes only that handle after success.",
+  problem: "Validated closed Problem metadata when the operation returned a conforming Problem body.",
   records: "Stable records manager owned by this client.",
   refresh: "Refreshes this handle from the canonical session item read.",
   resume: "Resumes the owning session and refreshes only that handle after success.",

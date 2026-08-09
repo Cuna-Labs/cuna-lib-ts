@@ -2,7 +2,7 @@
   "schema_version": 2,
   "status": "PASS",
   "method": "scripts/verify-duplicate-abstractions.mjs",
-  "audited_source_sha256": "489e71eccd28783870108be4ad708e091519db3fced1621fdaee53aad7d622bc",
+  "audited_source_sha256": "5dfaf83a6ee7e26d15e6eef75732fc5598274f7fdf8ae9063e4db97a125a4cbb",
   "audited_files": [
     "src/agent-sessions.ts",
     "src/client.ts",
@@ -106,9 +106,11 @@
           "decodeExec",
           "decodeMe",
           "decodeOpen",
+          "decodeProblem",
           "decodeRecords",
           "decodeSession",
-          "decodeSessions"
+          "decodeSessions",
+          "decodeTerminalConnectionGrant"
         ],
         "out_of_owner_definitions": 0
       },
@@ -138,7 +140,7 @@
         "src/session.ts"
       ],
       "observed": {
-        "object_has_own_calls": 12,
+        "object_has_own_calls": 14,
         "local_own_helpers": 2
       },
       "rationale": "Tiny private predicates stay at separate decode and caller-input trust boundaries; no public or cross-layer abstraction is created."
