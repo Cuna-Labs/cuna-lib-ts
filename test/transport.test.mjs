@@ -6,7 +6,6 @@ import {
   API_KEY,
   RECORD_ID,
   SESSION_ID,
-  agentAuthenticationFixture,
   jsonResponse,
   meFixture,
   openUrl,
@@ -40,15 +39,12 @@ function operationFetch(captures) {
     if (path.endsWith("/checkpoint") || init.method === "DELETE") {
       return jsonResponse({ ok: true });
     }
-    if (path.endsWith("/agent-auth")) {
-      return jsonResponse(agentAuthenticationFixture());
-    }
     if (path.endsWith("/open")) return jsonResponse({ url: openUrl() });
     return jsonResponse(sessionFixture());
   };
 }
 
-test("PRD-021/025/028-037 dispatch the 14 pinned baseline operations", async () => {
+test("PRD-021/025/028-037 dispatch the canonical legacy session operations", async () => {
   const captures = [];
   const runa = new Runa({
     apiKey: API_KEY,
@@ -77,14 +73,9 @@ test("PRD-021/025/028-037 dispatch the 14 pinned baseline operations", async () 
   assert.equal(exec.exitCode, 7);
   await session.checkpoint("checkpoint name");
   await session.open();
-  assert.deepEqual(await session.authenticationStatus(), {
-    agent: "codex",
-    method: "interactive_login",
-    state: "authenticated",
-  });
   await session.delete();
 
-  assert.equal(captures.length, 14);
+  assert.equal(captures.length, 13);
   assert.deepEqual(
     captures.map(({ target, init }) => `${init.method} ${target.pathname}`),
     [
@@ -100,7 +91,6 @@ test("PRD-021/025/028-037 dispatch the 14 pinned baseline operations", async () 
       `POST /v1/sessions/${SESSION_ID}/exec`,
       `POST /v1/sessions/${SESSION_ID}/checkpoint`,
       `POST /v1/sessions/${SESSION_ID}/open`,
-      `GET /v1/sessions/${SESSION_ID}/agent-auth`,
       `DELETE /v1/sessions/${SESSION_ID}`,
     ],
   );
@@ -120,7 +110,6 @@ test("PRD-021/025/028-037 dispatch the 14 pinned baseline operations", async () 
   assert.deepEqual(createBody, {
     name: "worker",
     agent: "codex",
-    background: true,
     vcpus: 2,
     memory_mib: 4096,
     allowed_hosts: ["example.invalid"],
@@ -140,75 +129,25 @@ test("PRD-021/025/028-037 dispatch the 14 pinned baseline operations", async () 
   await runa.close();
 });
 
-test("interactive creates default to background and preserve explicit control", async () => {
+test("SDK create never serializes console-only background", async () => {
   const bodies = [];
   const runa = new Runa({
     apiKey: API_KEY,
     fetch: async (_url, init) => {
-      if (init.method === "GET") {
-        return jsonResponse(sessionFixture({ status: "running" }));
-      }
       bodies.push(JSON.parse(init.body));
-      return jsonResponse(sessionFixture({ status: "creating" }), 201);
+      return jsonResponse(sessionFixture({ status: "running" }), 201);
     },
   });
 
-  const codex = await runa.sessions.create("codex", { agent: "codex" });
-  const claude = await runa.sessions.create("claude", { agent: "claude-code" });
-  await runa.sessions.create("legacy", { agent: "codex", background: false });
+  await runa.sessions.create("codex", { agent: "codex" });
+  await runa.sessions.create("claude", { agent: "claude-code" });
   await runa.sessions.create("openclaw", { agent: "openclaw" });
 
-  assert.equal(codex.snapshot.status, "creating");
-  assert.equal(claude.snapshot.status, "creating");
   assert.deepEqual(bodies, [
-    { name: "codex", agent: "codex", background: true },
-    { name: "claude", agent: "claude-code", background: true },
-    { name: "legacy", agent: "codex", background: false },
+    { name: "codex", agent: "codex" },
+    { name: "claude", agent: "claude-code" },
     { name: "openclaw", agent: "openclaw" },
   ]);
-  assert.equal(await codex.refresh(), codex);
-  assert.equal(codex.snapshot.status, "running");
-  await runa.close();
-});
-
-test("agent authentication status is closed, strict, and secret-free", async () => {
-  const invalid = [
-    agentAuthenticationFixture({ method: "oauth" }),
-    agentAuthenticationFixture({ state: "unknown" }),
-    agentAuthenticationFixture({ method: "api_key", state: "authenticated" }),
-    agentAuthenticationFixture({ method: "interactive_login", state: "configured" }),
-    agentAuthenticationFixture({ method: "none", state: "installing" }),
-    agentAuthenticationFixture({ agent: "other" }),
-    agentAuthenticationFixture({ token: "must-not-be-exposed" }),
-    { method: "none", state: "not_applicable" },
-  ];
-  for (const payload of invalid) {
-    const runa = new Runa({
-      apiKey: API_KEY,
-      fetch: async (url) => new URL(url).pathname.endsWith("/agent-auth")
-        ? jsonResponse(payload)
-        : jsonResponse(sessionFixture()),
-    });
-    const session = await runa.sessions.get(SESSION_ID);
-    await assert.rejects(
-      session.authenticationStatus(),
-      (error) => error instanceof ApiError && error.code === "malformed_response",
-    );
-    await runa.close();
-  }
-
-  const runa = new Runa({
-    apiKey: API_KEY,
-    fetch: async (url) => new URL(url).pathname.endsWith("/agent-auth")
-      ? jsonResponse({ agent: null, method: "none", state: "not_applicable" })
-      : jsonResponse(sessionFixture()),
-  });
-  const session = await runa.sessions.get(SESSION_ID);
-  assert.deepEqual(await session.authenticationStatus(), {
-    agent: null,
-    method: "none",
-    state: "not_applicable",
-  });
   await runa.close();
 });
 
@@ -416,7 +355,7 @@ test("TC-025-07 rejects local invalid values before I/O", async () => {
     ["ok", { outboundPolicy: { mode: "denylist", hosts: ["example.com", "example.com"] } }],
     ["ok", { outboundPolicy: { mode: "denylist", hosts: Array(129).fill("example.invalid") } }],
     ["ok", { runtimePort: 65_536 }],
-    ["ok", { background: "true" }],
+    ["ok", { background: true }],
     ["ok", { unknown: true }],
   ]) {
     await assert.rejects(runa.sessions.create(name, options), TypeError);

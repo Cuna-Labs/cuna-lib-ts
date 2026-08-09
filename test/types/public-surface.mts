@@ -1,6 +1,5 @@
 import { stderrText, stdoutText } from "../../src/index.js";
 import type {
-  AgentAuthenticationStatus,
   AssignedWorkspace,
   CapabilitySnapshot,
   Problem,
@@ -26,9 +25,6 @@ type StdoutHelperContract = Assert<
 >;
 type StderrHelperContract = Assert<
   Equal<ReturnType<typeof stderrText>, string | undefined>
->;
-type AgentAuthenticationStatusIsClosed = Assert<
-  Equal<keyof AgentAuthenticationStatus, "agent" | "method" | "state">
 >;
 type CapabilitySnapshotIsClosed = Assert<
   Equal<
@@ -78,7 +74,6 @@ type TerminalConnectionGrantIsClosed = Assert<
 >;
 
 export type {
-  AgentAuthenticationStatusIsClosed,
   CapabilitySnapshotIsClosed,
   ProblemIsClosed,
   AssignedDiscriminantIsLiteral,

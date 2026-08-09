@@ -5,7 +5,6 @@ import { FetchTransport } from "../dist/internal/transport.js";
 import {
   API_KEY,
   SESSION_ID,
-  agentAuthenticationFixture,
   jsonResponse,
   meFixture,
 } from "./helpers.mjs";
@@ -45,15 +44,7 @@ function deterministicRuntime(randomValues = []) {
   };
 }
 
-test("agent-auth receives a dedicated 30-second attempt deadline", async () => {
-  const authRuntime = deterministicRuntime();
-  const authTransport = new FetchTransport(
-    config(async () => jsonResponse(agentAuthenticationFixture())),
-    authRuntime.runtime,
-  );
-  await authTransport.execute("sessions.agentAuth", { id: SESSION_ID });
-  assert.deepEqual(authRuntime.deadlines, [30_000]);
-
+test("canonical reads receive a 10-second attempt deadline", async () => {
   const regularRuntime = deterministicRuntime();
   const regularTransport = new FetchTransport(
     config(async () => jsonResponse(meFixture())),

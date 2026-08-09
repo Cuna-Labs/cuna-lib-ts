@@ -4,7 +4,6 @@ import { TextDecoder } from "node:util";
 import type { EffectiveConfig } from "../config.js";
 import {
   decodeAcknowledgement,
-  decodeAgentAuthenticationStatus,
   decodeAgentSession,
   decodeAgentSessionPage,
   decodeProblem,
@@ -21,7 +20,6 @@ import {
 import { ApiError, ConfigError, apiErrorWithProblem } from "../errors.js";
 import type {
   Acknowledgement,
-  AgentAuthenticationStatus,
   CapabilitySnapshot,
   ExecResult,
   Me,
@@ -47,7 +45,6 @@ const READS = new Set<OperationKey>([
   "me.get",
   "sessions.list",
   "sessions.get",
-  "sessions.agentAuth",
   "records.list",
 ]);
 
@@ -62,7 +59,6 @@ export interface DispatchInput {
 
 export type DispatchResult =
   | Acknowledgement
-  | AgentAuthenticationStatus
   | AgentSession
   | AgentSessionPage
   | TerminalConnectionGrant
@@ -285,8 +281,6 @@ async function disposition(
     switch (descriptor.responseKind) {
       case "acknowledgement":
         return decodeAcknowledgement(value);
-      case "agent-authentication-status":
-        return decodeAgentAuthenticationStatus(value);
       case "agent-session":
         return decodeAgentSession(value);
       case "agent-session-page":
@@ -348,7 +342,6 @@ async function problemFailure(
 }
 
 function deadlineFor(operationKey: OperationKey, timeoutSecs?: number): number {
-  if (operationKey === "sessions.agentAuth") return 30_000;
   if (READS.has(operationKey)) return 10_000;
   if (operationKey === "sessions.create") return 90_000;
   if (operationKey === "sessions.exec") {
@@ -358,7 +351,6 @@ function deadlineFor(operationKey: OperationKey, timeoutSecs?: number): number {
 }
 
 function totalDeadlineFor(operationKey: OperationKey, timeoutSecs?: number): number {
-  if (operationKey === "sessions.agentAuth") return 90_000;
   if (READS.has(operationKey)) return 30_000;
   return deadlineFor(operationKey, timeoutSecs);
 }

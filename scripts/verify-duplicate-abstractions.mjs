@@ -25,7 +25,7 @@ for (const file of files) digest.update(`${file}\0${sources[file]}\0`);
 const decodeExports = [...sources["src/domain.ts"].matchAll(
   /export function (decode[A-Za-z]+)\(/g)].map((match) => match[1]).sort();
 assert.deepEqual(decodeExports, [
-  "decodeAcknowledgement", "decodeAgentAuthenticationStatus", "decodeAgentSession",
+  "decodeAcknowledgement", "decodeAgentSession",
   "decodeAgentSessionPage", "decodeCapabilitySnapshot", "decodeExec", "decodeMe", "decodeOpen",
   "decodeProblem", "decodeRecords", "decodeSession", "decodeSessions",
   "decodeTerminalConnectionGrant",
