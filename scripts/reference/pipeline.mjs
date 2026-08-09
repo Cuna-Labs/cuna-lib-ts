@@ -341,6 +341,7 @@ const memberDescriptions = Object.freeze({
   authenticationStatus: "Reads the secret-free authentication status of this session's agent.",
   background: "Whether creation may return while session provisioning is still in progress.",
   baseUrl: "Optional explicit canonical Runa API origin.",
+  capabilities: "Returns the stable capability discovery manager owned by this client.",
   checkpoint: "Creates one named checkpoint through the owning session handle.",
   close: "Closes this client after already admitted work completes.",
   code: "Stable normalized public error code.",

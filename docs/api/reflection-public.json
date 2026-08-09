@@ -634,6 +634,15 @@
         ]
       },
       {
+        "name": "capabilities",
+        "kind": "accessor",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "capabilities: CapabilitiesManager"
+        ]
+      },
+      {
         "name": "records",
         "kind": "accessor",
         "optional": false,
