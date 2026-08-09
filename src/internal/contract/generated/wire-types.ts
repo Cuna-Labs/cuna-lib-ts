@@ -1,84 +1,291 @@
-// @generated {"contract_id":"runa-sdk-contract","generator_path":"tools/runa-contract-generator.mjs","generator_sha256":"75de6242dde7fccfc9251d371020c5dc5ffb96a65399647b6d54d2c8850202e1","generator_version":"0.2.0","snapshot_path":"runa-sdk-contract.snapshot.json","snapshot_sha256":"497ad3bfd712d7ed0c55289e94808435a924fd5cc909f1ab0620f860a6ebfc98","snapshot_version":"1.3.0"}
+// @generated {"contract_id":"runa-sdk-contract","generator_path":"tools/runa-contract-generator.mjs","generator_sha256":"75de6242dde7fccfc9251d371020c5dc5ffb96a65399647b6d54d2c8850202e1","generator_version":"0.2.0","snapshot_path":"runa-sdk-contract.snapshot.json","snapshot_sha256":"f6ec19dbf8e96e3280da37f6f7b435163088b875c92d3ae2551e83902000a34a","snapshot_version":"1.4.0"}
 export type GeneratedWireValue = null | boolean | number | string | GeneratedWireValue[] | { readonly [key: string]: GeneratedWireValue };
 export const GENERATED_WIRE_SCHEMAS = {
-  "AgentAuth": {
+  "AgentSession": {
     "additionalProperties": false,
-    "oneOf": [
-      {
-        "properties": {
-          "method": {
-            "const": "none"
-          },
-          "state": {
-            "const": "not_applicable"
-          }
-        }
-      },
-      {
-        "properties": {
-          "method": {
-            "const": "interactive_login"
-          },
-          "state": {
-            "enum": [
-              "installing",
-              "login_required",
-              "authenticated",
-              "unavailable"
-            ]
-          }
-        }
-      },
-      {
-        "properties": {
-          "method": {
-            "const": "api_key"
-          },
-          "state": {
-            "enum": [
-              "installing",
-              "configured",
-              "unavailable"
-            ]
-          }
-        }
-      }
-    ],
     "properties": {
       "agent": {
         "enum": [
           "claude-code",
           "codex",
-          "openclaw",
-          null
-        ],
-        "type": [
-          "string",
-          "null"
+          "openclaw"
         ]
       },
-      "method": {
+      "auth_mode": {
         "enum": [
-          "none",
           "interactive_login",
-          "api_key"
+          "credential_binding"
         ]
       },
-      "state": {
+      "created_at": {
+        "format": "date-time",
+        "type": "string"
+      },
+      "cwd": {
+        "maxLength": 1024,
+        "minLength": 10,
+        "pattern": "^/workspace(?:/.*)?$",
+        "type": "string"
+      },
+      "desired_state": {
         "enum": [
-          "not_applicable",
-          "installing",
-          "login_required",
-          "authenticated",
-          "configured",
-          "unavailable"
+          "running",
+          "terminated"
         ]
+      },
+      "id": {
+        "$ref": "#/components/schemas/Uuid"
+      },
+      "machine_id": {
+        "$ref": "#/components/schemas/Uuid"
+      },
+      "name": {
+        "maxLength": 80,
+        "minLength": 1,
+        "type": "string"
+      },
+      "process_epoch": {
+        "$ref": "#/components/schemas/Uuid"
+      },
+      "process_state": {
+        "description": "Observed runtime fact. It is unknown until a current leased supervisor acknowledgement.",
+        "enum": [
+          "unknown",
+          "starting",
+          "ready",
+          "running",
+          "exited",
+          "failed",
+          "terminating",
+          "terminated"
+        ]
+      },
+      "request_state": {
+        "enum": [
+          "launch_pending",
+          "runtime_claimed",
+          "launched",
+          "termination_pending",
+          "terminal",
+          "failed"
+        ]
+      },
+      "row_version": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "runtime_observed_at": {
+        "format": "date-time",
+        "type": "string"
+      },
+      "termination_requested_at": {
+        "format": "date-time",
+        "type": "string"
+      },
+      "updated_at": {
+        "format": "date-time",
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "machine_id",
+      "name",
+      "agent",
+      "cwd",
+      "auth_mode",
+      "desired_state",
+      "request_state",
+      "process_state",
+      "row_version",
+      "created_at",
+      "updated_at"
+    ],
+    "type": "object"
+  },
+  "AgentSessionCreate": {
+    "additionalProperties": false,
+    "properties": {
+      "agent": {
+        "enum": [
+          "claude-code",
+          "codex",
+          "openclaw"
+        ]
+      },
+      "auth_mode": {
+        "enum": [
+          "interactive_login",
+          "credential_binding"
+        ]
+      },
+      "credential_binding_id": {
+        "$ref": "#/components/schemas/Uuid"
+      },
+      "cwd": {
+        "maxLength": 1024,
+        "minLength": 10,
+        "pattern": "^/workspace(?:/.*)?$",
+        "type": "string"
+      },
+      "name": {
+        "maxLength": 80,
+        "minLength": 1,
+        "type": "string"
       }
     },
     "required": [
       "agent",
-      "method",
-      "state"
+      "cwd"
+    ],
+    "type": "object"
+  },
+  "AgentSessionPage": {
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "$ref": "#/components/schemas/AgentSession"
+        },
+        "maxItems": 100,
+        "type": "array"
+      },
+      "next_cursor": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      }
+    },
+    "required": [
+      "items"
+    ],
+    "type": "object"
+  },
+  "AgentSessionRename": {
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "maxLength": 80,
+        "minLength": 1,
+        "type": "string"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "type": "object"
+  },
+  "Capability": {
+    "additionalProperties": false,
+    "properties": {
+      "availability": {
+        "enum": [
+          "supported",
+          "unsupported",
+          "temporarily_unavailable",
+          "unknown"
+        ]
+      },
+      "id": {
+        "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$",
+        "type": "string"
+      },
+      "interaction": {
+        "enum": [
+          "native",
+          "read_only",
+          "browser_handoff"
+        ]
+      },
+      "mutation_class": {
+        "enum": [
+          "none",
+          "reversible",
+          "destructive",
+          "secret_revealing",
+          "financial"
+        ]
+      },
+      "reason_code": {
+        "pattern": "^[a-z][a-z0-9_]{2,63}$",
+        "type": "string"
+      },
+      "required_permissions": {
+        "items": {
+          "pattern": "^[a-z][a-z0-9_]*(?::[a-z][a-z0-9_]*)+$",
+          "type": "string"
+        },
+        "maxItems": 16,
+        "type": "array",
+        "uniqueItems": true
+      },
+      "surfaces": {
+        "items": {
+          "enum": [
+            "cli",
+            "web",
+            "sdk"
+          ]
+        },
+        "maxItems": 3,
+        "minItems": 1,
+        "type": "array",
+        "uniqueItems": true
+      }
+    },
+    "required": [
+      "id",
+      "availability",
+      "surfaces",
+      "interaction",
+      "mutation_class",
+      "required_permissions"
+    ],
+    "type": "object"
+  },
+  "CapabilitySnapshot": {
+    "additionalProperties": false,
+    "properties": {
+      "capabilities": {
+        "items": {
+          "$ref": "#/components/schemas/Capability"
+        },
+        "maxItems": 128,
+        "type": "array"
+      },
+      "etag": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "expires_at": {
+        "format": "date-time",
+        "type": "string"
+      },
+      "observed_at": {
+        "format": "date-time",
+        "type": "string"
+      },
+      "schema_version": {
+        "const": "1.0"
+      },
+      "subject_id": {
+        "$ref": "#/components/schemas/Uuid"
+      },
+      "subject_scope": {
+        "enum": [
+          "account",
+          "machine",
+          "agent_session"
+        ]
+      }
+    },
+    "required": [
+      "schema_version",
+      "subject_scope",
+      "observed_at",
+      "expires_at",
+      "etag",
+      "capabilities"
     ],
     "type": "object"
   },
@@ -290,6 +497,57 @@ export const GENERATED_WIRE_SCHEMAS = {
     ],
     "type": "object"
   },
+  "Problem": {
+    "additionalProperties": false,
+    "properties": {
+      "action": {
+        "enum": [
+          "retry",
+          "sign_in",
+          "open_web",
+          "contact_support",
+          "none"
+        ]
+      },
+      "code": {
+        "pattern": "^[a-z][a-z0-9_]{2,63}$",
+        "type": "string"
+      },
+      "detail": {
+        "maxLength": 500,
+        "type": "string"
+      },
+      "request_id": {
+        "$ref": "#/components/schemas/Uuid"
+      },
+      "retryable": {
+        "type": "boolean"
+      },
+      "status": {
+        "maximum": 599,
+        "minimum": 400,
+        "type": "integer"
+      },
+      "title": {
+        "maxLength": 120,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": {
+        "pattern": "^https://api\\.runacode\\.io/problems/[a-z][a-z0-9_]{2,63}$",
+        "type": "string"
+      }
+    },
+    "required": [
+      "type",
+      "title",
+      "status",
+      "code",
+      "request_id",
+      "retryable"
+    ],
+    "type": "object"
+  },
   "Record": {
     "additionalProperties": false,
     "properties": {
@@ -342,10 +600,6 @@ export const GENERATED_WIRE_SCHEMAS = {
         },
         "maxItems": 128,
         "type": "array"
-      },
-      "background": {
-        "description": "Optional asynchronous provisioning mode. Omission or false preserves synchronous creation. True may return status creating; poll sessions.get while status remains creating before treating the machine as ready.",
-        "type": "boolean"
       },
       "memory_mib": {
         "maximum": 16384,
@@ -446,6 +700,186 @@ export const GENERATED_WIRE_SCHEMAS = {
       "created_at",
       "updated_at",
       "url"
+    ],
+    "type": "object"
+  },
+  "TerminalConnectionCapability": {
+    "additionalProperties": false,
+    "properties": {
+      "availability": {
+        "description": "Explicit Runa observation. Support is never inferred from omission.",
+        "enum": [
+          "supported",
+          "unsupported",
+          "unknown"
+        ]
+      },
+      "name": {
+        "enum": [
+          "acknowledgement",
+          "heartbeat",
+          "live_resize",
+          "resume",
+          "signals"
+        ]
+      }
+    },
+    "required": [
+      "name",
+      "availability"
+    ],
+    "type": "object"
+  },
+  "TerminalConnectionCreate": {
+    "additionalProperties": false,
+    "properties": {
+      "client_instance_id": {
+        "description": "Caller-stable Runa client instance identity used for attachment fencing.",
+        "maxLength": 256,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9._:-]+$",
+        "type": "string"
+      },
+      "protocol": {
+        "const": "runa.terminal.v1"
+      },
+      "resume_handle": {
+        "$ref": "#/components/schemas/Uuid",
+        "description": "Previously issued Runa resume handle. Omit for a new attachment generation."
+      }
+    },
+    "required": [
+      "protocol",
+      "client_instance_id"
+    ],
+    "type": "object"
+  },
+  "TerminalConnectionGrant": {
+    "additionalProperties": false,
+    "properties": {
+      "capabilities": {
+        "allOf": [
+          {
+            "contains": {
+              "properties": {
+                "name": {
+                  "const": "acknowledgement"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "maxContains": 1,
+            "minContains": 1
+          },
+          {
+            "contains": {
+              "properties": {
+                "name": {
+                  "const": "heartbeat"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "maxContains": 1,
+            "minContains": 1
+          },
+          {
+            "contains": {
+              "properties": {
+                "name": {
+                  "const": "live_resize"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "maxContains": 1,
+            "minContains": 1
+          },
+          {
+            "contains": {
+              "properties": {
+                "name": {
+                  "const": "resume"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "maxContains": 1,
+            "minContains": 1
+          },
+          {
+            "contains": {
+              "properties": {
+                "name": {
+                  "const": "signals"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "type": "object"
+            },
+            "maxContains": 1,
+            "minContains": 1
+          }
+        ],
+        "description": "Complete explicit Runa capability set. Every known capability appears exactly once with supported, unsupported, or unknown availability.",
+        "items": {
+          "$ref": "#/components/schemas/TerminalConnectionCapability"
+        },
+        "maxItems": 5,
+        "minItems": 5,
+        "type": "array",
+        "uniqueItems": true
+      },
+      "connect_token": {
+        "description": "One-use Runa terminal connection token. Plaintext is never persisted and is never placed in connect_url.",
+        "pattern": "^runa_tc_[A-Za-z0-9_-]{43}$",
+        "type": "string",
+        "writeOnly": true
+      },
+      "connect_url": {
+        "description": "Secret-free Runa WebSocket URL. It contains no token, query, fragment, provider host, or runtime identifier.",
+        "format": "uri",
+        "pattern": "^wss://api\\.runacode\\.io/v1/terminal-connections/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/stream$",
+        "type": "string"
+      },
+      "expires_at": {
+        "description": "Expiry of the unredeemed one-use connection grant.",
+        "format": "date-time",
+        "type": "string"
+      },
+      "protocol": {
+        "const": "runa.terminal.v1"
+      },
+      "resume_handle": {
+        "$ref": "#/components/schemas/Uuid"
+      },
+      "terminal_session_id": {
+        "$ref": "#/components/schemas/Uuid",
+        "description": "Opaque public Runa terminal-session identity."
+      }
+    },
+    "required": [
+      "terminal_session_id",
+      "resume_handle",
+      "connect_url",
+      "connect_token",
+      "protocol",
+      "capabilities",
+      "expires_at"
     ],
     "type": "object"
   },

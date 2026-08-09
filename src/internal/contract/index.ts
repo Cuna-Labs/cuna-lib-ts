@@ -1,82 +1,12 @@
 import { GENERATED_OPERATIONS } from "./generated/operation-metadata.js";
 
-const CAPABILITIES_GET = Object.freeze({
-  hasRequestBody: false,
-  method: "GET",
-  operationKey: "capabilities.get",
-  pathParameters: [],
-  pathTemplate: "/v1/capabilities",
-  successStatus: 200,
-} as const);
-
-// Handwritten exact projection of infra/contracts/runa-api.openapi.json 1.4.0.
-// Canonical artifact SHA-256 7206b5413e2007651b26cda11770cd028b20a3b533a2228465f46f3ed0fc662d;
-// SDK projection SHA-256 065c1588db506ffee69cda9ae5fa5bd5398bef9305e4de18c49a1a0e19abf6c4.
-const AGENT_SESSION_OPERATIONS = Object.freeze({
-  "agentSessions.list": Object.freeze({
-    hasRequestBody: false,
-    method: "GET",
-    operationKey: "agentSessions.list",
-    pathParameters: ["id"],
-    pathTemplate: "/v1/sessions/:id/agent-sessions",
-    successStatus: 200,
-  }),
-  "agentSessions.create": Object.freeze({
-    hasRequestBody: true,
-    method: "POST",
-    operationKey: "agentSessions.create",
-    pathParameters: ["id"],
-    pathTemplate: "/v1/sessions/:id/agent-sessions",
-    successStatus: 201,
-  }),
-  "agentSessions.get": Object.freeze({
-    hasRequestBody: false,
-    method: "GET",
-    operationKey: "agentSessions.get",
-    pathParameters: ["id"],
-    pathTemplate: "/v1/agent-sessions/:id",
-    successStatus: 200,
-  }),
-  "agentSessions.rename": Object.freeze({
-    hasRequestBody: true,
-    method: "PATCH",
-    operationKey: "agentSessions.rename",
-    pathParameters: ["id"],
-    pathTemplate: "/v1/agent-sessions/:id",
-    successStatus: 200,
-  }),
-  "agentSessions.terminate": Object.freeze({
-    hasRequestBody: false,
-    method: "POST",
-    operationKey: "agentSessions.terminate",
-    pathParameters: ["id"],
-    pathTemplate: "/v1/agent-sessions/:id/terminate",
-    successStatus: 200,
-  }),
-  "agentSessions.createTerminalConnection": Object.freeze({
-    hasRequestBody: true,
-    method: "POST",
-    operationKey: "agentSessions.createTerminalConnection",
-    pathParameters: ["id"],
-    pathTemplate: "/v1/agent-sessions/:id/terminal-connections",
-    successStatus: 201,
-  }),
-} as const);
-
-// The generated root remains bound to its approved PRD-002 snapshot. These
-// additive descriptors are bound to the separately digested Infra projection.
-const CANONICAL_OPERATIONS = Object.freeze({
-  "capabilities.get": CAPABILITIES_GET,
-  ...AGENT_SESSION_OPERATIONS,
-  ...GENERATED_OPERATIONS,
-});
+const CANONICAL_OPERATIONS = GENERATED_OPERATIONS;
 
 export type OperationKey = keyof typeof CANONICAL_OPERATIONS;
 type CanonicalOperationDescriptor =
   (typeof CANONICAL_OPERATIONS)[OperationKey];
 type ResponseKind =
   | "acknowledgement"
-  | "agent-authentication-status"
   | "agent-session"
   | "agent-session-page"
   | "terminal-connection-grant"
@@ -116,7 +46,6 @@ const RESPONSE_KINDS = Object.freeze({
   "agentSessions.createTerminalConnection": "terminal-connection-grant",
   "me.get": "me",
   "records.list": "records",
-  "sessions.agentAuth": "agent-authentication-status",
   "sessions.checkpoint": "acknowledgement",
   "sessions.create": "session",
   "sessions.delete": "acknowledgement",

@@ -1,5 +1,73 @@
-// @generated {"contract_id":"runa-sdk-contract","generator_path":"tools/runa-contract-generator.mjs","generator_sha256":"75de6242dde7fccfc9251d371020c5dc5ffb96a65399647b6d54d2c8850202e1","generator_version":"0.2.0","snapshot_path":"runa-sdk-contract.snapshot.json","snapshot_sha256":"497ad3bfd712d7ed0c55289e94808435a924fd5cc909f1ab0620f860a6ebfc98","snapshot_version":"1.3.0"}
+// @generated {"contract_id":"runa-sdk-contract","generator_path":"tools/runa-contract-generator.mjs","generator_sha256":"75de6242dde7fccfc9251d371020c5dc5ffb96a65399647b6d54d2c8850202e1","generator_version":"0.2.0","snapshot_path":"runa-sdk-contract.snapshot.json","snapshot_sha256":"f6ec19dbf8e96e3280da37f6f7b435163088b875c92d3ae2551e83902000a34a","snapshot_version":"1.4.0"}
 export const GENERATED_OPERATIONS = {
+  "agentSessions.create": {
+    "hasRequestBody": true,
+    "method": "POST",
+    "operationKey": "agentSessions.create",
+    "pathParameters": [
+      "id"
+    ],
+    "pathTemplate": "/v1/sessions/:id/agent-sessions",
+    "successStatus": 201
+  },
+  "agentSessions.createTerminalConnection": {
+    "hasRequestBody": true,
+    "method": "POST",
+    "operationKey": "agentSessions.createTerminalConnection",
+    "pathParameters": [
+      "id"
+    ],
+    "pathTemplate": "/v1/agent-sessions/:id/terminal-connections",
+    "successStatus": 201
+  },
+  "agentSessions.get": {
+    "hasRequestBody": false,
+    "method": "GET",
+    "operationKey": "agentSessions.get",
+    "pathParameters": [
+      "id"
+    ],
+    "pathTemplate": "/v1/agent-sessions/:id",
+    "successStatus": 200
+  },
+  "agentSessions.list": {
+    "hasRequestBody": false,
+    "method": "GET",
+    "operationKey": "agentSessions.list",
+    "pathParameters": [
+      "id"
+    ],
+    "pathTemplate": "/v1/sessions/:id/agent-sessions",
+    "successStatus": 200
+  },
+  "agentSessions.rename": {
+    "hasRequestBody": true,
+    "method": "PATCH",
+    "operationKey": "agentSessions.rename",
+    "pathParameters": [
+      "id"
+    ],
+    "pathTemplate": "/v1/agent-sessions/:id",
+    "successStatus": 200
+  },
+  "agentSessions.terminate": {
+    "hasRequestBody": false,
+    "method": "POST",
+    "operationKey": "agentSessions.terminate",
+    "pathParameters": [
+      "id"
+    ],
+    "pathTemplate": "/v1/agent-sessions/:id/terminate",
+    "successStatus": 200
+  },
+  "capabilities.get": {
+    "hasRequestBody": false,
+    "method": "GET",
+    "operationKey": "capabilities.get",
+    "pathParameters": [],
+    "pathTemplate": "/v1/capabilities",
+    "successStatus": 200
+  },
   "me.get": {
     "hasRequestBody": false,
     "method": "GET",
@@ -14,16 +82,6 @@ export const GENERATED_OPERATIONS = {
     "operationKey": "records.list",
     "pathParameters": [],
     "pathTemplate": "/v1/records",
-    "successStatus": 200
-  },
-  "sessions.agentAuth": {
-    "hasRequestBody": false,
-    "method": "GET",
-    "operationKey": "sessions.agentAuth",
-    "pathParameters": [
-      "id"
-    ],
-    "pathTemplate": "/v1/sessions/:id/agent-auth",
     "successStatus": 200
   },
   "sessions.checkpoint": {
