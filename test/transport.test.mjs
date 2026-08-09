@@ -48,7 +48,7 @@ function operationFetch(captures) {
   };
 }
 
-test("PRD-021/025/028-037 dispatch exactly 14 canonical operations", async () => {
+test("PRD-021/025/028-037 dispatch the 14 pinned baseline operations", async () => {
   const captures = [];
   const runa = new Runa({
     apiKey: API_KEY,

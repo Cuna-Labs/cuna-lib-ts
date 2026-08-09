@@ -30,6 +30,29 @@ export function agentAuthenticationFixture(overrides = {}) {
   };
 }
 
+export function capabilitySnapshotFixture(overrides = {}) {
+  const etag = "a".repeat(64);
+  return {
+    schema_version: "1.0",
+    subject_scope: "account",
+    observed_at: "2026-08-08T12:00:00.000Z",
+    expires_at: "2026-08-08T12:00:30.000Z",
+    etag,
+    capabilities: [
+      {
+        id: "agent_sessions.manage",
+        availability: "unsupported",
+        surfaces: ["cli", "web", "sdk"],
+        interaction: "native",
+        mutation_class: "reversible",
+        required_permissions: ["agent_sessions:manage"],
+        reason_code: "agent_session_foundation_not_available",
+      },
+    ],
+    ...overrides,
+  };
+}
+
 export function meFixture(assigned = true) {
   return assigned
     ? {

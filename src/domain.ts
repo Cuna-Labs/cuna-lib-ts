@@ -1,7 +1,9 @@
 import type {
   Acknowledgement, AgentAuthenticationMethod, AgentAuthenticationState,
-  AgentAuthenticationStatus, ExecResult, Me, OpenSessionResult, Record,
-  SessionAgent, SessionSnapshot, SessionStatus
+  AgentAuthenticationStatus, Capability, CapabilityAvailability,
+  CapabilityInteraction, CapabilityMutationClass, CapabilitySnapshot,
+  CapabilitySurface, ExecResult, Me, OpenSessionResult, Record, SessionAgent,
+  SessionSnapshot, SessionStatus
 } from "./types.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -18,6 +20,20 @@ const AUTHENTICATION_STATES = new Set<AgentAuthenticationState>([
   "not_applicable", "installing", "login_required", "authenticated",
   "configured", "unavailable",
 ]);
+const CAPABILITY_AVAILABILITIES = new Set<CapabilityAvailability>([
+  "supported", "unsupported", "temporarily_unavailable", "unknown",
+]);
+const CAPABILITY_SURFACES = new Set<CapabilitySurface>(["cli", "web", "sdk"]);
+const CAPABILITY_INTERACTIONS = new Set<CapabilityInteraction>([
+  "native", "read_only", "browser_handoff",
+]);
+const CAPABILITY_MUTATION_CLASSES = new Set<CapabilityMutationClass>([
+  "none", "reversible", "destructive", "secret_revealing", "financial",
+]);
+const CAPABILITY_ID = /^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$/;
+const PERMISSION = /^[a-z][a-z0-9_]*(?::[a-z][a-z0-9_]*)+$/;
+const REASON_CODE = /^[a-z][a-z0-9_]{2,63}$/;
+const ETAG = /^[0-9a-f]{64}$/;
 
 export class DecodeFailure {
   readonly kind = "decode_failure";
@@ -153,6 +169,77 @@ export function decodeAgentAuthenticationStatus(
     agent,
     method: method as AgentAuthenticationMethod,
     state: state as AgentAuthenticationState,
+  });
+}
+function enumValue<T extends string>(value: unknown, allowed: ReadonlySet<T>): T {
+  const candidate = string(value);
+  if (!allowed.has(candidate as T)) malformed();
+  return candidate as T;
+}
+function uniqueStrings(
+  value: unknown,
+  maximum: number,
+  pattern: RegExp,
+): readonly string[] {
+  if (!Array.isArray(value) || value.length > maximum) malformed();
+  const items = value.map((item) => string(item));
+  if (items.some((item) => !pattern.test(item)) || new Set(items).size !== items.length) malformed();
+  return Object.freeze(items);
+}
+function decodeCapability(value: unknown): Capability {
+  const source = object(value);
+  exact(
+    source,
+    ["id", "availability", "surfaces", "interaction", "mutation_class", "required_permissions"],
+    ["reason_code"],
+  );
+  const id = string(source.id);
+  if (!CAPABILITY_ID.test(id) || !Array.isArray(source.surfaces) ||
+      source.surfaces.length < 1 || source.surfaces.length > 3) malformed();
+  const surfaces = source.surfaces.map((surface) =>
+    enumValue(surface, CAPABILITY_SURFACES));
+  if (new Set(surfaces).size !== surfaces.length) malformed();
+  let reasonCode: string | undefined;
+  if (Object.hasOwn(source, "reason_code")) {
+    reasonCode = string(source.reason_code);
+    if (!REASON_CODE.test(reasonCode)) malformed();
+  }
+  return Object.freeze({
+    id,
+    availability: enumValue(source.availability, CAPABILITY_AVAILABILITIES),
+    surfaces: Object.freeze(surfaces),
+    interaction: enumValue(source.interaction, CAPABILITY_INTERACTIONS),
+    mutationClass: enumValue(source.mutation_class, CAPABILITY_MUTATION_CLASSES),
+    requiredPermissions: uniqueStrings(source.required_permissions, 16, PERMISSION),
+    ...(reasonCode === undefined ? {} : { reasonCode }),
+  });
+}
+export function decodeCapabilitySnapshot(value: unknown): CapabilitySnapshot {
+  const source = object(value);
+  exact(
+    source,
+    ["schema_version", "subject_scope", "observed_at", "expires_at", "etag", "capabilities"],
+    ["subject_id"],
+  );
+  if (source.schema_version !== "1.0") malformed();
+  const subjectScope = string(source.subject_scope);
+  if (subjectScope !== "account" && subjectScope !== "machine") malformed();
+  const observedAt = dateTime(source.observed_at);
+  const expiresAt = dateTime(source.expires_at);
+  if (Date.parse(expiresAt) <= Date.parse(observedAt)) malformed();
+  const etag = string(source.etag);
+  if (!ETAG.test(etag) || !Array.isArray(source.capabilities) ||
+      source.capabilities.length > 128) malformed();
+  let subjectId: string | undefined;
+  if (Object.hasOwn(source, "subject_id")) subjectId = uuid(source.subject_id);
+  return Object.freeze({
+    schemaVersion: "1.0",
+    subjectScope,
+    ...(subjectId === undefined ? {} : { subjectId }),
+    observedAt,
+    expiresAt,
+    etag,
+    capabilities: Object.freeze(source.capabilities.map(decodeCapability)),
   });
 }
 export function decodeRecords(value: unknown): readonly Record[] {

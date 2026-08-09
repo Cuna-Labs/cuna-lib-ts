@@ -14,6 +14,8 @@ import {
 import { createDefaultTransport } from "./internal/test-seams.js";
 import { Session, constructSession } from "./session.js";
 import type {
+  CapabilityScope,
+  CapabilitySnapshot,
   Me,
   Record,
   RunaConfig,
@@ -87,6 +89,16 @@ export interface RecordsManager {
    * @runa-contract recordsmanager-list-example PRD-037#R-037-01
    */
   list(): Promise<readonly Record[]>;
+}
+
+/** Client-owned entry point for discovering current feature availability. */
+export interface CapabilitiesManager {
+  /**
+   * Gets leased capability evidence. Discovery never authorizes a mutation.
+   * Agent-session discovery is sent explicitly and currently returns the
+   * canonical unsupported API error.
+   */
+  get(scope: CapabilityScope, resourceId?: string): Promise<CapabilitySnapshot>;
 }
 
 class ClientContext implements ClientPort {
@@ -304,12 +316,46 @@ class RecordsManagerImplementation implements RecordsManager {
   }
 }
 
+class CapabilitiesManagerImplementation implements CapabilitiesManager {
+  readonly #owner: ClientPort;
+
+  constructor(owner: ClientPort) {
+    this.#owner = owner;
+  }
+
+  async get(
+    scope: CapabilityScope,
+    resourceId?: string,
+  ): Promise<CapabilitySnapshot> {
+    if (scope !== "account" && scope !== "machine" && scope !== "agent_session") {
+      throw new TypeError("Invalid capability scope.");
+    }
+    if (scope === "account") {
+      if (resourceId !== undefined) throw new TypeError("Invalid capability scope.");
+    } else {
+      assertUuid(resourceId);
+    }
+    const snapshot = (await this.#owner.invoke("capabilities.get", {
+      query: Object.freeze({
+        scope,
+        ...(resourceId === undefined ? {} : { resource_id: resourceId }),
+      }),
+    })) as CapabilitySnapshot;
+    if (snapshot.subjectScope !== scope ||
+        (scope === "machine" && snapshot.subjectId !== resourceId)) {
+      throw new ApiError(200, "malformed_response");
+    }
+    return snapshot;
+  }
+}
+
 /**
  * Constructible Runa client that owns managers, transport lifecycle, and cleanup.
  * @runa-contract runa-summary PRD-023#R-023-01
  */
 export class Runa {
   readonly #context: ClientContext;
+  #capabilities: CapabilitiesManager | undefined;
   #sessions: SessionsManager | undefined;
   #records: RecordsManager | undefined;
 
@@ -333,6 +379,12 @@ export class Runa {
   get sessions(): SessionsManager {
     this.#sessions ??= new SessionsManagerImplementation(this.#context);
     return this.#sessions;
+  }
+
+  /** Stable capability discovery manager owned by this client. */
+  get capabilities(): CapabilitiesManager {
+    this.#capabilities ??= new CapabilitiesManagerImplementation(this.#context);
+    return this.#capabilities;
   }
 
   /** Stable records manager owned by this client. */

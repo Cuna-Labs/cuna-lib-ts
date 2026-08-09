@@ -2,6 +2,7 @@ import { stderrText, stdoutText } from "../../src/index.js";
 import type {
   AgentAuthenticationStatus,
   AssignedWorkspace,
+  CapabilitySnapshot,
   Workspace,
 } from "../../src/index.js";
 
@@ -25,9 +26,22 @@ type StderrHelperContract = Assert<
 type AgentAuthenticationStatusIsClosed = Assert<
   Equal<keyof AgentAuthenticationStatus, "agent" | "method" | "state">
 >;
+type CapabilitySnapshotIsClosed = Assert<
+  Equal<
+    keyof CapabilitySnapshot,
+    | "schemaVersion"
+    | "subjectScope"
+    | "subjectId"
+    | "observedAt"
+    | "expiresAt"
+    | "etag"
+    | "capabilities"
+  >
+>;
 
 export type {
   AgentAuthenticationStatusIsClosed,
+  CapabilitySnapshotIsClosed,
   AssignedDiscriminantIsLiteral,
   StderrHelperContract,
   StdoutHelperContract,

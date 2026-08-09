@@ -4,6 +4,58 @@
  */
 export type OpaqueWireValue = unknown;
 
+/** Scope accepted by capability discovery. */
+export type CapabilityScope = "account" | "machine" | "agent_session";
+
+/** Scope represented by a successful capability snapshot. */
+export type CapabilitySubjectScope = Exclude<CapabilityScope, "agent_session">;
+
+/** Current availability reported for a capability. */
+export type CapabilityAvailability =
+  | "supported"
+  | "unsupported"
+  | "temporarily_unavailable"
+  | "unknown";
+
+/** Product surface on which a capability can be used. */
+export type CapabilitySurface = "cli" | "web" | "sdk";
+
+/** Interaction required to use a capability. */
+export type CapabilityInteraction =
+  | "native"
+  | "read_only"
+  | "browser_handoff";
+
+/** Consequence class of the operation behind a capability. */
+export type CapabilityMutationClass =
+  | "none"
+  | "reversible"
+  | "destructive"
+  | "secret_revealing"
+  | "financial";
+
+/** Immutable capability description returned by discovery. */
+export interface Capability {
+  readonly id: string;
+  readonly availability: CapabilityAvailability;
+  readonly surfaces: readonly CapabilitySurface[];
+  readonly interaction: CapabilityInteraction;
+  readonly mutationClass: CapabilityMutationClass;
+  readonly requiredPermissions: readonly string[];
+  readonly reasonCode?: string;
+}
+
+/** Leased capability evidence for one account or machine. */
+export interface CapabilitySnapshot {
+  readonly schemaVersion: "1.0";
+  readonly subjectScope: CapabilitySubjectScope;
+  readonly subjectId?: string;
+  readonly observedAt: string;
+  readonly expiresAt: string;
+  readonly etag: string;
+  readonly capabilities: readonly Capability[];
+}
+
 /**
  * Documented session status returned by the API.
  * @runa-contract sessionstatus-summary PRD-022#R-022-02
@@ -259,6 +311,7 @@ export interface Me {
 }
 
 export type OperationKey =
+  | "capabilities.get"
   | "me.get"
   | "records.list"
   | "sessions.agentAuth"

@@ -5,6 +5,7 @@ import type { EffectiveConfig } from "../config.js";
 import {
   decodeAcknowledgement,
   decodeAgentAuthenticationStatus,
+  decodeCapabilitySnapshot,
   decodeExec,
   decodeMe,
   decodeOpen,
@@ -17,6 +18,7 @@ import { ApiError, ConfigError } from "../errors.js";
 import type {
   Acknowledgement,
   AgentAuthenticationStatus,
+  CapabilitySnapshot,
   ExecResult,
   Me,
   OpenSessionResult,
@@ -33,6 +35,7 @@ import { SDK_VERSION } from "../version.js";
 
 const MAX_RESPONSE_BYTES = 8_388_608;
 const READS = new Set<OperationKey>([
+  "capabilities.get",
   "me.get",
   "sessions.list",
   "sessions.get",
@@ -42,6 +45,7 @@ const READS = new Set<OperationKey>([
 
 export interface DispatchInput {
   readonly id?: string;
+  readonly query?: Readonly<globalThis.Record<string, string>>;
   readonly body?: unknown;
   readonly timeoutSecs?: number;
   readonly signal?: AbortSignal;
@@ -50,6 +54,7 @@ export interface DispatchInput {
 export type DispatchResult =
   | Acknowledgement
   | AgentAuthenticationStatus
+  | CapabilitySnapshot
   | ExecResult
   | Me
   | OpenSessionResult
@@ -101,7 +106,13 @@ function prepare(
   const descriptor = operationDescriptor(operationKey);
   const path = renderPath(descriptor.pathTemplate, input.id);
   const target = new URL(path, `${config.baseUrl}/`);
-  if (target.origin !== config.baseUrl || target.href !== `${config.baseUrl}${path}`) {
+  if (input.query !== undefined) {
+    for (const [key, value] of Object.entries(input.query)) {
+      target.searchParams.append(key, value);
+    }
+  }
+  const expectedHref = `${config.baseUrl}${path}${target.search}`;
+  if (target.origin !== config.baseUrl || target.href !== expectedHref) {
     throw new ConfigError();
   }
   let body: string | undefined;
@@ -252,6 +263,14 @@ async function disposition(
         return decodeAcknowledgement(value);
       case "agent-authentication-status":
         return decodeAgentAuthenticationStatus(value);
+      case "capability-snapshot": {
+        const snapshot = decodeCapabilitySnapshot(value);
+        const etag = response.headers.get("etag");
+        if (etag !== `"${snapshot.etag}"`) {
+          throw new ApiError(response.status, "malformed_response");
+        }
+        return snapshot;
+      }
       case "exec":
         return decodeExec(value);
       case "me":
