@@ -2,7 +2,10 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { containsProhibitedMarker } from "../dist/internal/boundary-policy.js";
 
-const ignored = new Set([".git", "node_modules", "coverage"]);
+// Gitlink workspaces are verified by their owning repository. Scanning their
+// checked-out contents here produces false positives for bytes that are not
+// part of this package candidate.
+const ignored = new Set([".codex-work", ".git", "node_modules", "coverage"]);
 const canonicalContractRoot = path.resolve("contracts");
 const files = [];
 async function walk(directory) {

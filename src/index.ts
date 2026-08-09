@@ -8,6 +8,18 @@ export {
 } from "./errors.js";
 export { stderrText, stdoutText } from "./text.js";
 
+export type {
+  AgentSession,
+  AgentSessionAuthMode,
+  AgentSessionCreateOptions,
+  AgentSessionDesiredState,
+  AgentSessionListOptions,
+  AgentSessionPage,
+  AgentSessionProcessState,
+  AgentSessionRequestState,
+  AgentSessionsManager,
+} from "./agent-sessions.js";
+
 export type { CapabilitiesManager, RecordsManager, SessionsManager } from "./client.js";
 export type {
   Acknowledgement,

@@ -38,6 +38,7 @@ invalid higher-precedence value is an error; it never falls through.
 - `Session` lifecycle methods, `exec()`, `checkpoint()`, `authenticationStatus()`, and `open()`
 - `runa.records.list()`
 - `runa.me()`
+- `runa.agentSessions.list(machineId)`, `create(machineId, options)`, `get(id)`, `rename(id, name)`, and `terminate(id)`
 
 `Session.open()` returns a short-lived sensitive value. Use it only for the
 immediate handoff and do not print, persist, cache, or fetch it automatically.

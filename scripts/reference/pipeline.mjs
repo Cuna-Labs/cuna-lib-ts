@@ -335,6 +335,7 @@ const anchor = (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-")
 
 const memberDescriptions = Object.freeze({
   agent: "Selected session agent, when the API returned or the caller supplied one.",
+  agentSessions: "Stable AgentSession manager owned by this client.",
   allowedHosts: "Optional ordered host allowlist copied into the create request.",
   apiKey: "Optional constructor API key selected before environment or explicit-file sources.",
   assigned: "Literal discriminator for the workspace assignment variant.",

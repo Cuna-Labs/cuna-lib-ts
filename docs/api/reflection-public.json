@@ -634,6 +634,15 @@
         ]
       },
       {
+        "name": "agentSessions",
+        "kind": "accessor",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "agentSessions: AgentSessionsManager"
+        ]
+      },
+      {
         "name": "capabilities",
         "kind": "accessor",
         "optional": false,

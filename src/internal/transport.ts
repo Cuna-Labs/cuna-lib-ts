@@ -5,6 +5,8 @@ import type { EffectiveConfig } from "../config.js";
 import {
   decodeAcknowledgement,
   decodeAgentAuthenticationStatus,
+  decodeAgentSession,
+  decodeAgentSessionPage,
   decodeCapabilitySnapshot,
   decodeExec,
   decodeMe,
@@ -25,6 +27,7 @@ import type {
   Record,
   SessionSnapshot,
 } from "../types.js";
+import type { AgentSession, AgentSessionPage } from "../agent-sessions.js";
 import {
   operationDescriptor,
   type OperationKey,
@@ -35,6 +38,8 @@ import { SDK_VERSION } from "../version.js";
 
 const MAX_RESPONSE_BYTES = 8_388_608;
 const READS = new Set<OperationKey>([
+  "agentSessions.list",
+  "agentSessions.get",
   "capabilities.get",
   "me.get",
   "sessions.list",
@@ -49,11 +54,14 @@ export interface DispatchInput {
   readonly body?: unknown;
   readonly timeoutSecs?: number;
   readonly signal?: AbortSignal;
+  readonly idempotencyKey?: string;
 }
 
 export type DispatchResult =
   | Acknowledgement
   | AgentAuthenticationStatus
+  | AgentSession
+  | AgentSessionPage
   | CapabilitySnapshot
   | ExecResult
   | Me
@@ -76,7 +84,7 @@ export interface TransportRuntime {
 
 interface PreparedRequest {
   readonly url: string;
-  readonly method: "GET" | "POST" | "DELETE";
+  readonly method: "GET" | "POST" | "PATCH" | "DELETE";
   readonly headers: Readonly<globalThis.Record<string, string>>;
   readonly body?: string;
 }
@@ -128,6 +136,10 @@ function prepare(
   } else if (input.body !== undefined) {
     throw new TypeError("The Runa request body is invalid.");
   }
+  const needsIdempotencyKey = operationKey === "agentSessions.create";
+  if (needsIdempotencyKey !== (input.idempotencyKey !== undefined)) {
+    throw new TypeError("The Runa idempotency key is invalid.");
+  }
   return Object.freeze({
     url: target.href,
     method: descriptor.method,
@@ -135,6 +147,9 @@ function prepare(
       Accept: "application/json",
       Authorization: `Bearer ${config.apiKey}`,
       "User-Agent": `runa-sdk-typescript/${SDK_VERSION}`,
+      ...(input.idempotencyKey === undefined
+        ? {}
+        : { "Idempotency-Key": input.idempotencyKey }),
       ...(body === undefined
         ? {}
         : { "Content-Type": "application/json; charset=utf-8" }),
@@ -263,6 +278,10 @@ async function disposition(
         return decodeAcknowledgement(value);
       case "agent-authentication-status":
         return decodeAgentAuthenticationStatus(value);
+      case "agent-session":
+        return decodeAgentSession(value);
+      case "agent-session-page":
+        return decodeAgentSessionPage(value);
       case "capability-snapshot": {
         const snapshot = decodeCapabilitySnapshot(value);
         const etag = response.headers.get("etag");

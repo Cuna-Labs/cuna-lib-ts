@@ -5,6 +5,14 @@ import type {
   CapabilitySurface, ExecResult, Me, OpenSessionResult, Record, SessionAgent,
   SessionSnapshot, SessionStatus
 } from "./types.js";
+import type {
+  AgentSession,
+  AgentSessionAuthMode,
+  AgentSessionDesiredState,
+  AgentSessionPage,
+  AgentSessionProcessState,
+  AgentSessionRequestState,
+} from "./agent-sessions.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const SLUG = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
@@ -34,6 +42,19 @@ const CAPABILITY_ID = /^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$/;
 const PERMISSION = /^[a-z][a-z0-9_]*(?::[a-z][a-z0-9_]*)+$/;
 const REASON_CODE = /^[a-z][a-z0-9_]{2,63}$/;
 const ETAG = /^[0-9a-f]{64}$/;
+const AGENT_SESSION_AUTH_MODES = new Set<AgentSessionAuthMode>([
+  "interactive_login", "credential_binding",
+]);
+const AGENT_SESSION_DESIRED_STATES = new Set<AgentSessionDesiredState>([
+  "running", "terminated",
+]);
+const AGENT_SESSION_REQUEST_STATES = new Set<AgentSessionRequestState>([
+  "launch_pending", "runtime_claimed", "launched", "termination_pending", "terminal", "failed",
+]);
+const AGENT_SESSION_PROCESS_STATES = new Set<AgentSessionProcessState>([
+  "unknown", "starting", "ready", "running", "exited", "failed", "terminating", "terminated",
+]);
+const AGENT_SESSION_CWD = /^\/workspace(?:\/.*)?$/u;
 
 export class DecodeFailure {
   readonly kind = "decode_failure";
@@ -111,6 +132,77 @@ export function decodeSession(value: unknown): SessionSnapshot {
 export function decodeSessions(value: unknown): readonly SessionSnapshot[] {
   if (!Array.isArray(value)) malformed();
   return Object.freeze(value.map(decodeSession));
+}
+
+function boundedString(value: unknown, minimum: number, maximum: number): string {
+  const result = string(value);
+  const size = [...result].length;
+  if (size < minimum || size > maximum) malformed();
+  return result;
+}
+
+function safeInteger(value: unknown, minimum: number): number {
+  if (!Number.isSafeInteger(value) || (value as number) < minimum) malformed();
+  return value as number;
+}
+
+export function decodeAgentSession(value: unknown): AgentSession {
+  const source = object(value);
+  exact(
+    source,
+    [
+      "id", "machine_id", "name", "agent", "cwd", "auth_mode", "desired_state",
+      "request_state", "process_state", "row_version", "created_at", "updated_at",
+    ],
+    ["process_epoch", "runtime_observed_at", "termination_requested_at"],
+  );
+  const name = boundedString(source.name, 1, 80);
+  const agent = enumValue(source.agent, AGENTS);
+  const cwd = boundedString(source.cwd, 10, 1_024);
+  if (!AGENT_SESSION_CWD.test(cwd)) malformed();
+  const authMode = enumValue(source.auth_mode, AGENT_SESSION_AUTH_MODES);
+  const desiredState = enumValue(source.desired_state, AGENT_SESSION_DESIRED_STATES);
+  const requestState = enumValue(source.request_state, AGENT_SESSION_REQUEST_STATES);
+  const processState = enumValue(source.process_state, AGENT_SESSION_PROCESS_STATES);
+  const processEpoch = Object.hasOwn(source, "process_epoch")
+    ? uuid(source.process_epoch)
+    : undefined;
+  const runtimeObservedAt = Object.hasOwn(source, "runtime_observed_at")
+    ? dateTime(source.runtime_observed_at)
+    : undefined;
+  const terminationRequestedAt = Object.hasOwn(source, "termination_requested_at")
+    ? dateTime(source.termination_requested_at)
+    : undefined;
+  return Object.freeze({
+    id: uuid(source.id),
+    machineId: uuid(source.machine_id),
+    name,
+    agent,
+    cwd,
+    authMode,
+    desiredState,
+    requestState,
+    processState,
+    ...(processEpoch === undefined ? {} : { processEpoch }),
+    ...(runtimeObservedAt === undefined ? {} : { runtimeObservedAt }),
+    ...(terminationRequestedAt === undefined ? {} : { terminationRequestedAt }),
+    rowVersion: safeInteger(source.row_version, 0),
+    createdAt: dateTime(source.created_at),
+    updatedAt: dateTime(source.updated_at),
+  });
+}
+
+export function decodeAgentSessionPage(value: unknown): AgentSessionPage {
+  const source = object(value);
+  exact(source, ["items"], ["next_cursor"]);
+  if (!Array.isArray(source.items) || source.items.length > 100) malformed();
+  const nextCursor = Object.hasOwn(source, "next_cursor")
+    ? boundedString(source.next_cursor, 1, 512)
+    : undefined;
+  return Object.freeze({
+    items: Object.freeze(source.items.map(decodeAgentSession)),
+    ...(nextCursor === undefined ? {} : { nextCursor }),
+  });
 }
 export function decodeExec(value: unknown): ExecResult {
   const source = object(value);

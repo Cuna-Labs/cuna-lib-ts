@@ -311,6 +311,11 @@ export interface Me {
 }
 
 export type OperationKey =
+  | "agentSessions.create"
+  | "agentSessions.get"
+  | "agentSessions.list"
+  | "agentSessions.rename"
+  | "agentSessions.terminate"
   | "capabilities.get"
   | "me.get"
   | "records.list"
@@ -336,7 +341,7 @@ export type NormalizedErrorCode =
 interface EventBase {
   readonly request_id: string;
   readonly operation_key: OperationKey;
-  readonly method: "GET" | "POST" | "DELETE";
+  readonly method: "GET" | "POST" | "PATCH" | "DELETE";
   readonly relative_path_template: string;
   readonly sdk_language: "typescript";
   readonly sdk_version: string;

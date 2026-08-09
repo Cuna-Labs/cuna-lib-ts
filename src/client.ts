@@ -1,6 +1,10 @@
 import { resolveConfig, type EffectiveConfig } from "./config.js";
 import { assertUuid } from "./domain.js";
 import { ApiError } from "./errors.js";
+import {
+  constructAgentSessionsManager,
+  type AgentSessionsManager,
+} from "./agent-sessions.js";
 import type { ClientPort } from "./internal/client-port.js";
 import type { OperationKey } from "./internal/contract/index.js";
 import {
@@ -355,6 +359,7 @@ class CapabilitiesManagerImplementation implements CapabilitiesManager {
  */
 export class Runa {
   readonly #context: ClientContext;
+  #agentSessions: AgentSessionsManager | undefined;
   #capabilities: CapabilitiesManager | undefined;
   #sessions: SessionsManager | undefined;
   #records: RecordsManager | undefined;
@@ -379,6 +384,12 @@ export class Runa {
   get sessions(): SessionsManager {
     this.#sessions ??= new SessionsManagerImplementation(this.#context);
     return this.#sessions;
+  }
+
+  /** Stable manager for multiple agent processes owned by one machine. */
+  get agentSessions(): AgentSessionsManager {
+    this.#agentSessions ??= constructAgentSessionsManager(this.#context);
+    return this.#agentSessions;
   }
 
   /** Stable capability discovery manager owned by this client. */

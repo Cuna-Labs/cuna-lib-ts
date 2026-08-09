@@ -33,6 +33,14 @@ Stable sessions manager owned by this client.
 sessions: SessionsManager
 ```
 
+#### agentSessions
+
+Stable AgentSession manager owned by this client.
+
+```ts
+agentSessions: AgentSessionsManager
+```
+
 #### capabilities
 
 Returns the stable capability discovery manager owned by this client.
