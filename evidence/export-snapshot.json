@@ -13,9 +13,6 @@
   ],
   "type_exports": [
     "Acknowledgement",
-    "AgentAuthenticationMethod",
-    "AgentAuthenticationState",
-    "AgentAuthenticationStatus",
     "AssignedWorkspace",
     "EstimatedUsage",
     "ExecOptions",

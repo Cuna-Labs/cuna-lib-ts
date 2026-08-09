@@ -556,7 +556,7 @@ const validateLinks = (files) => {
 
 const validateModel = (model, expectedNames) => {
   assert.deepEqual(model.entries.map((item) => item.name).sort(), expectedNames);
-  assert.equal(new Set(model.entries.map((item) => item.name)).size, 31);
+  assert.equal(new Set(model.entries.map((item) => item.name)).size, 28);
   for (const entry of model.entries) {
     assert.equal(curation[entry.name].page, entry.page);
     assert.equal(entry.signature.length > 3, true);
@@ -659,7 +659,7 @@ export async function runReferencePipeline({ write = true } = {}) {
   const reflection = JSON.parse(await readFile("docs/.reflection.json", "utf8"));
   const surface = JSON.parse(await readFile("evidence/export-snapshot.json", "utf8"));
   const expectedNames = [...surface.runtime_exports, ...surface.type_exports].sort();
-  assert.equal(expectedNames.length, 31);
+  assert.equal(expectedNames.length, 28);
   assert.deepEqual(Object.keys(curation).sort(), expectedNames);
   const reflectedRoots = (reflection.children ?? []).filter((entry) =>
     expectedNames.includes(entry.name));

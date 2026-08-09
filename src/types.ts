@@ -76,10 +76,6 @@ export type SessionStatus =
 export type SessionAgent = "claude-code" | "codex" | "openclaw";
 
 /**
- * Authentication method selected for the session agent.
- * @runa-contract agentauthenticationmethod-summary PRD-022#R-022-02
- */
-/**
  * Public outbound network policy mode.
  * @runa-contract outboundpolicymode-summary PRD-028#R-028-01
  */
