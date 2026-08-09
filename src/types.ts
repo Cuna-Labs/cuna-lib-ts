@@ -45,7 +45,7 @@ export interface Capability {
   readonly reasonCode?: string;
 }
 
-/** Leased capability evidence for one account or machine. */
+/** Leased capability evidence for one account, machine, or AgentSession. */
 export interface CapabilitySnapshot {
   readonly schemaVersion: "1.0";
   readonly subjectScope: CapabilitySubjectScope;
