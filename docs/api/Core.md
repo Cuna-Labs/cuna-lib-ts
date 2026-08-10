@@ -2,6 +2,19 @@
 
 Generated from the released public TypeScript declarations.
 
+<a id="cuna"></a>
+## Cuna
+
+Canonical Cuna client alias with the same lifecycle and managers as Runa.
+
+**Kind:** runtime
+
+**Signature**
+
+```ts
+alias Cuna
+```
+
 <a id="runa"></a>
 ## Runa
 

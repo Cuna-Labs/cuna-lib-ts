@@ -236,6 +236,26 @@
     ]
   },
   {
+    "name": "Cuna",
+    "kind": "runtime",
+    "declarationKind": "reference",
+    "page": "Core.md",
+    "source": "dist/index.d.ts",
+    "signature": "alias Cuna",
+    "members": [],
+    "operations": []
+  },
+  {
+    "name": "CunaError",
+    "kind": "runtime",
+    "declarationKind": "reference",
+    "page": "Shared.md",
+    "source": "dist/index.d.ts",
+    "signature": "alias CunaError",
+    "members": [],
+    "operations": []
+  },
+  {
     "name": "EstimatedUsage",
     "kind": "type",
     "declarationKind": "interface",

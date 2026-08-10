@@ -6,6 +6,19 @@
   "type_export_count": 18,
   "entries": [
     {
+      "name": "Cuna",
+      "kind": "runtime",
+      "page": "Core.md",
+      "anchor": "cuna",
+      "signature": "alias Cuna",
+      "documentation": "complete",
+      "examples": [],
+      "contractRefs": [
+        "PRD-023#R-023-01"
+      ],
+      "status": "PASS"
+    },
+    {
       "name": "Runa",
       "kind": "runtime",
       "page": "Core.md",
@@ -421,6 +434,19 @@
       "status": "PASS"
     },
     {
+      "name": "CunaError",
+      "kind": "runtime",
+      "page": "Shared.md",
+      "anchor": "cunaerror",
+      "signature": "alias CunaError",
+      "documentation": "complete",
+      "examples": [],
+      "contractRefs": [
+        "PRD-024#R-024-01"
+      ],
+      "status": "PASS"
+    },
+    {
       "name": "RunaError",
       "kind": "runtime",
       "page": "Shared.md",
@@ -474,6 +500,14 @@
     }
   ],
   "claimRegistry": [
+    {
+      "claimId": "cuna-summary",
+      "subjectKey": "Cuna",
+      "fragment": "summary",
+      "contractRefs": [
+        "PRD-023#R-023-01"
+      ]
+    },
     {
       "claimId": "runa-summary",
       "subjectKey": "Runa",
@@ -661,6 +695,14 @@
     {
       "claimId": "commanderror-summary",
       "subjectKey": "CommandError",
+      "fragment": "summary",
+      "contractRefs": [
+        "PRD-024#R-024-01"
+      ]
+    },
+    {
+      "claimId": "cunaerror-summary",
+      "subjectKey": "CunaError",
       "fragment": "summary",
       "contractRefs": [
         "PRD-024#R-024-01"

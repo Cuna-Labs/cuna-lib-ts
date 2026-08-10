@@ -166,6 +166,19 @@ Fixed safe English public error message.
 message: "The session command failed."
 ```
 
+<a id="cunaerror"></a>
+## CunaError
+
+Canonical Cuna alias for the normalized public SDK error base class.
+
+**Kind:** runtime
+
+**Signature**
+
+```ts
+alias CunaError
+```
+
 <a id="runaerror"></a>
 ## RunaError
 

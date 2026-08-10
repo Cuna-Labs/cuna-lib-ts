@@ -24,6 +24,7 @@ const kindName = (node) => {
   if (node.kind === 256) return "interface";
   if (node.kind === 64) return "function";
   if (node.kind === 2097152) return "type";
+  if (node.kind === 4194304) return "reference";
   return "declaration";
 };
 
@@ -78,6 +79,7 @@ const entrySignature = (entry) => {
   if (entry.kind === 2097152) return `type ${entry.name} = ${renderType(entry.type)}`;
   if (entry.kind === 64) return (entry.signatures ?? []).map((signature) =>
     `function ${signatureOf(entry.name, signature)}`).join("\n");
+  if (entry.kind === 4194304) return `alias ${entry.name}`;
   throw new Error(`R-048-03: unsupported public declaration ${entry.name}`);
 };
 
@@ -560,7 +562,7 @@ const validateLinks = (files) => {
 
 const validateModel = (model, expectedNames) => {
   assert.deepEqual(model.entries.map((item) => item.name).sort(), expectedNames);
-  assert.equal(new Set(model.entries.map((item) => item.name)).size, 28);
+  assert.equal(new Set(model.entries.map((item) => item.name)).size, 30);
   for (const entry of model.entries) {
     assert.equal(curation[entry.name].page, entry.page);
     assert.equal(entry.signature.length > 3, true);

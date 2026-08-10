@@ -5,12 +5,12 @@
   "runtime_export_count": 8,
   "type_export_count": 18,
   "operation_count": 20,
-  "claim_count": 110,
-  "source_claims_sha256": "19ccd065d1e5b3c85178043bac1a055bb8c5c79e7d25987a57bfed3fe37de7a7",
+  "claim_count": 112,
+  "source_claims_sha256": "5dad6d74b7658b9736b75c43c1e8d0c2d4cfd3d55f8be59df18603cb16124e5d",
   "source_claims_owner": "docs/reference/claims.runa-contract",
   "error_matrix_count": 20,
   "example_count": 16,
-  "deterministic_output_sha256": "c1980b6026b6c46d72b3127fdd786f7c0d7442f18df9981c5ce40e691b92fa75",
+  "deterministic_output_sha256": "bec1498a9cae23d27505200bcf90753d6e5bce8f3163b4a002fc05a553a1f84b",
   "mutations": [
     {
       "name": "missing",

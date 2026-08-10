@@ -2,7 +2,7 @@
   "schema_version": 2,
   "status": "PASS",
   "method": "scripts/verify-duplicate-abstractions.mjs",
-  "audited_source_sha256": "2bddba8a9bcb3b6b86469a8497651fad592ff208ef095f36a8c69f32a2afe9e6",
+  "audited_source_sha256": "bde3099dd448148172ceaaf1026b66350caf83cce60fb31eef7d9ba72dd009c7",
   "audited_files": [
     "src/agent-sessions.ts",
     "src/client.ts",
@@ -103,6 +103,7 @@
         "decoder_exports": [
           "decodeAcknowledgement",
           "decodeAgentSession",
+          "decodeAgentSessionAuth",
           "decodeAgentSessionPage",
           "decodeCapabilitySnapshot",
           "decodeExec",
