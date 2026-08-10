@@ -9,3 +9,10 @@ newer and ESM are required.
 Canonical keys start with `cuna_sk_`. The legacy `RUNA_API_KEY` variable and
 `runa_sk_` prefix remain accepted, but a present invalid `CUNA_API_KEY` fails
 closed instead of falling through to the legacy value.
+
+The API origin follows the same rule. Set `CUNA_BASE_URL` to select an origin
+from the environment; the legacy `RUNA_BASE_URL` remains accepted. If both are
+set to different values, `CUNA_BASE_URL` is used and the client emits a
+`CunaConfigWarning` naming the variable it ignored, so the choice is never
+silent. A present but invalid `CUNA_BASE_URL` fails closed rather than falling
+through to `RUNA_BASE_URL`.

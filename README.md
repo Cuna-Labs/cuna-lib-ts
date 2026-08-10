@@ -47,6 +47,23 @@ Configuration precedence is constructor options, environment variables, the
 optional configuration file, then the default API endpoint. A present but
 invalid higher-precedence value is an error; it never falls through.
 
+### Environment variables
+
+| Variable | Purpose | Precedence |
+| --- | --- | --- |
+| `CUNA_API_KEY` | API key | canonical; outranks `RUNA_API_KEY` |
+| `RUNA_API_KEY` | API key | legacy alias, still accepted |
+| `CUNA_BASE_URL` | API origin | canonical; outranks `RUNA_BASE_URL` |
+| `RUNA_BASE_URL` | API origin | legacy alias, still accepted |
+
+The two spellings of one setting are read from a single list, so the credential
+and the endpoint always agree on which name wins. When both spellings of the
+same setting are exported with **different** values, the canonical `CUNA_`
+variable is used and the client emits a `CunaConfigWarning` on the process
+warning channel naming the variable that was ignored; values are never
+included. Exporting both with the same value is silent. A present but invalid
+`CUNA_` variable is an error and never falls back to its `RUNA_` alias.
+
 ## Resources
 
 - `runa.sessions.create(name, options)`, `list()`, and `get(id)`

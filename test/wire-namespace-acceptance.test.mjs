@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
-import { test } from "vitest";
+import { test, vi } from "vitest";
 
-import { ApiError, Runa } from "../dist/index.js";
+import { ApiError, ConfigError, Runa } from "../dist/index.js";
+import { resolveConfig } from "../dist/config.js";
 import { API_KEY, SESSION_ID, jsonResponse, sessionFixture } from "./helpers.mjs";
 
 /*
@@ -237,4 +238,176 @@ test("session runtime URLs outside a single-label runtime zone are still rejecte
   for (const url of rejected) {
     await assert.rejects(sessionUrl(url), malformed, url);
   }
+});
+
+/*
+ * Configuration variable names are a branded namespace too, and they broke the
+ * same way. The name is minted by the documentation and accepted by
+ * `config.ts`, in different files, compared independently — so `CUNA_API_KEY`
+ * was dual-accepted while `CUNA_BASE_URL` in the very same config block was
+ * read nowhere. That failure is worse than a rejected response: an unread
+ * endpoint variable does not error, it falls through to the default host, and
+ * the user believes they are pointed somewhere else.
+ *
+ * The same three directions apply, plus a fourth that only a precedence
+ * question has: when both spellings are set, which one wins and does anything
+ * say so.
+ */
+
+const CANONICAL_URL = "https://api.getcuna.com";
+const LEGACY_URL = "https://api.runacode.io";
+const CANONICAL_KEY = ["cuna", "sk", "synthetic"].join("_");
+
+function withEnv(values, body) {
+  for (const [name, value] of Object.entries(values)) vi.stubEnv(name, value);
+  try {
+    return body();
+  } finally {
+    vi.unstubAllEnvs();
+  }
+}
+
+const CLEARED = {
+  CUNA_API_KEY: undefined,
+  RUNA_API_KEY: undefined,
+  CUNA_BASE_URL: undefined,
+  RUNA_BASE_URL: undefined,
+};
+
+test("the API endpoint is read in both brand spellings", () => {
+  for (const [name, url] of [
+    ["CUNA_BASE_URL", LEGACY_URL],
+    ["RUNA_BASE_URL", LEGACY_URL],
+  ]) {
+    const resolved = withEnv(
+      { ...CLEARED, CUNA_API_KEY: CANONICAL_KEY, [name]: url },
+      () => resolveConfig(),
+    );
+    assert.equal(resolved.baseUrl, url, `${name} was not read`);
+    assert.equal(resolved.baseUrlSource, "environment", `${name} was not read`);
+  }
+});
+
+test("the API key is read in both brand spellings", () => {
+  for (const [name, key] of [
+    ["CUNA_API_KEY", CANONICAL_KEY],
+    ["RUNA_API_KEY", API_KEY],
+  ]) {
+    const resolved = withEnv({ ...CLEARED, [name]: key }, () => resolveConfig());
+    assert.equal(resolved.apiKey, key, `${name} was not read`);
+    assert.equal(resolved.apiKeySource, "environment", `${name} was not read`);
+  }
+});
+
+test("a malformed value in either brand spelling is still rejected", () => {
+  const rejected = [
+    ["CUNA_BASE_URL", "https://example.invalid"],
+    ["RUNA_BASE_URL", "https://example.invalid"],
+    ["CUNA_BASE_URL", `http://${"api.getcuna.com"}`],
+    ["CUNA_BASE_URL", `${CANONICAL_URL}/v1`],
+    ["CUNA_BASE_URL", ""],
+    ["RUNA_BASE_URL", ""],
+  ];
+  for (const [name, value] of rejected) {
+    assert.throws(
+      () => withEnv(
+        { ...CLEARED, CUNA_API_KEY: CANONICAL_KEY, [name]: value },
+        () => resolveConfig(),
+      ),
+      ConfigError,
+      `${name}=${value} was accepted`,
+    );
+  }
+  for (const name of ["CUNA_API_KEY", "RUNA_API_KEY"]) {
+    assert.throws(
+      () => withEnv({ ...CLEARED, [name]: "invalid" }, () => resolveConfig()),
+      ConfigError,
+      `${name}=invalid was accepted`,
+    );
+  }
+});
+
+test("the canonical spelling wins when both are set, and the loser is named", () => {
+  const warnings = [];
+  vi.spyOn(process, "emitWarning").mockImplementation((...args) => {
+    warnings.push(args);
+  });
+  try {
+    const resolved = withEnv(
+      {
+        ...CLEARED,
+        CUNA_API_KEY: CANONICAL_KEY,
+        RUNA_API_KEY: API_KEY,
+        CUNA_BASE_URL: CANONICAL_URL,
+        RUNA_BASE_URL: LEGACY_URL,
+      },
+      () => resolveConfig(),
+    );
+    assert.equal(resolved.apiKey, CANONICAL_KEY);
+    assert.equal(resolved.baseUrl, CANONICAL_URL);
+    assert.deepEqual(
+      warnings.map(([, type]) => type),
+      ["CunaConfigWarning", "CunaConfigWarning"],
+    );
+    assert.match(warnings[0][0], /^RUNA_API_KEY is set to a different value than CUNA_API_KEY\./u);
+    assert.match(warnings[1][0], /^RUNA_BASE_URL is set to a different value than CUNA_BASE_URL\./u);
+    for (const [text] of warnings) {
+      assert.equal(text.includes(CANONICAL_KEY), false, "a warning leaked a value");
+      assert.equal(text.includes(API_KEY), false, "a warning leaked a value");
+    }
+  } finally {
+    vi.restoreAllMocks();
+  }
+});
+
+test("agreeing spellings and a lone legacy spelling are resolved without a warning", () => {
+  const warnings = [];
+  vi.spyOn(process, "emitWarning").mockImplementation((...args) => {
+    warnings.push(args);
+  });
+  try {
+    const agreeing = withEnv(
+      {
+        ...CLEARED,
+        CUNA_API_KEY: CANONICAL_KEY,
+        RUNA_API_KEY: CANONICAL_KEY,
+        CUNA_BASE_URL: LEGACY_URL,
+        RUNA_BASE_URL: LEGACY_URL,
+      },
+      () => resolveConfig(),
+    );
+    assert.equal(agreeing.baseUrl, LEGACY_URL);
+    const legacyOnly = withEnv(
+      { ...CLEARED, RUNA_API_KEY: API_KEY, RUNA_BASE_URL: LEGACY_URL },
+      () => resolveConfig(),
+    );
+    assert.equal(legacyOnly.baseUrl, LEGACY_URL);
+    assert.deepEqual(warnings, []);
+  } finally {
+    vi.restoreAllMocks();
+  }
+});
+
+test("a present but invalid canonical variable never falls through to its legacy alias", () => {
+  assert.throws(
+    () => withEnv(
+      {
+        ...CLEARED,
+        CUNA_API_KEY: CANONICAL_KEY,
+        CUNA_BASE_URL: "https://example.invalid",
+        RUNA_BASE_URL: LEGACY_URL,
+      },
+      () => resolveConfig(),
+    ),
+    ConfigError,
+    "an invalid CUNA_BASE_URL fell through to RUNA_BASE_URL",
+  );
+  assert.throws(
+    () => withEnv(
+      { ...CLEARED, CUNA_API_KEY: "invalid", RUNA_API_KEY: API_KEY },
+      () => resolveConfig(),
+    ),
+    ConfigError,
+    "an invalid CUNA_API_KEY fell through to RUNA_API_KEY",
+  );
 });

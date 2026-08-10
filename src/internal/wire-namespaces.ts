@@ -20,9 +20,28 @@
  * spelling; `EMITTED_TERMINAL_PROTOCOL` records what this client sends, it is
  * deliberately a single value, and widening the accept sets must never change
  * it.
+ *
+ * Not every branded identity travels on the wire. A configuration variable
+ * name is minted by the documentation and accepted by `config.ts`, compared in
+ * a different file from the one that publishes it — the same producer/consumer
+ * split, with the same failure. `CUNA_BASE_URL` was documented nowhere and read
+ * nowhere while `CUNA_API_KEY` in the very same config block was dual-accepted,
+ * so a user who exported the Cuna spelling of the endpoint silently kept
+ * talking to the default host. Environment names therefore derive from
+ * `WIRE_BRANDS` too: one list, so the credential and the endpoint cannot drift
+ * apart again.
  */
 
-/** Every brand spelling accepted on the wire. Append-only. */
+/**
+ * Every brand spelling accepted on the wire. Append-only, and ORDERED: the
+ * first entry is the spelling this product mints today and every later entry is
+ * a legacy alias that must keep working.
+ *
+ * The order is load-bearing exactly once, in `brandedEnvNames`, where it
+ * decides which variable wins when a user sets more than one spelling of the
+ * same setting. Appending is safe by construction — a new entry lands last and
+ * therefore cannot change an existing precedence.
+ */
 export const WIRE_BRANDS = ["cuna", "runa"] as const;
 
 export type WireBrand = (typeof WIRE_BRANDS)[number];
@@ -60,6 +79,31 @@ export function brandedProtocols<Suffix extends string>(
 ): ReadonlySet<BrandedProtocol<Suffix>> {
   return new Set(
     WIRE_BRANDS.map((brand): BrandedProtocol<Suffix> => `${brand}.${suffix}`),
+  );
+}
+
+/**
+ * One environment-variable name in one brand spelling, e.g. `CUNA_BASE_URL`.
+ */
+export type BrandedEnvName<Suffix extends string> =
+  `${Uppercase<WireBrand>}_${Suffix}`;
+
+/**
+ * Every brand spelling of one environment-variable suffix, most canonical
+ * first — which is also the order a reader must consult them in.
+ *
+ * A caller that reads this list instead of writing the names out cannot widen
+ * the credential and forget the endpoint, because there is only one list and
+ * one order for both. Annotating the result with a `Covers<>` alias turns a
+ * shrunk `WIRE_BRANDS` into a compile error at the configuration layer as well
+ * as the wire layer.
+ */
+export function brandedEnvNames<Suffix extends string>(
+  suffix: Suffix,
+): readonly BrandedEnvName<Suffix>[] {
+  return WIRE_BRANDS.map(
+    (brand): BrandedEnvName<Suffix> =>
+      `${brand.toUpperCase() as Uppercase<WireBrand>}_${suffix}`,
   );
 }
 
