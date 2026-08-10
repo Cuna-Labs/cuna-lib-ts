@@ -20,10 +20,16 @@ import type {
   TerminalConnectionCapabilityAvailability,
   TerminalConnectionCapabilityName,
   TerminalConnectionGrant,
+  TerminalConnectionProtocol,
 } from "./agent-sessions.js";
 import type { Problem, ProblemAction } from "./errors.js";
 import type { MachineCreateRequest } from "./machine-creates.js";
 import type { WorkspaceBinding } from "./workspace-bindings.js";
+import {
+  brandedCredentialPattern,
+  brandedProtocols,
+  brandedZonePattern,
+} from "./internal/wire-namespaces.js";
 import type {
   WorkspaceSyncCapability,
   WorkspaceSyncChangeItem,
@@ -41,8 +47,8 @@ import type {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const SLUG = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
-const RUNTIME_URL = /^https:\/\/[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.runacode\.cloud$/;
-const OPEN_URL = /^https:\/\/[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.runacode\.cloud\/__runa\/auth\?t=[^&#]+$/;
+const RUNTIME_URL = brandedZonePattern();
+const OPEN_URL = brandedZonePattern("/__runa/auth\\?t=[^&#]+");
 const RFC3339 = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|([+-])(\d{2}):(\d{2}))$/;
 const STATUSES = new Set<SessionStatus>(["creating", "running", "paused", "suspended", "stopped", "deleted", "error"]);
 const AGENTS = new Set<SessionAgent>(["claude-code", "codex", "openclaw"]);
@@ -67,7 +73,8 @@ const AGENT_SESSION_AUTH_EVIDENCE = new Set<AgentSessionAuthEvidenceClass>([
   "provider_cli_login_status", "credential_binding_authority", "insufficient",
 ]);
 const AGENT_VERSION = /^[0-9]+\.[0-9]+\.[0-9]+$/u;
-const AGENT_AUTH_ADAPTER = "runa.agent-auth.v1" as const;
+const AGENT_AUTH_ADAPTERS: ReadonlySet<AgentSessionAuth["adapterVersion"]> =
+  brandedProtocols("agent-auth.v1");
 const MAX_AGENT_AUTH_TTL_MS = 30_000;
 const MAX_AGENT_AUTH_FUTURE_SKEW_MS = 5_000;
 const AGENT_SESSION_DESIRED_STATES = new Set<AgentSessionDesiredState>([
@@ -81,7 +88,9 @@ const AGENT_SESSION_PROCESS_STATES = new Set<AgentSessionProcessState>([
 ]);
 const AGENT_SESSION_CWD = /^\/workspace(?:\/.*)?$/u;
 const TERMINAL_CONNECTION_URL = /^wss:\/\/api\.(?:getcuna\.com|runacode\.io)\/v1\/terminal-connections\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/stream$/u;
-const TERMINAL_CONNECTION_TOKEN = /^runa_tc_[A-Za-z0-9_-]{43}$/u;
+const TERMINAL_CONNECTION_TOKEN = brandedCredentialPattern("tc", "[A-Za-z0-9_-]{43}");
+const TERMINAL_PROTOCOLS: ReadonlySet<TerminalConnectionProtocol> =
+  brandedProtocols("terminal.v1");
 const TERMINAL_CAPABILITY_NAMES = new Set<TerminalConnectionCapabilityName>([
   "acknowledgement", "heartbeat", "live_resize", "resume", "signals",
 ]);
@@ -116,17 +125,37 @@ function malformed(): never { throw new DecodeFailure(); }
 /** The value substituted for a credential when a result is serialized. */
 const REDACTED = "[redacted]";
 
+/** Node's opt-in rendering hook, the one `util.inspect` consults. */
+const INSPECT_CUSTOM = Symbol.for("nodejs.util.inspect.custom");
+
 /**
- * Freeze a result whose named fields are live capabilities, and attach a
- * non-enumerable `toJSON` that redacts them.
+ * Freeze a result whose named fields are live capabilities, and attach one
+ * non-enumerable redacting hook for every sink that offers one.
  *
  * A plain frozen object hands its secret to `JSON.stringify` verbatim, and
  * `JSON.stringify` is what every structured logger, crash reporter, and
  * outbound request body calls. The type system cannot object: the field is a
- * `string` like any other. Redacting at the serialization boundary is the only
- * place the guard survives being passed to code that never heard of this SDK.
+ * `string` like any other.
  *
- * `toJSON` is non-enumerable, so the object's own key set, spreads, and
+ * Exactly two sinks in the platform accept a hook, and both are installed here:
+ *
+ * - `toJSON` — `JSON.stringify`, and `util.format("%j")` through it.
+ * - `Symbol.for("nodejs.util.inspect.custom")` — `util.inspect`, which is what
+ *   `console.log`, `util.format("%o")` and Node's own uncaught-exception
+ *   printer call.
+ *
+ * The serialization boundary is NOT "the only place the guard survives", and
+ * believing that sentence is what left `console.log(grant)` printing the token
+ * in full for as long as `toJSON` was the sole hook. Every sink that copies the
+ * object's own data properties reads the real value and accepts no hook at all:
+ * object spread, `Object.entries`, `structuredClone`, `URLSearchParams`,
+ * `Object.values().join()`. Three of those hand the plain copy straight back to
+ * `JSON.stringify`, the very sink this guard claims to own — the copy has no
+ * `toJSON`, so the secret is emitted. There is no hook that closes them; each
+ * needs its own guard where the copy is made. The list of hooks above is a
+ * floor and may only ever GROW.
+ *
+ * Both hooks are non-enumerable, so the object's own key set, spreads, and
  * `deepStrictEqual` comparisons are unchanged, and the caller still reads the
  * real value off the property.
  */
@@ -134,20 +163,23 @@ function redactOnSerialize<T extends object>(
   value: T,
   secretKeys: readonly (keyof T & string)[],
 ): T {
-  Object.defineProperty(value, "toJSON", {
-    value(this: T): globalThis.Record<string, unknown> {
-      const safe: globalThis.Record<string, unknown> = Object.fromEntries(
-        Object.entries(this),
-      );
-      for (const key of secretKeys) {
-        if (Object.hasOwn(safe, key)) safe[key] = REDACTED;
-      }
-      return safe;
-    },
-    enumerable: false,
-    writable: false,
-    configurable: false,
-  });
+  function redacted(this: T): globalThis.Record<string, unknown> {
+    const safe: globalThis.Record<string, unknown> = Object.fromEntries(
+      Object.entries(this),
+    );
+    for (const key of secretKeys) {
+      if (Object.hasOwn(safe, key)) safe[key] = REDACTED;
+    }
+    return safe;
+  }
+  for (const hook of [INSPECT_CUSTOM, "toJSON"] as const) {
+    Object.defineProperty(value, hook, {
+      value: redacted,
+      enumerable: false,
+      writable: false,
+      configurable: false,
+    });
+  }
   return Object.freeze(value);
 }
 
@@ -254,7 +286,7 @@ export function decodeAgentSessionAuth(
   const credential = authMode === "credential_binding" &&
     evidenceClass === "credential_binding_authority" && state === "configured";
   if (
-    adapterVersion !== AGENT_AUTH_ADAPTER ||
+    !AGENT_AUTH_ADAPTERS.has(adapterVersion as AgentSessionAuth["adapterVersion"]) ||
     (!unavailable && !interactive && !credential) ||
     (unavailable && validUntilMs !== observedMs) ||
     (!unavailable && (
@@ -272,7 +304,10 @@ export function decodeAgentSessionAuth(
     processEpoch,
     authMode,
     agentVersion,
-    adapterVersion: AGENT_AUTH_ADAPTER,
+    // The accepted spelling is echoed, not normalized: the service is the
+    // authority on which one it minted, and a caller that compares it must see
+    // what actually arrived.
+    adapterVersion: adapterVersion as AgentSessionAuth["adapterVersion"],
     evidenceClass,
     observedAt,
     validUntil,
@@ -689,9 +724,10 @@ export function decodeTerminalConnectionGrant(value: unknown): TerminalConnectio
     `wss://api.getcuna.com/v1/terminal-connections/${terminalSessionId}/stream`,
     `wss://api.runacode.io/v1/terminal-connections/${terminalSessionId}/stream`,
   ]);
+  const protocol = enumValue(source.protocol, TERMINAL_PROTOCOLS);
   if (!TERMINAL_CONNECTION_URL.test(connectUrl) || !expectedConnectUrls.has(connectUrl) ||
       !TERMINAL_CONNECTION_TOKEN.test(connectToken) ||
-      connectUrl.includes(connectToken) || source.protocol !== "runa.terminal.v1" ||
+      connectUrl.includes(connectToken) ||
       !Array.isArray(source.capabilities) || source.capabilities.length !== 5) malformed();
   const capabilities = source.capabilities.map((item): TerminalConnectionCapability => {
     const capability = object(item);
@@ -715,7 +751,7 @@ export function decodeTerminalConnectionGrant(value: unknown): TerminalConnectio
     resumeHandle: uuid(source.resume_handle),
     connectUrl,
     connectToken,
-    protocol: "runa.terminal.v1" as const,
+    protocol,
     capabilities: Object.freeze(capabilities),
     expiresAt: dateTime(source.expires_at),
   }, ["connectToken"]);

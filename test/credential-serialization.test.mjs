@@ -1,17 +1,30 @@
 import assert from "node:assert/strict";
+import { Console } from "node:console";
+import { Writable } from "node:stream";
+import { format, inspect } from "node:util";
 import { test } from "vitest";
 
 import { Runa } from "../dist/index.js";
 import { API_KEY, SESSION_ID, jsonResponse, openUrl, sessionFixture } from "./helpers.mjs";
 
 /*
- * Credential-holding results must not hand their secret to `JSON.stringify`.
+ * Credential-holding results must not hand their secret to a sink that accepts
+ * a redacting hook.
  *
- * A plain frozen object does exactly that, and `JSON.stringify` is what every
+ * A plain frozen object hands it to every sink. `JSON.stringify` is what every
  * structured logger, crash reporter, analytics call and outbound request body
- * reaches for. Nothing in the type system objects: the field is a `string`.
- * Redaction at the serialization boundary is the only guard that survives the
- * object being handed to code that never heard of this SDK.
+ * reaches for; `util.inspect` is what `console.log`, `util.format("%o")` and
+ * Node's uncaught-exception printer reach for. Nothing in the type system
+ * objects: the field is a `string`.
+ *
+ * Serialization is NOT the only place a guard survives, and this file said it
+ * was while `console.log(grant)` printed the connect token in full. Two sinks
+ * take a hook and both are covered below. The sinks that copy the object's own
+ * data properties — object spread, `Object.entries`, `structuredClone`,
+ * `URLSearchParams`, `Object.values().join()` — take no hook at all and still
+ * read the real value; three of them then hand the hookless copy back to
+ * `JSON.stringify`. Closing those needs a guard where the copy is made, not a
+ * better hook here.
  *
  * The floor below may only ever GROW. Each case names its object so a removed
  * guard fails by name.
@@ -125,5 +138,97 @@ test("SEC-5 TerminalConnectionGrant never serializes its connect token", async (
   assert.equal(JSON.parse(serialized).connectUrl, grant.connectUrl);
   assert.equal(JSON.stringify({ grant }).includes(CONNECT_TOKEN), false);
   assert.equal(Object.keys(grant).includes("toJSON"), false);
+  await runa.close();
+});
+
+/**
+ * Capture the bytes `console.log` actually writes, rather than asserting about
+ * the function it is documented to call.
+ *
+ * This builds a real `node:console` Console — the same class the global
+ * `console` is an instance of, running the same `util.inspect` path — over a
+ * stream owned by the test. The global `console` is unusable here: the test
+ * runner replaces it, so asserting against it would prove something about
+ * Vitest instead of about this SDK.
+ */
+function consoleOutput(value) {
+  const written = [];
+  const sink = new Writable({
+    write(chunk, _encoding, done) {
+      written.push(String(chunk));
+      done();
+    },
+  });
+  new Console({ stdout: sink, colorMode: false }).log(value);
+  return written.join("");
+}
+
+test("SEC-5 OpenSessionResult never renders its capability URL to a console", async () => {
+  const runa = new Runa({
+    apiKey: API_KEY,
+    baseUrl: "https://api.runacode.io",
+    fetch: async (url) =>
+      new URL(url).pathname.endsWith("/open")
+        ? jsonResponse({ url: openUrl() })
+        : jsonResponse(sessionFixture()),
+  });
+  const session = await runa.sessions.get(SESSION_ID);
+  const result = await session.open();
+
+  for (const [sink, rendered] of [
+    ["console.log", consoleOutput(result)],
+    ["util.inspect", inspect(result)],
+    ["util.inspect depth", inspect({ nested: [result] }, { depth: 5 })],
+    ["util.format %o", format("%o", result)],
+    ["util.format %s", format("%s", result)],
+    ["util.format %j", format("%j", result)],
+  ]) {
+    assert.equal(rendered.includes(openUrl()), false, `OpenSessionResult.url reached ${sink}`);
+    assert.equal(rendered.includes(REDACTED), true, `${sink} rendered no redaction marker`);
+  }
+  // The caller still reads the real capability off the property.
+  assert.equal(result.url, openUrl());
+  await runa.close();
+});
+
+test("SEC-5 TerminalConnectionGrant never renders its connect token to a console", async () => {
+  const runa = new Runa({
+    apiKey: API_KEY,
+    baseUrl: "https://api.runacode.io",
+    fetch: async (url) =>
+      new URL(url).pathname.endsWith("/terminal-connections")
+        ? jsonResponse(terminalGrantFixture(), 201)
+        : jsonResponse(agentSessionFixture()),
+  });
+  const grant = await runa.agentSessions.createTerminalConnection(AGENT_SESSION_ID, {
+    idempotencyKey: "terminal-connection-1",
+    clientInstanceId: "typescript-sdk.test:1",
+    resumeHandle: RESUME_HANDLE,
+  });
+
+  for (const [sink, rendered] of [
+    ["console.log", consoleOutput(grant)],
+    ["util.inspect", inspect(grant)],
+    ["util.inspect depth", inspect({ nested: [grant] }, { depth: 5 })],
+    ["util.format %o", format("%o", grant)],
+    ["util.format %s", format("%s", grant)],
+    ["util.format %j", format("%j", grant)],
+  ]) {
+    assert.equal(
+      rendered.includes(CONNECT_TOKEN),
+      false,
+      `TerminalConnectionGrant.connectToken reached ${sink}`,
+    );
+    assert.equal(rendered.includes(REDACTED), true, `${sink} rendered no redaction marker`);
+    // The non-secret half stays visible, or the guard has made the object
+    // useless to read rather than safe to log.
+    assert.equal(rendered.includes(TERMINAL_SESSION_ID), true, `${sink} hid the whole grant`);
+  }
+  assert.equal(grant.connectToken, CONNECT_TOKEN);
+  // The hook must stay invisible to the object's own shape.
+  assert.deepEqual(Object.keys(grant).sort(), [
+    "capabilities", "connectToken", "connectUrl", "expiresAt", "protocol",
+    "resumeHandle", "terminalSessionId",
+  ]);
   await runa.close();
 });

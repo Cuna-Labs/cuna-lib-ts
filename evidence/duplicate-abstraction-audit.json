@@ -2,7 +2,7 @@
   "schema_version": 2,
   "status": "PASS",
   "method": "scripts/verify-duplicate-abstractions.mjs",
-  "audited_source_sha256": "1438b5fc3466f97e7393c7645b77087c8dc08e437bd13b02eb37ced17b97b1f6",
+  "audited_source_sha256": "b89034e87e23051c875393ff1756ba74cf86536cff41e275ef61a3b192eef6cf",
   "audited_files": [
     "src/agent-sessions.ts",
     "src/client.ts",
@@ -23,6 +23,7 @@
     "src/internal/sanitize.ts",
     "src/internal/test-seams.ts",
     "src/internal/transport.ts",
+    "src/internal/wire-namespaces.ts",
     "src/machine-creates.ts",
     "src/session.ts",
     "src/text.ts",

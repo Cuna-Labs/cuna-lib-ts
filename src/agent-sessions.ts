@@ -1,5 +1,10 @@
 import { ApiError } from "./errors.js";
 import { assertUuid } from "./domain.js";
+import {
+  EMITTED_TERMINAL_PROTOCOL,
+  brandedProtocols,
+} from "./internal/wire-namespaces.js";
+import type { BrandedProtocol } from "./internal/wire-namespaces.js";
 import type { ClientPort } from "./internal/client-port.js";
 import type { SessionAgent } from "./types.js";
 
@@ -27,7 +32,11 @@ export interface AgentSessionAuth {
   readonly processEpoch: string | null;
   readonly authMode: AgentSessionAuthMode;
   readonly agentVersion: string;
-  readonly adapterVersion: "runa.agent-auth.v1";
+  /**
+   * The adapter contract version exactly as the service minted it. Both brand
+   * spellings are accepted; the value is echoed, never normalized.
+   */
+  readonly adapterVersion: "cuna.agent-auth.v1" | "runa.agent-auth.v1";
   readonly evidenceClass: AgentSessionAuthEvidenceClass;
   readonly observedAt: string;
   readonly validUntil: string;
@@ -100,7 +109,12 @@ export interface AgentSessionCreateOptions {
   readonly credentialBindingId?: string;
 }
 
-export type TerminalConnectionProtocol = "runa.terminal.v1";
+/**
+ * The terminal-stream protocol identity. Both brand spellings are accepted on
+ * a grant and as a requested protocol; the client always sends the single
+ * spelling the service mints today.
+ */
+export type TerminalConnectionProtocol = "cuna.terminal.v1" | "runa.terminal.v1";
 export type TerminalConnectionCapabilityName =
   | "acknowledgement"
   | "heartbeat"
@@ -179,7 +193,15 @@ const TERMINAL_CONNECTION_FIELDS = new Set([
   "resumeHandle",
 ]);
 const CLIENT_INSTANCE_ID = /^[A-Za-z0-9._:-]{1,256}$/u;
-const TERMINAL_PROTOCOL: TerminalConnectionProtocol = "runa.terminal.v1";
+/** Accepted from the caller. */
+const TERMINAL_PROTOCOLS: ReadonlySet<TerminalConnectionProtocol> =
+  brandedProtocols("terminal.v1");
+/**
+ * Sent to the service. One value on purpose: the service is the authority on
+ * the minted spelling, and widening what this client accepts must never change
+ * what it emits.
+ */
+const TERMINAL_PROTOCOL: BrandedProtocol<"terminal.v1"> = EMITTED_TERMINAL_PROTOCOL;
 
 function length(value: string): number {
   return [...value].length;
@@ -332,7 +354,7 @@ class AgentSessionsManagerImplementation implements AgentSessionsManager {
         Object.keys(options).some((key) => !TERMINAL_CONNECTION_FIELDS.has(key)) ||
         typeof options.idempotencyKey !== "string" || !IDEMPOTENCY_KEY.test(options.idempotencyKey) ||
         typeof options.clientInstanceId !== "string" || !CLIENT_INSTANCE_ID.test(options.clientInstanceId) ||
-        (options.protocol !== undefined && options.protocol !== TERMINAL_PROTOCOL)) {
+        (options.protocol !== undefined && !TERMINAL_PROTOCOLS.has(options.protocol))) {
       throw new TypeError("Invalid terminal connection options.");
     }
     if (options.resumeHandle !== undefined) assertUuid(options.resumeHandle);
