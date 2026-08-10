@@ -30,6 +30,7 @@ import {
   brandedProtocols,
   brandedZonePattern,
 } from "./internal/wire-namespaces.js";
+import type { BrandedProtocol, Covers } from "./internal/wire-namespaces.js";
 import type {
   WorkspaceSyncCapability,
   WorkspaceSyncChangeItem,
@@ -75,6 +76,8 @@ const AGENT_SESSION_AUTH_EVIDENCE = new Set<AgentSessionAuthEvidenceClass>([
 const AGENT_VERSION = /^[0-9]+\.[0-9]+\.[0-9]+$/u;
 const AGENT_AUTH_ADAPTERS: ReadonlySet<AgentSessionAuth["adapterVersion"]> =
   brandedProtocols("agent-auth.v1");
+type _AgentAuthAdapterCoverage =
+  Covers<AgentSessionAuth["adapterVersion"], BrandedProtocol<"agent-auth.v1">>;
 const MAX_AGENT_AUTH_TTL_MS = 30_000;
 const MAX_AGENT_AUTH_FUTURE_SKEW_MS = 5_000;
 const AGENT_SESSION_DESIRED_STATES = new Set<AgentSessionDesiredState>([
@@ -91,6 +94,8 @@ const TERMINAL_CONNECTION_URL = /^wss:\/\/api\.(?:getcuna\.com|runacode\.io)\/v1
 const TERMINAL_CONNECTION_TOKEN = brandedCredentialPattern("tc", "[A-Za-z0-9_-]{43}");
 const TERMINAL_PROTOCOLS: ReadonlySet<TerminalConnectionProtocol> =
   brandedProtocols("terminal.v1");
+type _TerminalProtocolCoverage =
+  Covers<TerminalConnectionProtocol, BrandedProtocol<"terminal.v1">>;
 const TERMINAL_CAPABILITY_NAMES = new Set<TerminalConnectionCapabilityName>([
   "acknowledgement", "heartbeat", "live_resize", "resume", "signals",
 ]);

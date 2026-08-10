@@ -30,6 +30,18 @@ export type WireBrand = (typeof WIRE_BRANDS)[number];
 /** A dotted protocol identity in both brand spellings, e.g. `terminal.v1`. */
 export type BrandedProtocol<Suffix extends string> = `${WireBrand}.${Suffix}`;
 
+/**
+ * Compile-time proof that an accept set still covers a whole public union.
+ *
+ * `ReadonlySet<PublicUnion> = brandedProtocols(...)` already catches a set that
+ * admits a spelling the public type never declared. This catches the opposite
+ * and more dangerous direction: shrinking `WIRE_BRANDS` would silently narrow
+ * every accept set below the union the SDK promises to return, and narrowing is
+ * the one edit this module exists to forbid. Instantiating this alias fails to
+ * compile the moment a declared spelling stops being accepted.
+ */
+export type Covers<Union extends Accepted, Accepted> = Union;
+
 /** `(?:cuna|runa)` — the brand alternation, for embedding in a validator. */
 export const BRAND_ALTERNATION = `(?:${WIRE_BRANDS.join("|")})`;
 
