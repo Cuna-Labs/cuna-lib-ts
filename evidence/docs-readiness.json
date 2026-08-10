@@ -10,7 +10,7 @@
   "source_claims_owner": "docs/reference/claims.runa-contract",
   "error_matrix_count": 20,
   "example_count": 16,
-  "deterministic_output_sha256": "07cb1eb96e484873c7fa46ca2441ed2c1169d1aee80d86a1b59a909ed71cff42",
+  "deterministic_output_sha256": "c1980b6026b6c46d72b3127fdd786f7c0d7442f18df9981c5ce40e691b92fa75",
   "mutations": [
     {
       "name": "missing",

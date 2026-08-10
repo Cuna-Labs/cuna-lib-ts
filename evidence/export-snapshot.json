@@ -5,6 +5,8 @@
     "ApiError",
     "CommandError",
     "ConfigError",
+    "Cuna",
+    "CunaError",
     "Runa",
     "RunaError",
     "Session",

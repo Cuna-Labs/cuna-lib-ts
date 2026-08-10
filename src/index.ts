@@ -1,12 +1,21 @@
-export { Runa, Runa as Cuna } from "./client.js";
+export { Runa } from "./client.js";
+/**
+ * Canonical Cuna client alias with the same lifecycle and managers as Runa.
+ * @runa-contract cuna-summary PRD-023#R-023-01
+ */
+export { Runa as Cuna } from "./client.js";
 export { Session } from "./session.js";
 export {
   ApiError,
   CommandError,
   ConfigError,
   RunaError,
-  RunaError as CunaError,
 } from "./errors.js";
+/**
+ * Canonical Cuna alias for the normalized public SDK error base class.
+ * @runa-contract cunaerror-summary PRD-024#R-024-01
+ */
+export { RunaError as CunaError } from "./errors.js";
 export { stderrText, stdoutText } from "./text.js";
 
 export type {

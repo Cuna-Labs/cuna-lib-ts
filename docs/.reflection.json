@@ -634,7 +634,7 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 543,
+						"target": 548,
 						"name": "SessionAgent",
 						"package": "@cuna_labs/sdk"
 					}
@@ -1135,7 +1135,7 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 543,
+						"target": 548,
 						"name": "SessionAgent",
 						"package": "@cuna_labs/sdk"
 					}
@@ -2473,7 +2473,7 @@
 									},
 									"type": {
 										"type": "reference",
-										"target": 544,
+										"target": 549,
 										"name": "SessionCreateOptions",
 										"package": "@cuna_labs/sdk"
 									}
@@ -2939,7 +2939,7 @@
 											"type": "array",
 											"elementType": {
 												"type": "reference",
-												"target": 521,
+												"target": 526,
 												"name": "Record",
 												"package": "@cuna_labs/sdk"
 											}
@@ -3028,7 +3028,7 @@
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"target": 485,
+										"target": 490,
 										"name": "CapabilityScope",
 										"package": "@cuna_labs/sdk"
 									}
@@ -3057,7 +3057,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"target": 486,
+										"target": 491,
 										"name": "CapabilitySnapshot",
 										"package": "@cuna_labs/sdk"
 									}
@@ -3239,7 +3239,7 @@
 									},
 									"type": {
 										"type": "reference",
-										"target": 528,
+										"target": 533,
 										"name": "RunaConfig",
 										"package": "@cuna_labs/sdk"
 									}
@@ -3658,7 +3658,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"target": 510,
+										"target": 515,
 										"name": "Me",
 										"package": "@cuna_labs/sdk"
 									}
@@ -4704,7 +4704,7 @@
 					},
 					{
 						"type": "reference",
-						"target": 426,
+						"target": 430,
 						"name": "WorkspaceSyncProblem",
 						"package": "@cuna_labs/sdk"
 					}
@@ -6428,11 +6428,30 @@
 			"variant": "reference",
 			"kind": 4194304,
 			"flags": {},
+			"comment": {
+				"summary": [
+					{
+						"kind": "text",
+						"text": "Canonical Cuna client alias with the same lifecycle and managers as Runa."
+					}
+				],
+				"blockTags": [
+					{
+						"tag": "@runa-contract",
+						"content": [
+							{
+								"kind": "text",
+								"text": "cuna-summary PRD-023#R-023-01"
+							}
+						]
+					}
+				]
+			},
 			"sources": [
 				{
 					"fileName": "dist/index.d.ts",
-					"line": 1,
-					"character": 23
+					"line": 6,
+					"character": 17
 				}
 			],
 			"target": 1
@@ -6443,17 +6462,36 @@
 			"variant": "reference",
 			"kind": 4194304,
 			"flags": {},
+			"comment": {
+				"summary": [
+					{
+						"kind": "text",
+						"text": "Canonical Cuna alias for the normalized public SDK error base class."
+					}
+				],
+				"blockTags": [
+					{
+						"tag": "@runa-contract",
+						"content": [
+							{
+								"kind": "text",
+								"text": "cunaerror-summary PRD-024#R-024-01"
+							}
+						]
+					}
+				]
+			},
 			"sources": [
 				{
 					"fileName": "dist/index.d.ts",
-					"line": 3,
-					"character": 70
+					"line": 13,
+					"character": 22
 				}
 			],
 			"target": 113
 		},
 		{
-			"id": 542,
+			"id": 547,
 			"name": "CunaConfig",
 			"variant": "reference",
 			"kind": 4194304,
@@ -6461,11 +6499,11 @@
 			"sources": [
 				{
 					"fileName": "dist/index.d.ts",
-					"line": 11,
+					"line": 21,
 					"character": 365
 				}
 			],
-			"target": 528
+			"target": 533
 		},
 		{
 			"id": 267,
@@ -6907,7 +6945,7 @@
 						],
 						"type": {
 							"type": "reference",
-							"target": 552,
+							"target": 557,
 							"name": "SessionSnapshot",
 							"package": "@cuna_labs/sdk"
 						}
@@ -7628,7 +7666,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"target": 468,
+										"target": 472,
 										"name": "Acknowledgement",
 										"package": "@cuna_labs/sdk"
 									}
@@ -7811,7 +7849,7 @@
 									},
 									"type": {
 										"type": "reference",
-										"target": 500,
+										"target": 505,
 										"name": "ExecOptions",
 										"package": "@cuna_labs/sdk"
 									}
@@ -7827,7 +7865,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"target": 503,
+										"target": 508,
 										"name": "ExecResult",
 										"package": "@cuna_labs/sdk"
 									}
@@ -7978,7 +8016,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"target": 468,
+										"target": 472,
 										"name": "Acknowledgement",
 										"package": "@cuna_labs/sdk"
 									}
@@ -8099,7 +8137,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"target": 515,
+										"target": 520,
 										"name": "OpenSessionResult",
 										"package": "@cuna_labs/sdk"
 									}
@@ -8241,7 +8279,7 @@
 							},
 							"type": {
 								"type": "reference",
-								"target": 503,
+								"target": 508,
 								"name": "ExecResult",
 								"package": "@cuna_labs/sdk"
 							}
@@ -8362,7 +8400,7 @@
 							},
 							"type": {
 								"type": "reference",
-								"target": 503,
+								"target": 508,
 								"name": "ExecResult",
 								"package": "@cuna_labs/sdk"
 							}
@@ -8385,7 +8423,7 @@
 			]
 		},
 		{
-			"id": 514,
+			"id": 519,
 			"name": "OpaqueWireValue",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -8422,7 +8460,7 @@
 			}
 		},
 		{
-			"id": 485,
+			"id": 490,
 			"name": "CapabilityScope",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -8461,7 +8499,7 @@
 			}
 		},
 		{
-			"id": 494,
+			"id": 499,
 			"name": "CapabilitySubjectScope",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -8483,13 +8521,13 @@
 			],
 			"type": {
 				"type": "reference",
-				"target": 485,
+				"target": 490,
 				"name": "CapabilityScope",
 				"package": "@cuna_labs/sdk"
 			}
 		},
 		{
-			"id": 482,
+			"id": 487,
 			"name": "CapabilityAvailability",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -8532,7 +8570,7 @@
 			}
 		},
 		{
-			"id": 495,
+			"id": 500,
 			"name": "CapabilitySurface",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -8571,7 +8609,7 @@
 			}
 		},
 		{
-			"id": 483,
+			"id": 488,
 			"name": "CapabilityInteraction",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -8610,7 +8648,7 @@
 			}
 		},
 		{
-			"id": 484,
+			"id": 489,
 			"name": "CapabilityMutationClass",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -8657,7 +8695,7 @@
 			}
 		},
 		{
-			"id": 474,
+			"id": 479,
 			"name": "Capability",
 			"variant": "declaration",
 			"kind": 256,
@@ -8672,7 +8710,7 @@
 			},
 			"children": [
 				{
-					"id": 475,
+					"id": 480,
 					"name": "id",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8692,7 +8730,7 @@
 					}
 				},
 				{
-					"id": 476,
+					"id": 481,
 					"name": "availability",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8708,13 +8746,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 482,
+						"target": 487,
 						"name": "CapabilityAvailability",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 477,
+					"id": 482,
 					"name": "surfaces",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8735,7 +8773,7 @@
 							"type": "array",
 							"elementType": {
 								"type": "reference",
-								"target": 495,
+								"target": 500,
 								"name": "CapabilitySurface",
 								"package": "@cuna_labs/sdk"
 							}
@@ -8743,7 +8781,7 @@
 					}
 				},
 				{
-					"id": 478,
+					"id": 483,
 					"name": "interaction",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8759,13 +8797,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 483,
+						"target": 488,
 						"name": "CapabilityInteraction",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 479,
+					"id": 484,
 					"name": "mutationClass",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8781,13 +8819,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 484,
+						"target": 489,
 						"name": "CapabilityMutationClass",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 480,
+					"id": 485,
 					"name": "requiredPermissions",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8814,7 +8852,7 @@
 					}
 				},
 				{
-					"id": 481,
+					"id": 486,
 					"name": "reasonCode",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8839,13 +8877,13 @@
 				{
 					"title": "Properties",
 					"children": [
-						475,
-						476,
-						477,
-						478,
-						479,
 						480,
-						481
+						481,
+						482,
+						483,
+						484,
+						485,
+						486
 					]
 				}
 			],
@@ -8858,7 +8896,7 @@
 			]
 		},
 		{
-			"id": 486,
+			"id": 491,
 			"name": "CapabilitySnapshot",
 			"variant": "declaration",
 			"kind": 256,
@@ -8873,7 +8911,7 @@
 			},
 			"children": [
 				{
-					"id": 487,
+					"id": 492,
 					"name": "schemaVersion",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8893,7 +8931,7 @@
 					}
 				},
 				{
-					"id": 488,
+					"id": 493,
 					"name": "subjectScope",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8909,13 +8947,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 485,
+						"target": 490,
 						"name": "CapabilityScope",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 489,
+					"id": 494,
 					"name": "subjectId",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8936,7 +8974,7 @@
 					}
 				},
 				{
-					"id": 490,
+					"id": 495,
 					"name": "observedAt",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8956,7 +8994,7 @@
 					}
 				},
 				{
-					"id": 491,
+					"id": 496,
 					"name": "expiresAt",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8976,7 +9014,7 @@
 					}
 				},
 				{
-					"id": 492,
+					"id": 497,
 					"name": "etag",
 					"variant": "declaration",
 					"kind": 1024,
@@ -8996,7 +9034,7 @@
 					}
 				},
 				{
-					"id": 493,
+					"id": 498,
 					"name": "capabilities",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9017,7 +9055,7 @@
 							"type": "array",
 							"elementType": {
 								"type": "reference",
-								"target": 474,
+								"target": 479,
 								"name": "Capability",
 								"package": "@cuna_labs/sdk"
 							}
@@ -9029,13 +9067,13 @@
 				{
 					"title": "Properties",
 					"children": [
-						487,
-						488,
-						489,
-						490,
-						491,
 						492,
-						493
+						493,
+						494,
+						495,
+						496,
+						497,
+						498
 					]
 				}
 			],
@@ -9048,7 +9086,7 @@
 			]
 		},
 		{
-			"id": 565,
+			"id": 570,
 			"name": "SessionStatus",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -9114,7 +9152,7 @@
 			}
 		},
 		{
-			"id": 543,
+			"id": 548,
 			"name": "SessionAgent",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -9164,7 +9202,7 @@
 			}
 		},
 		{
-			"id": 520,
+			"id": 525,
 			"name": "OutboundPolicyMode",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -9210,7 +9248,7 @@
 			}
 		},
 		{
-			"id": 517,
+			"id": 522,
 			"name": "OutboundPolicy",
 			"variant": "declaration",
 			"kind": 256,
@@ -9236,7 +9274,7 @@
 			},
 			"children": [
 				{
-					"id": 518,
+					"id": 523,
 					"name": "mode",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9260,13 +9298,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 520,
+						"target": 525,
 						"name": "OutboundPolicyMode",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 519,
+					"id": 524,
 					"name": "hosts",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9305,8 +9343,8 @@
 				{
 					"title": "Properties",
 					"children": [
-						518,
-						519
+						523,
+						524
 					]
 				}
 			],
@@ -9319,7 +9357,7 @@
 			]
 		},
 		{
-			"id": 552,
+			"id": 557,
 			"name": "SessionSnapshot",
 			"variant": "declaration",
 			"kind": 256,
@@ -9345,7 +9383,7 @@
 			},
 			"children": [
 				{
-					"id": 553,
+					"id": 558,
 					"name": "id",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9373,7 +9411,7 @@
 					}
 				},
 				{
-					"id": 554,
+					"id": 559,
 					"name": "userId",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9401,7 +9439,7 @@
 					}
 				},
 				{
-					"id": 555,
+					"id": 560,
 					"name": "slug",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9429,7 +9467,7 @@
 					}
 				},
 				{
-					"id": 556,
+					"id": 561,
 					"name": "name",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9457,7 +9495,7 @@
 					}
 				},
 				{
-					"id": 557,
+					"id": 562,
 					"name": "agent",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9482,13 +9520,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 543,
+						"target": 548,
 						"name": "SessionAgent",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 558,
+					"id": 563,
 					"name": "vcpus",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9516,7 +9554,7 @@
 					}
 				},
 				{
-					"id": 559,
+					"id": 564,
 					"name": "memoryMiB",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9544,7 +9582,7 @@
 					}
 				},
 				{
-					"id": 560,
+					"id": 565,
 					"name": "status",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9568,13 +9606,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 565,
+						"target": 570,
 						"name": "SessionStatus",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 561,
+					"id": 566,
 					"name": "runningSeconds",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9602,7 +9640,7 @@
 					}
 				},
 				{
-					"id": 562,
+					"id": 567,
 					"name": "createdAt",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9630,7 +9668,7 @@
 					}
 				},
 				{
-					"id": 563,
+					"id": 568,
 					"name": "updatedAt",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9658,7 +9696,7 @@
 					}
 				},
 				{
-					"id": 564,
+					"id": 569,
 					"name": "url",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9690,18 +9728,18 @@
 				{
 					"title": "Properties",
 					"children": [
-						553,
-						554,
-						555,
-						556,
-						557,
 						558,
 						559,
 						560,
 						561,
 						562,
 						563,
-						564
+						564,
+						565,
+						566,
+						567,
+						568,
+						569
 					]
 				}
 			],
@@ -9714,7 +9752,7 @@
 			]
 		},
 		{
-			"id": 544,
+			"id": 549,
 			"name": "SessionCreateOptions",
 			"variant": "declaration",
 			"kind": 256,
@@ -9740,7 +9778,7 @@
 			},
 			"children": [
 				{
-					"id": 545,
+					"id": 550,
 					"name": "idempotencyKey",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9769,7 +9807,7 @@
 					}
 				},
 				{
-					"id": 546,
+					"id": 551,
 					"name": "agent",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9794,13 +9832,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 543,
+						"target": 548,
 						"name": "SessionAgent",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 547,
+					"id": 552,
 					"name": "vcpus",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9829,7 +9867,7 @@
 					}
 				},
 				{
-					"id": 548,
+					"id": 553,
 					"name": "memoryMiB",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9858,7 +9896,7 @@
 					}
 				},
 				{
-					"id": 549,
+					"id": 554,
 					"name": "allowedHosts",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9921,7 +9959,7 @@
 					}
 				},
 				{
-					"id": 550,
+					"id": 555,
 					"name": "outboundPolicy",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9946,13 +9984,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 517,
+						"target": 522,
 						"name": "OutboundPolicy",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 551,
+					"id": 556,
 					"name": "runtimePort",
 					"variant": "declaration",
 					"kind": 1024,
@@ -9985,13 +10023,13 @@
 				{
 					"title": "Properties",
 					"children": [
-						545,
-						546,
-						547,
-						548,
-						549,
 						550,
-						551
+						551,
+						552,
+						553,
+						554,
+						555,
+						556
 					]
 				}
 			],
@@ -10004,7 +10042,7 @@
 			]
 		},
 		{
-			"id": 500,
+			"id": 505,
 			"name": "ExecOptions",
 			"variant": "declaration",
 			"kind": 256,
@@ -10030,7 +10068,7 @@
 			},
 			"children": [
 				{
-					"id": 501,
+					"id": 506,
 					"name": "cwd",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10059,7 +10097,7 @@
 					}
 				},
 				{
-					"id": 502,
+					"id": 507,
 					"name": "timeoutSecs",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10092,8 +10130,8 @@
 				{
 					"title": "Properties",
 					"children": [
-						501,
-						502
+						506,
+						507
 					]
 				}
 			],
@@ -10106,7 +10144,7 @@
 			]
 		},
 		{
-			"id": 503,
+			"id": 508,
 			"name": "ExecResult",
 			"variant": "declaration",
 			"kind": 256,
@@ -10132,7 +10170,7 @@
 			},
 			"children": [
 				{
-					"id": 504,
+					"id": 509,
 					"name": "exitCode",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10160,7 +10198,7 @@
 					}
 				},
 				{
-					"id": 505,
+					"id": 510,
 					"name": "stdout",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10188,7 +10226,7 @@
 					}
 				},
 				{
-					"id": 506,
+					"id": 511,
 					"name": "stderr",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10216,7 +10254,7 @@
 					}
 				},
 				{
-					"id": 507,
+					"id": 512,
 					"name": "durationMs",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10244,7 +10282,7 @@
 					}
 				},
 				{
-					"id": 508,
+					"id": 513,
 					"name": "stdoutTruncated",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10272,7 +10310,7 @@
 					}
 				},
 				{
-					"id": 509,
+					"id": 514,
 					"name": "stderrTruncated",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10304,12 +10342,12 @@
 				{
 					"title": "Properties",
 					"children": [
-						504,
-						505,
-						506,
-						507,
-						508,
-						509
+						509,
+						510,
+						511,
+						512,
+						513,
+						514
 					]
 				}
 			],
@@ -10322,7 +10360,7 @@
 			]
 		},
 		{
-			"id": 468,
+			"id": 472,
 			"name": "Acknowledgement",
 			"variant": "declaration",
 			"kind": 256,
@@ -10348,7 +10386,7 @@
 			},
 			"children": [
 				{
-					"id": 469,
+					"id": 473,
 					"name": "ok",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10380,7 +10418,7 @@
 				{
 					"title": "Properties",
 					"children": [
-						469
+						473
 					]
 				}
 			],
@@ -10393,7 +10431,7 @@
 			]
 		},
 		{
-			"id": 515,
+			"id": 520,
 			"name": "OpenSessionResult",
 			"variant": "declaration",
 			"kind": 256,
@@ -10419,7 +10457,7 @@
 			},
 			"children": [
 				{
-					"id": 516,
+					"id": 521,
 					"name": "url",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10451,7 +10489,7 @@
 				{
 					"title": "Properties",
 					"children": [
-						516
+						521
 					]
 				}
 			],
@@ -10464,7 +10502,7 @@
 			]
 		},
 		{
-			"id": 521,
+			"id": 526,
 			"name": "Record",
 			"variant": "declaration",
 			"kind": 256,
@@ -10490,7 +10528,7 @@
 			},
 			"children": [
 				{
-					"id": 522,
+					"id": 527,
 					"name": "id",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10518,7 +10556,7 @@
 					}
 				},
 				{
-					"id": 523,
+					"id": 528,
 					"name": "sessionId",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10546,7 +10584,7 @@
 					}
 				},
 				{
-					"id": 524,
+					"id": 529,
 					"name": "kind",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10574,7 +10612,7 @@
 					}
 				},
 				{
-					"id": 525,
+					"id": 530,
 					"name": "summary",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10602,7 +10640,7 @@
 					}
 				},
 				{
-					"id": 526,
+					"id": 531,
 					"name": "detail",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10630,7 +10668,7 @@
 					}
 				},
 				{
-					"id": 527,
+					"id": 532,
 					"name": "createdAt",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10662,12 +10700,12 @@
 				{
 					"title": "Properties",
 					"children": [
-						522,
-						523,
-						524,
-						525,
-						526,
-						527
+						527,
+						528,
+						529,
+						530,
+						531,
+						532
 					]
 				}
 			],
@@ -10680,7 +10718,7 @@
 			]
 		},
 		{
-			"id": 496,
+			"id": 501,
 			"name": "EstimatedUsage",
 			"variant": "declaration",
 			"kind": 256,
@@ -10706,7 +10744,7 @@
 			},
 			"children": [
 				{
-					"id": 497,
+					"id": 502,
 					"name": "estimatedSpendUsd",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10734,7 +10772,7 @@
 					}
 				},
 				{
-					"id": 498,
+					"id": 503,
 					"name": "estimatedRemainingUsd",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10762,7 +10800,7 @@
 					}
 				},
 				{
-					"id": 499,
+					"id": 504,
 					"name": "note",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10794,9 +10832,9 @@
 				{
 					"title": "Properties",
 					"children": [
-						497,
-						498,
-						499
+						502,
+						503,
+						504
 					]
 				}
 			],
@@ -10809,7 +10847,7 @@
 			]
 		},
 		{
-			"id": 470,
+			"id": 474,
 			"name": "AssignedWorkspace",
 			"variant": "declaration",
 			"kind": 256,
@@ -10835,7 +10873,7 @@
 			},
 			"children": [
 				{
-					"id": 471,
+					"id": 475,
 					"name": "assigned",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10863,7 +10901,35 @@
 					}
 				},
 				{
-					"id": 472,
+					"id": 476,
+					"name": "id",
+					"variant": "declaration",
+					"kind": 1024,
+					"flags": {
+						"isReadonly": true
+					},
+					"comment": {
+						"summary": [
+							{
+								"kind": "text",
+								"text": "Canonical public workspace UUID used by synchronization APIs."
+							}
+						]
+					},
+					"sources": [
+						{
+							"fileName": "dist/types.d.ts",
+							"line": 198,
+							"character": 13
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 477,
 					"name": "usage",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10881,19 +10947,19 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 198,
+							"line": 200,
 							"character": 13
 						}
 					],
 					"type": {
 						"type": "reference",
-						"target": 496,
+						"target": 501,
 						"name": "EstimatedUsage",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 473,
+					"id": 478,
 					"name": "waitlistPosition",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10912,7 +10978,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 200,
+							"line": 202,
 							"character": 13
 						}
 					],
@@ -10926,9 +10992,10 @@
 				{
 					"title": "Properties",
 					"children": [
-						471,
-						472,
-						473
+						475,
+						476,
+						477,
+						478
 					]
 				}
 			],
@@ -10941,7 +11008,7 @@
 			]
 		},
 		{
-			"id": 566,
+			"id": 571,
 			"name": "UnassignedWorkspace",
 			"variant": "declaration",
 			"kind": 256,
@@ -10967,7 +11034,7 @@
 			},
 			"children": [
 				{
-					"id": 567,
+					"id": 572,
 					"name": "assigned",
 					"variant": "declaration",
 					"kind": 1024,
@@ -10985,7 +11052,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 208,
+							"line": 210,
 							"character": 13
 						}
 					],
@@ -10995,7 +11062,7 @@
 					}
 				},
 				{
-					"id": 568,
+					"id": 573,
 					"name": "waitlistPosition",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11013,7 +11080,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 210,
+							"line": 212,
 							"character": 13
 						}
 					],
@@ -11023,7 +11090,7 @@
 					}
 				},
 				{
-					"id": 569,
+					"id": 574,
 					"name": "usage",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11042,7 +11109,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 212,
+							"line": 214,
 							"character": 13
 						}
 					],
@@ -11056,22 +11123,22 @@
 				{
 					"title": "Properties",
 					"children": [
-						567,
-						568,
-						569
+						572,
+						573,
+						574
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "dist/types.d.ts",
-					"line": 206,
+					"line": 208,
 					"character": 17
 				}
 			]
 		},
 		{
-			"id": 570,
+			"id": 575,
 			"name": "Workspace",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -11098,7 +11165,7 @@
 			"sources": [
 				{
 					"fileName": "dist/types.d.ts",
-					"line": 218,
+					"line": 220,
 					"character": 12
 				}
 			],
@@ -11107,13 +11174,13 @@
 				"types": [
 					{
 						"type": "reference",
-						"target": 470,
+						"target": 474,
 						"name": "AssignedWorkspace",
 						"package": "@cuna_labs/sdk"
 					},
 					{
 						"type": "reference",
-						"target": 566,
+						"target": 571,
 						"name": "UnassignedWorkspace",
 						"package": "@cuna_labs/sdk"
 					}
@@ -11121,7 +11188,7 @@
 			}
 		},
 		{
-			"id": 510,
+			"id": 515,
 			"name": "Me",
 			"variant": "declaration",
 			"kind": 256,
@@ -11147,7 +11214,7 @@
 			},
 			"children": [
 				{
-					"id": 511,
+					"id": 516,
 					"name": "id",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11165,7 +11232,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 225,
+							"line": 227,
 							"character": 13
 						}
 					],
@@ -11175,7 +11242,7 @@
 					}
 				},
 				{
-					"id": 512,
+					"id": 517,
 					"name": "email",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11193,7 +11260,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 227,
+							"line": 229,
 							"character": 13
 						}
 					],
@@ -11203,7 +11270,7 @@
 					}
 				},
 				{
-					"id": 513,
+					"id": 518,
 					"name": "workspace",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11221,13 +11288,13 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 229,
+							"line": 231,
 							"character": 13
 						}
 					],
 					"type": {
 						"type": "reference",
-						"target": 570,
+						"target": 575,
 						"name": "Workspace",
 						"package": "@cuna_labs/sdk"
 					}
@@ -11237,22 +11304,22 @@
 				{
 					"title": "Properties",
 					"children": [
-						511,
-						512,
-						513
+						516,
+						517,
+						518
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "dist/types.d.ts",
-					"line": 223,
+					"line": 225,
 					"character": 17
 				}
 			]
 		},
 		{
-			"id": 528,
+			"id": 533,
 			"name": "RunaConfig",
 			"variant": "declaration",
 			"kind": 256,
@@ -11278,7 +11345,7 @@
 			},
 			"children": [
 				{
-					"id": 529,
+					"id": 534,
 					"name": "apiKey",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11297,7 +11364,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 295,
+							"line": 297,
 							"character": 13
 						}
 					],
@@ -11307,7 +11374,7 @@
 					}
 				},
 				{
-					"id": 530,
+					"id": 535,
 					"name": "baseUrl",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11326,7 +11393,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 297,
+							"line": 299,
 							"character": 13
 						}
 					],
@@ -11336,7 +11403,7 @@
 					}
 				},
 				{
-					"id": 531,
+					"id": 536,
 					"name": "configFile",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11355,7 +11422,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 299,
+							"line": 301,
 							"character": 13
 						}
 					],
@@ -11374,7 +11441,7 @@
 					}
 				},
 				{
-					"id": 532,
+					"id": 537,
 					"name": "fetch",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11393,21 +11460,21 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 301,
+							"line": 303,
 							"character": 13
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 533,
+							"id": 538,
 							"name": "__type",
 							"variant": "declaration",
 							"kind": 65536,
 							"flags": {},
 							"signatures": [
 								{
-									"id": 534,
+									"id": 539,
 									"name": "__type",
 									"variant": "signature",
 									"kind": 4096,
@@ -11422,7 +11489,7 @@
 									},
 									"parameters": [
 										{
-											"id": 535,
+											"id": 540,
 											"name": "input",
 											"variant": "param",
 											"kind": 32768,
@@ -11454,7 +11521,7 @@
 											}
 										},
 										{
-											"id": 536,
+											"id": 541,
 											"name": "init",
 											"variant": "param",
 											"kind": 32768,
@@ -11497,7 +11564,7 @@
 									}
 								},
 								{
-									"id": 537,
+									"id": 542,
 									"name": "__type",
 									"variant": "signature",
 									"kind": 4096,
@@ -11512,7 +11579,7 @@
 									},
 									"parameters": [
 										{
-											"id": 538,
+											"id": 543,
 											"name": "input",
 											"variant": "param",
 											"kind": 32768,
@@ -11548,7 +11615,7 @@
 											}
 										},
 										{
-											"id": 539,
+											"id": 544,
 											"name": "init",
 											"variant": "param",
 											"kind": 32768,
@@ -11595,7 +11662,7 @@
 					}
 				},
 				{
-					"id": 540,
+					"id": 545,
 					"name": "diagnostics",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11614,7 +11681,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 303,
+							"line": 305,
 							"character": 13
 						}
 					],
@@ -11630,7 +11697,7 @@
 					}
 				},
 				{
-					"id": 541,
+					"id": 546,
 					"name": "tracing",
 					"variant": "declaration",
 					"kind": 1024,
@@ -11649,7 +11716,7 @@
 					"sources": [
 						{
 							"fileName": "dist/types.d.ts",
-							"line": 305,
+							"line": 307,
 							"character": 13
 						}
 					],
@@ -11669,19 +11736,19 @@
 				{
 					"title": "Properties",
 					"children": [
-						529,
-						530,
-						531,
-						532,
-						540,
-						541
+						534,
+						535,
+						536,
+						537,
+						545,
+						546
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "dist/types.d.ts",
-					"line": 293,
+					"line": 295,
 					"character": 17
 				}
 			]
@@ -12522,7 +12589,7 @@
 			]
 		},
 		{
-			"id": 422,
+			"id": 426,
 			"name": "WorkspaceSyncProtocol",
 			"variant": "declaration",
 			"kind": 2097152,
@@ -12592,14 +12659,14 @@
 			}
 		},
 		{
-			"id": 426,
+			"id": 430,
 			"name": "WorkspaceSyncProblem",
 			"variant": "declaration",
 			"kind": 256,
 			"flags": {},
 			"children": [
 				{
-					"id": 432,
+					"id": 436,
 					"name": "type",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12627,7 +12694,7 @@
 					}
 				},
 				{
-					"id": 433,
+					"id": 437,
 					"name": "title",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12655,7 +12722,7 @@
 					}
 				},
 				{
-					"id": 434,
+					"id": 438,
 					"name": "status",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12683,7 +12750,7 @@
 					}
 				},
 				{
-					"id": 435,
+					"id": 439,
 					"name": "requestId",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12711,7 +12778,7 @@
 					}
 				},
 				{
-					"id": 436,
+					"id": 440,
 					"name": "retryable",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12739,7 +12806,7 @@
 					}
 				},
 				{
-					"id": 427,
+					"id": 431,
 					"name": "code",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12775,7 +12842,7 @@
 					}
 				},
 				{
-					"id": 428,
+					"id": 432,
 					"name": "detail",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12795,7 +12862,7 @@
 					}
 				},
 				{
-					"id": 429,
+					"id": 433,
 					"name": "action",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12824,7 +12891,7 @@
 					}
 				},
 				{
-					"id": 430,
+					"id": 434,
 					"name": "selectedProtocol",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12843,7 +12910,7 @@
 						"types": [
 							{
 								"type": "reference",
-								"target": 422,
+								"target": 426,
 								"name": "WorkspaceSyncProtocol",
 								"package": "@cuna_labs/sdk"
 							},
@@ -12855,7 +12922,7 @@
 					}
 				},
 				{
-					"id": 431,
+					"id": 435,
 					"name": "capabilities",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12888,16 +12955,16 @@
 				{
 					"title": "Properties",
 					"children": [
+						436,
+						437,
+						438,
+						439,
+						440,
+						431,
 						432,
 						433,
 						434,
-						435,
-						436,
-						427,
-						428,
-						429,
-						430,
-						431
+						435
 					]
 				}
 			],
@@ -12943,14 +13010,14 @@
 			]
 		},
 		{
-			"id": 423,
+			"id": 427,
 			"name": "WorkspaceSyncProtocolRange",
 			"variant": "declaration",
 			"kind": 256,
 			"flags": {},
 			"children": [
 				{
-					"id": 424,
+					"id": 428,
 					"name": "minimum",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12970,7 +13037,7 @@
 					}
 				},
 				{
-					"id": 425,
+					"id": 429,
 					"name": "maximum",
 					"variant": "declaration",
 					"kind": 1024,
@@ -12994,8 +13061,8 @@
 				{
 					"title": "Properties",
 					"children": [
-						424,
-						425
+						428,
+						429
 					]
 				}
 			],
@@ -13119,7 +13186,7 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 423,
+						"target": 427,
 						"name": "WorkspaceSyncProtocolRange",
 						"package": "@cuna_labs/sdk"
 					}
@@ -13253,14 +13320,14 @@
 			]
 		},
 		{
-			"id": 404,
+			"id": 408,
 			"name": "WorkspaceSyncManifestEntry",
 			"variant": "declaration",
 			"kind": 256,
 			"flags": {},
 			"children": [
 				{
-					"id": 405,
+					"id": 409,
 					"name": "path",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13280,7 +13347,7 @@
 					}
 				},
 				{
-					"id": 406,
+					"id": 410,
 					"name": "kind",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13313,7 +13380,7 @@
 					}
 				},
 				{
-					"id": 407,
+					"id": 411,
 					"name": "byteLength",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13333,7 +13400,7 @@
 					}
 				},
 				{
-					"id": 408,
+					"id": 412,
 					"name": "executable",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13353,7 +13420,7 @@
 					}
 				},
 				{
-					"id": 409,
+					"id": 413,
 					"name": "chunks",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13382,7 +13449,7 @@
 					}
 				},
 				{
-					"id": 410,
+					"id": 414,
 					"name": "linkTarget",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13415,12 +13482,12 @@
 				{
 					"title": "Properties",
 					"children": [
-						405,
-						406,
-						407,
-						408,
 						409,
-						410
+						410,
+						411,
+						412,
+						413,
+						414
 					]
 				}
 			],
@@ -13433,14 +13500,14 @@
 			]
 		},
 		{
-			"id": 411,
+			"id": 415,
 			"name": "WorkspaceSyncManifestPageRequest",
 			"variant": "declaration",
 			"kind": 256,
 			"flags": {},
 			"children": [
 				{
-					"id": 412,
+					"id": 416,
 					"name": "pageIndex",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13460,7 +13527,7 @@
 					}
 				},
 				{
-					"id": 413,
+					"id": 417,
 					"name": "isLast",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13480,7 +13547,7 @@
 					}
 				},
 				{
-					"id": 414,
+					"id": 418,
 					"name": "minimumReader",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13500,7 +13567,7 @@
 					}
 				},
 				{
-					"id": 415,
+					"id": 419,
 					"name": "minimumWriter",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13520,7 +13587,7 @@
 					}
 				},
 				{
-					"id": 416,
+					"id": 420,
 					"name": "entries",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13541,7 +13608,7 @@
 							"type": "array",
 							"elementType": {
 								"type": "reference",
-								"target": 404,
+								"target": 408,
 								"name": "WorkspaceSyncManifestEntry",
 								"package": "@cuna_labs/sdk"
 							}
@@ -13553,11 +13620,11 @@
 				{
 					"title": "Properties",
 					"children": [
-						412,
-						413,
-						414,
-						415,
-						416
+						416,
+						417,
+						418,
+						419,
+						420
 					]
 				}
 			],
@@ -13698,14 +13765,14 @@
 			]
 		},
 		{
-			"id": 443,
+			"id": 447,
 			"name": "WorkspaceSyncReconcileRequest",
 			"variant": "declaration",
 			"kind": 256,
 			"flags": {},
 			"children": [
 				{
-					"id": 444,
+					"id": 448,
 					"name": "workspaceBindingId",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13733,7 +13800,7 @@
 					}
 				},
 				{
-					"id": 445,
+					"id": 449,
 					"name": "machineId",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13753,7 +13820,7 @@
 					}
 				},
 				{
-					"id": 446,
+					"id": 450,
 					"name": "observedGeneration",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13773,7 +13840,7 @@
 					}
 				},
 				{
-					"id": 447,
+					"id": 451,
 					"name": "exclusionPolicyDigest",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13793,7 +13860,7 @@
 					}
 				},
 				{
-					"id": 448,
+					"id": 452,
 					"name": "manifestRoot",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13813,7 +13880,7 @@
 					}
 				},
 				{
-					"id": 449,
+					"id": 453,
 					"name": "protocol",
 					"variant": "declaration",
 					"kind": 1024,
@@ -13829,7 +13896,7 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 423,
+						"target": 427,
 						"name": "WorkspaceSyncProtocolRange",
 						"package": "@cuna_labs/sdk"
 					}
@@ -13839,12 +13906,12 @@
 				{
 					"title": "Properties",
 					"children": [
-						444,
-						445,
-						446,
-						447,
 						448,
-						449
+						449,
+						450,
+						451,
+						452,
+						453
 					]
 				}
 			],
@@ -13900,7 +13967,7 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 422,
+						"target": 426,
 						"name": "WorkspaceSyncProtocol",
 						"package": "@cuna_labs/sdk"
 					}
@@ -13988,14 +14055,14 @@
 			]
 		},
 		{
-			"id": 450,
+			"id": 454,
 			"name": "WorkspaceSyncSession",
 			"variant": "declaration",
 			"kind": 256,
 			"flags": {},
 			"children": [
 				{
-					"id": 451,
+					"id": 455,
 					"name": "id",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14015,7 +14082,7 @@
 					}
 				},
 				{
-					"id": 452,
+					"id": 456,
 					"name": "workspaceId",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14043,7 +14110,7 @@
 					}
 				},
 				{
-					"id": 453,
+					"id": 457,
 					"name": "machineId",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14063,7 +14130,7 @@
 					}
 				},
 				{
-					"id": 454,
+					"id": 458,
 					"name": "baseGeneration",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14083,7 +14150,7 @@
 					}
 				},
 				{
-					"id": 455,
+					"id": 459,
 					"name": "exclusionPolicyDigest",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14103,7 +14170,7 @@
 					}
 				},
 				{
-					"id": 456,
+					"id": 460,
 					"name": "selectedProtocol",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14119,13 +14186,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 422,
+						"target": 426,
 						"name": "WorkspaceSyncProtocol",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 457,
+					"id": 461,
 					"name": "capabilities",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14154,7 +14221,7 @@
 					}
 				},
 				{
-					"id": 458,
+					"id": 462,
 					"name": "state",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14191,7 +14258,7 @@
 					}
 				},
 				{
-					"id": 459,
+					"id": 463,
 					"name": "manifestEntryCount",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14211,7 +14278,7 @@
 					}
 				},
 				{
-					"id": 460,
+					"id": 464,
 					"name": "manifestEncodedBytes",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14231,7 +14298,7 @@
 					}
 				},
 				{
-					"id": 461,
+					"id": 465,
 					"name": "contentBytes",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14251,7 +14318,7 @@
 					}
 				},
 				{
-					"id": 462,
+					"id": 466,
 					"name": "lastPageIndex",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14272,7 +14339,7 @@
 					}
 				},
 				{
-					"id": 463,
+					"id": 467,
 					"name": "committedGeneration",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14293,7 +14360,7 @@
 					}
 				},
 				{
-					"id": 464,
+					"id": 468,
 					"name": "committedManifestRoot",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14314,7 +14381,7 @@
 					}
 				},
 				{
-					"id": 465,
+					"id": 469,
 					"name": "expiresAt",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14334,7 +14401,7 @@
 					}
 				},
 				{
-					"id": 466,
+					"id": 470,
 					"name": "createdAt",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14354,7 +14421,7 @@
 					}
 				},
 				{
-					"id": 467,
+					"id": 471,
 					"name": "updatedAt",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14378,10 +14445,6 @@
 				{
 					"title": "Properties",
 					"children": [
-						451,
-						452,
-						453,
-						454,
 						455,
 						456,
 						457,
@@ -14394,7 +14457,11 @@
 						464,
 						465,
 						466,
-						467
+						467,
+						468,
+						469,
+						470,
+						471
 					]
 				}
 			],
@@ -14407,14 +14474,14 @@
 			]
 		},
 		{
-			"id": 417,
+			"id": 421,
 			"name": "WorkspaceSyncManifestReceipt",
 			"variant": "declaration",
 			"kind": 256,
 			"flags": {},
 			"children": [
 				{
-					"id": 418,
+					"id": 422,
 					"name": "sync",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14430,13 +14497,13 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 450,
+						"target": 454,
 						"name": "WorkspaceSyncSession",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 419,
+					"id": 423,
 					"name": "pageIndex",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14456,7 +14523,7 @@
 					}
 				},
 				{
-					"id": 420,
+					"id": 424,
 					"name": "pageDigest",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14476,7 +14543,7 @@
 					}
 				},
 				{
-					"id": 421,
+					"id": 425,
 					"name": "missingDigests",
 					"variant": "declaration",
 					"kind": 1024,
@@ -14507,10 +14574,10 @@
 				{
 					"title": "Properties",
 					"children": [
-						418,
-						419,
-						420,
-						421
+						422,
+						423,
+						424,
+						425
 					]
 				}
 			],
@@ -14546,7 +14613,7 @@
 					],
 					"type": {
 						"type": "reference",
-						"target": 422,
+						"target": 426,
 						"name": "WorkspaceSyncProtocol",
 						"package": "@cuna_labs/sdk"
 					}
@@ -14649,13 +14716,13 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 100,
+							"line": 108,
 							"character": 13
 						}
 					],
 					"type": {
 						"type": "reference",
-						"target": 422,
+						"target": 426,
 						"name": "WorkspaceSyncProtocol",
 						"package": "@cuna_labs/sdk"
 					}
@@ -14671,7 +14738,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 101,
+							"line": 109,
 							"character": 13
 						}
 					],
@@ -14691,7 +14758,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 102,
+							"line": 110,
 							"character": 13
 						}
 					],
@@ -14711,7 +14778,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 103,
+							"line": 111,
 							"character": 13
 						}
 					],
@@ -14731,7 +14798,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 104,
+							"line": 112,
 							"character": 13
 						}
 					],
@@ -14751,7 +14818,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 105,
+							"line": 113,
 							"character": 13
 						}
 					],
@@ -14771,7 +14838,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 106,
+							"line": 114,
 							"character": 13
 						}
 					],
@@ -14798,7 +14865,7 @@
 			"sources": [
 				{
 					"fileName": "dist/workspace-sync.d.ts",
-					"line": 99,
+					"line": 107,
 					"character": 17
 				}
 			]
@@ -14821,7 +14888,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 109,
+							"line": 117,
 							"character": 13
 						}
 					],
@@ -14841,7 +14908,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 110,
+							"line": 118,
 							"character": 13
 						}
 					],
@@ -14874,7 +14941,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 111,
+							"line": 119,
 							"character": 13
 						}
 					],
@@ -14903,7 +14970,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 112,
+							"line": 120,
 							"character": 13
 						}
 					],
@@ -14912,7 +14979,7 @@
 						"types": [
 							{
 								"type": "reference",
-								"target": 404,
+								"target": 408,
 								"name": "WorkspaceSyncManifestEntry",
 								"package": "@cuna_labs/sdk"
 							},
@@ -14934,7 +15001,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 113,
+							"line": 121,
 							"character": 13
 						}
 					],
@@ -14954,7 +15021,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 114,
+							"line": 122,
 							"character": 13
 						}
 					],
@@ -14974,7 +15041,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 115,
+							"line": 123,
 							"character": 13
 						}
 					],
@@ -14994,7 +15061,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 116,
+							"line": 124,
 							"character": 13
 						}
 					],
@@ -15014,7 +15081,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 117,
+							"line": 125,
 							"character": 13
 						}
 					],
@@ -15043,7 +15110,7 @@
 			"sources": [
 				{
 					"fileName": "dist/workspace-sync.d.ts",
-					"line": 108,
+					"line": 116,
 					"character": 17
 				}
 			]
@@ -15066,13 +15133,13 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 120,
+							"line": 128,
 							"character": 13
 						}
 					],
 					"type": {
 						"type": "reference",
-						"target": 422,
+						"target": 426,
 						"name": "WorkspaceSyncProtocol",
 						"package": "@cuna_labs/sdk"
 					}
@@ -15088,7 +15155,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 121,
+							"line": 129,
 							"character": 13
 						}
 					],
@@ -15117,7 +15184,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 122,
+							"line": 130,
 							"character": 13
 						}
 					],
@@ -15149,20 +15216,20 @@
 			"sources": [
 				{
 					"fileName": "dist/workspace-sync.d.ts",
-					"line": 119,
+					"line": 127,
 					"character": 17
 				}
 			]
 		},
 		{
-			"id": 437,
+			"id": 441,
 			"name": "WorkspaceSyncReconcileReceipt",
 			"variant": "declaration",
 			"kind": 256,
 			"flags": {},
 			"children": [
 				{
-					"id": 438,
+					"id": 442,
 					"name": "selectedProtocol",
 					"variant": "declaration",
 					"kind": 1024,
@@ -15172,19 +15239,19 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 125,
+							"line": 133,
 							"character": 13
 						}
 					],
 					"type": {
 						"type": "reference",
-						"target": 422,
+						"target": 426,
 						"name": "WorkspaceSyncProtocol",
 						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
-					"id": 439,
+					"id": 443,
 					"name": "status",
 					"variant": "declaration",
 					"kind": 1024,
@@ -15194,7 +15261,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 126,
+							"line": 134,
 							"character": 13
 						}
 					],
@@ -15213,7 +15280,7 @@
 					}
 				},
 				{
-					"id": 440,
+					"id": 444,
 					"name": "activeGeneration",
 					"variant": "declaration",
 					"kind": 1024,
@@ -15223,7 +15290,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 127,
+							"line": 135,
 							"character": 13
 						}
 					],
@@ -15233,7 +15300,7 @@
 					}
 				},
 				{
-					"id": 441,
+					"id": 445,
 					"name": "activeManifestRoot",
 					"variant": "declaration",
 					"kind": 1024,
@@ -15243,7 +15310,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 128,
+							"line": 136,
 							"character": 13
 						}
 					],
@@ -15253,7 +15320,7 @@
 					}
 				},
 				{
-					"id": 442,
+					"id": 446,
 					"name": "exclusionPolicyDigest",
 					"variant": "declaration",
 					"kind": 1024,
@@ -15263,7 +15330,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 129,
+							"line": 137,
 							"character": 13
 						}
 					],
@@ -15277,18 +15344,18 @@
 				{
 					"title": "Properties",
 					"children": [
-						438,
-						439,
-						440,
-						441,
-						442
+						442,
+						443,
+						444,
+						445,
+						446
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "dist/workspace-sync.d.ts",
-					"line": 124,
+					"line": 132,
 					"character": 17
 				}
 			]
@@ -15311,7 +15378,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 132,
+							"line": 140,
 							"character": 13
 						}
 					],
@@ -15332,7 +15399,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 133,
+							"line": 141,
 							"character": 13
 						}
 					],
@@ -15353,7 +15420,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 134,
+							"line": 142,
 							"character": 13
 						}
 					],
@@ -15376,7 +15443,7 @@
 			"sources": [
 				{
 					"fileName": "dist/workspace-sync.d.ts",
-					"line": 131,
+					"line": 139,
 					"character": 17
 				}
 			]
@@ -15397,7 +15464,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 138,
+							"line": 146,
 							"character": 4
 						}
 					],
@@ -15419,7 +15486,7 @@
 							"sources": [
 								{
 									"fileName": "dist/workspace-sync.d.ts",
-									"line": 138,
+									"line": 146,
 									"character": 4
 								}
 							],
@@ -15474,7 +15541,7 @@
 										"typeArguments": [
 											{
 												"type": "reference",
-												"target": 450,
+												"target": 454,
 												"name": "WorkspaceSyncSession",
 												"package": "@cuna_labs/sdk"
 											}
@@ -15498,7 +15565,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 139,
+							"line": 147,
 							"character": 4
 						}
 					],
@@ -15512,7 +15579,7 @@
 							"sources": [
 								{
 									"fileName": "dist/workspace-sync.d.ts",
-									"line": 139,
+									"line": 147,
 									"character": 4
 								}
 							],
@@ -15536,7 +15603,7 @@
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"target": 411,
+										"target": 415,
 										"name": "WorkspaceSyncManifestPageRequest",
 										"package": "@cuna_labs/sdk"
 									}
@@ -15567,7 +15634,7 @@
 										"typeArguments": [
 											{
 												"type": "reference",
-												"target": 417,
+												"target": 421,
 												"name": "WorkspaceSyncManifestReceipt",
 												"package": "@cuna_labs/sdk"
 											}
@@ -15591,7 +15658,7 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 140,
+							"line": 148,
 							"character": 4
 						}
 					],
@@ -15605,7 +15672,7 @@
 							"sources": [
 								{
 									"fileName": "dist/workspace-sync.d.ts",
-									"line": 140,
+									"line": 148,
 									"character": 4
 								}
 							],
@@ -15692,28 +15759,36 @@
 				},
 				{
 					"id": 390,
-					"name": "commit",
+					"name": "downloadChunk",
 					"variant": "declaration",
 					"kind": 2048,
 					"flags": {},
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 141,
+							"line": 150,
 							"character": 4
 						}
 					],
 					"signatures": [
 						{
 							"id": 391,
-							"name": "commit",
+							"name": "downloadChunk",
 							"variant": "signature",
 							"kind": 4096,
 							"flags": {},
+							"comment": {
+								"summary": [
+									{
+										"kind": "text",
+										"text": "Download one chunk as immutable bytes after strict digest and length verification."
+									}
+								]
+							},
 							"sources": [
 								{
 									"fileName": "dist/workspace-sync.d.ts",
-									"line": 141,
+									"line": 150,
 									"character": 4
 								}
 							],
@@ -15731,6 +15806,94 @@
 								},
 								{
 									"id": 393,
+									"name": "digest",
+									"variant": "param",
+									"kind": 32768,
+									"flags": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"target": {
+									"packageName": "typescript",
+									"packagePath": "lib/lib.es5.d.ts",
+									"qualifiedName": "Promise"
+								},
+								"typeArguments": [
+									{
+										"type": "reference",
+										"target": {
+											"packageName": "typescript",
+											"packagePath": "lib/lib.es5.d.ts",
+											"qualifiedName": "Uint8Array"
+										},
+										"typeArguments": [
+											{
+												"type": "reference",
+												"target": {
+													"packageName": "typescript",
+													"packagePath": "lib/lib.es5.d.ts",
+													"qualifiedName": "ArrayBufferLike"
+												},
+												"name": "ArrayBufferLike",
+												"package": "typescript"
+											}
+										],
+										"name": "Uint8Array",
+										"package": "typescript"
+									}
+								],
+								"name": "Promise",
+								"package": "typescript"
+							}
+						}
+					]
+				},
+				{
+					"id": 394,
+					"name": "commit",
+					"variant": "declaration",
+					"kind": 2048,
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "dist/workspace-sync.d.ts",
+							"line": 151,
+							"character": 4
+						}
+					],
+					"signatures": [
+						{
+							"id": 395,
+							"name": "commit",
+							"variant": "signature",
+							"kind": 4096,
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "dist/workspace-sync.d.ts",
+									"line": 151,
+									"character": 4
+								}
+							],
+							"parameters": [
+								{
+									"id": 396,
+									"name": "syncId",
+									"variant": "param",
+									"kind": 32768,
+									"flags": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 397,
 									"name": "request",
 									"variant": "param",
 									"kind": 32768,
@@ -15743,7 +15906,7 @@
 									}
 								},
 								{
-									"id": 394,
+									"id": 398,
 									"name": "idempotencyKey",
 									"variant": "param",
 									"kind": 32768,
@@ -15784,7 +15947,7 @@
 					]
 				},
 				{
-					"id": 395,
+					"id": 399,
 					"name": "changes",
 					"variant": "declaration",
 					"kind": 2048,
@@ -15792,13 +15955,13 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 142,
+							"line": 152,
 							"character": 4
 						}
 					],
 					"signatures": [
 						{
-							"id": 396,
+							"id": 400,
 							"name": "changes",
 							"variant": "signature",
 							"kind": 4096,
@@ -15806,13 +15969,13 @@
 							"sources": [
 								{
 									"fileName": "dist/workspace-sync.d.ts",
-									"line": 142,
+									"line": 152,
 									"character": 4
 								}
 							],
 							"parameters": [
 								{
-									"id": 397,
+									"id": 401,
 									"name": "syncId",
 									"variant": "param",
 									"kind": 32768,
@@ -15823,7 +15986,7 @@
 									}
 								},
 								{
-									"id": 398,
+									"id": 402,
 									"name": "options",
 									"variant": "param",
 									"kind": 32768,
@@ -15866,7 +16029,7 @@
 					]
 				},
 				{
-					"id": 399,
+					"id": 403,
 					"name": "reconcile",
 					"variant": "declaration",
 					"kind": 2048,
@@ -15874,13 +16037,13 @@
 					"sources": [
 						{
 							"fileName": "dist/workspace-sync.d.ts",
-							"line": 143,
+							"line": 153,
 							"character": 4
 						}
 					],
 					"signatures": [
 						{
-							"id": 400,
+							"id": 404,
 							"name": "reconcile",
 							"variant": "signature",
 							"kind": 4096,
@@ -15888,13 +16051,13 @@
 							"sources": [
 								{
 									"fileName": "dist/workspace-sync.d.ts",
-									"line": 143,
+									"line": 153,
 									"character": 4
 								}
 							],
 							"parameters": [
 								{
-									"id": 401,
+									"id": 405,
 									"name": "workspaceId",
 									"variant": "param",
 									"kind": 32768,
@@ -15905,20 +16068,20 @@
 									}
 								},
 								{
-									"id": 402,
+									"id": 406,
 									"name": "request",
 									"variant": "param",
 									"kind": 32768,
 									"flags": {},
 									"type": {
 										"type": "reference",
-										"target": 443,
+										"target": 447,
 										"name": "WorkspaceSyncReconcileRequest",
 										"package": "@cuna_labs/sdk"
 									}
 								},
 								{
-									"id": 403,
+									"id": 407,
 									"name": "idempotencyKey",
 									"variant": "param",
 									"kind": 32768,
@@ -15943,7 +16106,7 @@
 										"typeArguments": [
 											{
 												"type": "reference",
-												"target": 437,
+												"target": 441,
 												"name": "WorkspaceSyncReconcileReceipt",
 												"package": "@cuna_labs/sdk"
 											}
@@ -15967,15 +16130,16 @@
 						379,
 						384,
 						390,
-						395,
-						399
+						394,
+						399,
+						403
 					]
 				}
 			],
 			"sources": [
 				{
 					"fileName": "dist/workspace-sync.d.ts",
-					"line": 136,
+					"line": 144,
 					"character": 17
 				}
 			]
@@ -16011,41 +16175,41 @@
 				239,
 				267,
 				274,
+				479,
+				491,
+				522,
+				557,
+				549,
+				505,
+				508,
+				472,
+				520,
+				526,
+				501,
 				474,
-				486,
-				517,
-				552,
-				544,
-				500,
-				503,
-				468,
+				571,
 				515,
-				521,
-				496,
-				470,
-				566,
-				510,
-				528,
+				533,
 				296,
 				303,
 				281,
 				309,
-				426,
-				423,
+				430,
+				427,
 				318,
 				350,
-				404,
-				411,
+				408,
+				415,
 				361,
-				443,
+				447,
 				367,
-				450,
-				417,
+				454,
+				421,
 				345,
 				353,
 				331,
 				341,
-				437,
+				441,
 				327,
 				373
 			]
@@ -16064,18 +16228,18 @@
 				222,
 				248,
 				238,
-				514,
-				485,
-				494,
-				482,
-				495,
-				483,
-				484,
-				565,
-				543,
-				520,
+				519,
+				490,
+				499,
+				487,
+				500,
+				488,
+				489,
 				570,
-				422,
+				548,
+				525,
+				575,
+				426,
 				326
 			]
 		},
@@ -16091,7 +16255,7 @@
 			"children": [
 				24,
 				135,
-				542
+				547
 			]
 		}
 	],
@@ -18020,12 +18184,12 @@
 		"390": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManager.commit"
+			"qualifiedName": "WorkspaceSyncManager.downloadChunk"
 		},
 		"391": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManager.commit"
+			"qualifiedName": "WorkspaceSyncManager.downloadChunk"
 		},
 		"392": {
 			"packageName": "@cuna_labs/sdk",
@@ -18035,889 +18199,914 @@
 		"393": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "request"
+			"qualifiedName": "digest"
 		},
 		"394": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "idempotencyKey"
+			"qualifiedName": "WorkspaceSyncManager.commit"
 		},
 		"395": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManager.changes"
+			"qualifiedName": "WorkspaceSyncManager.commit"
 		},
 		"396": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManager.changes"
+			"qualifiedName": "syncId"
 		},
 		"397": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "syncId"
+			"qualifiedName": "request"
 		},
 		"398": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "options"
+			"qualifiedName": "idempotencyKey"
 		},
 		"399": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManager.reconcile"
+			"qualifiedName": "WorkspaceSyncManager.changes"
 		},
 		"400": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManager.reconcile"
+			"qualifiedName": "WorkspaceSyncManager.changes"
 		},
 		"401": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "workspaceId"
+			"qualifiedName": "syncId"
 		},
 		"402": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "request"
+			"qualifiedName": "options"
 		},
 		"403": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "idempotencyKey"
+			"qualifiedName": "WorkspaceSyncManager.reconcile"
 		},
 		"404": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestEntry"
+			"qualifiedName": "WorkspaceSyncManager.reconcile"
 		},
 		"405": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestEntry.path"
+			"qualifiedName": "workspaceId"
 		},
 		"406": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestEntry.kind"
+			"qualifiedName": "request"
 		},
 		"407": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestEntry.byteLength"
+			"qualifiedName": "idempotencyKey"
 		},
 		"408": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestEntry.executable"
+			"qualifiedName": "WorkspaceSyncManifestEntry"
 		},
 		"409": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestEntry.chunks"
+			"qualifiedName": "WorkspaceSyncManifestEntry.path"
 		},
 		"410": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestEntry.linkTarget"
+			"qualifiedName": "WorkspaceSyncManifestEntry.kind"
 		},
 		"411": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestPageRequest"
+			"qualifiedName": "WorkspaceSyncManifestEntry.byteLength"
 		},
 		"412": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestPageRequest.pageIndex"
+			"qualifiedName": "WorkspaceSyncManifestEntry.executable"
 		},
 		"413": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestPageRequest.isLast"
+			"qualifiedName": "WorkspaceSyncManifestEntry.chunks"
 		},
 		"414": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestPageRequest.minimumReader"
+			"qualifiedName": "WorkspaceSyncManifestEntry.linkTarget"
 		},
 		"415": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestPageRequest.minimumWriter"
+			"qualifiedName": "WorkspaceSyncManifestPageRequest"
 		},
 		"416": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestPageRequest.entries"
+			"qualifiedName": "WorkspaceSyncManifestPageRequest.pageIndex"
 		},
 		"417": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestReceipt"
+			"qualifiedName": "WorkspaceSyncManifestPageRequest.isLast"
 		},
 		"418": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestReceipt.sync"
+			"qualifiedName": "WorkspaceSyncManifestPageRequest.minimumReader"
 		},
 		"419": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestReceipt.pageIndex"
+			"qualifiedName": "WorkspaceSyncManifestPageRequest.minimumWriter"
 		},
 		"420": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestReceipt.pageDigest"
+			"qualifiedName": "WorkspaceSyncManifestPageRequest.entries"
 		},
 		"421": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncManifestReceipt.missingDigests"
+			"qualifiedName": "WorkspaceSyncManifestReceipt"
 		},
 		"422": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncProtocol"
+			"qualifiedName": "WorkspaceSyncManifestReceipt.sync"
 		},
 		"423": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncProtocolRange"
+			"qualifiedName": "WorkspaceSyncManifestReceipt.pageIndex"
 		},
 		"424": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncProtocolRange.minimum"
+			"qualifiedName": "WorkspaceSyncManifestReceipt.pageDigest"
 		},
 		"425": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncProtocolRange.maximum"
+			"qualifiedName": "WorkspaceSyncManifestReceipt.missingDigests"
 		},
 		"426": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncProblem"
+			"qualifiedName": "WorkspaceSyncProtocol"
 		},
 		"427": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncProblem.code"
+			"qualifiedName": "WorkspaceSyncProtocolRange"
 		},
 		"428": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncProblem.detail"
+			"qualifiedName": "WorkspaceSyncProtocolRange.minimum"
 		},
 		"429": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncProblem.action"
+			"qualifiedName": "WorkspaceSyncProtocolRange.maximum"
 		},
 		"430": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncProblem.selectedProtocol"
+			"qualifiedName": "WorkspaceSyncProblem"
 		},
 		"431": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncProblem.capabilities"
+			"qualifiedName": "WorkspaceSyncProblem.code"
 		},
 		"432": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/errors.ts",
-			"qualifiedName": "type"
+			"packagePath": "src/workspace-sync.ts",
+			"qualifiedName": "WorkspaceSyncProblem.detail"
 		},
 		"433": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/errors.ts",
-			"qualifiedName": "title"
+			"packagePath": "src/workspace-sync.ts",
+			"qualifiedName": "WorkspaceSyncProblem.action"
 		},
 		"434": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/errors.ts",
-			"qualifiedName": "status"
+			"packagePath": "src/workspace-sync.ts",
+			"qualifiedName": "WorkspaceSyncProblem.selectedProtocol"
 		},
 		"435": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/errors.ts",
-			"qualifiedName": "requestId"
+			"packagePath": "src/workspace-sync.ts",
+			"qualifiedName": "WorkspaceSyncProblem.capabilities"
 		},
 		"436": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/errors.ts",
-			"qualifiedName": "retryable"
+			"qualifiedName": "type"
 		},
 		"437": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileReceipt"
+			"packagePath": "src/errors.ts",
+			"qualifiedName": "title"
 		},
 		"438": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileReceipt.selectedProtocol"
+			"packagePath": "src/errors.ts",
+			"qualifiedName": "status"
 		},
 		"439": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileReceipt.status"
+			"packagePath": "src/errors.ts",
+			"qualifiedName": "requestId"
 		},
 		"440": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileReceipt.activeGeneration"
+			"packagePath": "src/errors.ts",
+			"qualifiedName": "retryable"
 		},
 		"441": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileReceipt.activeManifestRoot"
+			"qualifiedName": "WorkspaceSyncReconcileReceipt"
 		},
 		"442": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileReceipt.exclusionPolicyDigest"
+			"qualifiedName": "WorkspaceSyncReconcileReceipt.selectedProtocol"
 		},
 		"443": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileRequest"
+			"qualifiedName": "WorkspaceSyncReconcileReceipt.status"
 		},
 		"444": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileRequest.workspaceBindingId"
+			"qualifiedName": "WorkspaceSyncReconcileReceipt.activeGeneration"
 		},
 		"445": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileRequest.machineId"
+			"qualifiedName": "WorkspaceSyncReconcileReceipt.activeManifestRoot"
 		},
 		"446": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileRequest.observedGeneration"
+			"qualifiedName": "WorkspaceSyncReconcileReceipt.exclusionPolicyDigest"
 		},
 		"447": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileRequest.exclusionPolicyDigest"
+			"qualifiedName": "WorkspaceSyncReconcileRequest"
 		},
 		"448": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileRequest.manifestRoot"
+			"qualifiedName": "WorkspaceSyncReconcileRequest.workspaceBindingId"
 		},
 		"449": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncReconcileRequest.protocol"
+			"qualifiedName": "WorkspaceSyncReconcileRequest.machineId"
 		},
 		"450": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession"
+			"qualifiedName": "WorkspaceSyncReconcileRequest.observedGeneration"
 		},
 		"451": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.id"
+			"qualifiedName": "WorkspaceSyncReconcileRequest.exclusionPolicyDigest"
 		},
 		"452": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.workspaceId"
+			"qualifiedName": "WorkspaceSyncReconcileRequest.manifestRoot"
 		},
 		"453": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.machineId"
+			"qualifiedName": "WorkspaceSyncReconcileRequest.protocol"
 		},
 		"454": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.baseGeneration"
+			"qualifiedName": "WorkspaceSyncSession"
 		},
 		"455": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.exclusionPolicyDigest"
+			"qualifiedName": "WorkspaceSyncSession.id"
 		},
 		"456": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.selectedProtocol"
+			"qualifiedName": "WorkspaceSyncSession.workspaceId"
 		},
 		"457": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.capabilities"
+			"qualifiedName": "WorkspaceSyncSession.machineId"
 		},
 		"458": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.state"
+			"qualifiedName": "WorkspaceSyncSession.baseGeneration"
 		},
 		"459": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.manifestEntryCount"
+			"qualifiedName": "WorkspaceSyncSession.exclusionPolicyDigest"
 		},
 		"460": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.manifestEncodedBytes"
+			"qualifiedName": "WorkspaceSyncSession.selectedProtocol"
 		},
 		"461": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.contentBytes"
+			"qualifiedName": "WorkspaceSyncSession.capabilities"
 		},
 		"462": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.lastPageIndex"
+			"qualifiedName": "WorkspaceSyncSession.state"
 		},
 		"463": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.committedGeneration"
+			"qualifiedName": "WorkspaceSyncSession.manifestEntryCount"
 		},
 		"464": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.committedManifestRoot"
+			"qualifiedName": "WorkspaceSyncSession.manifestEncodedBytes"
 		},
 		"465": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.expiresAt"
+			"qualifiedName": "WorkspaceSyncSession.contentBytes"
 		},
 		"466": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.createdAt"
+			"qualifiedName": "WorkspaceSyncSession.lastPageIndex"
 		},
 		"467": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/workspace-sync.ts",
-			"qualifiedName": "WorkspaceSyncSession.updatedAt"
+			"qualifiedName": "WorkspaceSyncSession.committedGeneration"
 		},
 		"468": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/types.ts",
-			"qualifiedName": "Acknowledgement"
+			"packagePath": "src/workspace-sync.ts",
+			"qualifiedName": "WorkspaceSyncSession.committedManifestRoot"
 		},
 		"469": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/types.ts",
-			"qualifiedName": "Acknowledgement.ok"
+			"packagePath": "src/workspace-sync.ts",
+			"qualifiedName": "WorkspaceSyncSession.expiresAt"
 		},
 		"470": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/types.ts",
-			"qualifiedName": "AssignedWorkspace"
+			"packagePath": "src/workspace-sync.ts",
+			"qualifiedName": "WorkspaceSyncSession.createdAt"
 		},
 		"471": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/types.ts",
-			"qualifiedName": "AssignedWorkspace.assigned"
+			"packagePath": "src/workspace-sync.ts",
+			"qualifiedName": "WorkspaceSyncSession.updatedAt"
 		},
 		"472": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "AssignedWorkspace.usage"
+			"qualifiedName": "Acknowledgement"
 		},
 		"473": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "AssignedWorkspace.waitlistPosition"
+			"qualifiedName": "Acknowledgement.ok"
 		},
 		"474": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Capability"
+			"qualifiedName": "AssignedWorkspace"
 		},
 		"475": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Capability.id"
+			"qualifiedName": "AssignedWorkspace.assigned"
 		},
 		"476": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Capability.availability"
+			"qualifiedName": "AssignedWorkspace.id"
 		},
 		"477": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Capability.surfaces"
+			"qualifiedName": "AssignedWorkspace.usage"
 		},
 		"478": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Capability.interaction"
+			"qualifiedName": "AssignedWorkspace.waitlistPosition"
 		},
 		"479": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Capability.mutationClass"
+			"qualifiedName": "Capability"
 		},
 		"480": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Capability.requiredPermissions"
+			"qualifiedName": "Capability.id"
 		},
 		"481": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Capability.reasonCode"
+			"qualifiedName": "Capability.availability"
 		},
 		"482": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilityAvailability"
+			"qualifiedName": "Capability.surfaces"
 		},
 		"483": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilityInteraction"
+			"qualifiedName": "Capability.interaction"
 		},
 		"484": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilityMutationClass"
+			"qualifiedName": "Capability.mutationClass"
 		},
 		"485": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilityScope"
+			"qualifiedName": "Capability.requiredPermissions"
 		},
 		"486": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilitySnapshot"
+			"qualifiedName": "Capability.reasonCode"
 		},
 		"487": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilitySnapshot.schemaVersion"
+			"qualifiedName": "CapabilityAvailability"
 		},
 		"488": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilitySnapshot.subjectScope"
+			"qualifiedName": "CapabilityInteraction"
 		},
 		"489": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilitySnapshot.subjectId"
+			"qualifiedName": "CapabilityMutationClass"
 		},
 		"490": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilitySnapshot.observedAt"
+			"qualifiedName": "CapabilityScope"
 		},
 		"491": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilitySnapshot.expiresAt"
+			"qualifiedName": "CapabilitySnapshot"
 		},
 		"492": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilitySnapshot.etag"
+			"qualifiedName": "CapabilitySnapshot.schemaVersion"
 		},
 		"493": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilitySnapshot.capabilities"
+			"qualifiedName": "CapabilitySnapshot.subjectScope"
 		},
 		"494": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilitySubjectScope"
+			"qualifiedName": "CapabilitySnapshot.subjectId"
 		},
 		"495": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "CapabilitySurface"
+			"qualifiedName": "CapabilitySnapshot.observedAt"
 		},
 		"496": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "EstimatedUsage"
+			"qualifiedName": "CapabilitySnapshot.expiresAt"
 		},
 		"497": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "EstimatedUsage.estimatedSpendUsd"
+			"qualifiedName": "CapabilitySnapshot.etag"
 		},
 		"498": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "EstimatedUsage.estimatedRemainingUsd"
+			"qualifiedName": "CapabilitySnapshot.capabilities"
 		},
 		"499": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "EstimatedUsage.note"
+			"qualifiedName": "CapabilitySubjectScope"
 		},
 		"500": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "ExecOptions"
+			"qualifiedName": "CapabilitySurface"
 		},
 		"501": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "ExecOptions.cwd"
+			"qualifiedName": "EstimatedUsage"
 		},
 		"502": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "ExecOptions.timeoutSecs"
+			"qualifiedName": "EstimatedUsage.estimatedSpendUsd"
 		},
 		"503": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "ExecResult"
+			"qualifiedName": "EstimatedUsage.estimatedRemainingUsd"
 		},
 		"504": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "ExecResult.exitCode"
+			"qualifiedName": "EstimatedUsage.note"
 		},
 		"505": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "ExecResult.stdout"
+			"qualifiedName": "ExecOptions"
 		},
 		"506": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "ExecResult.stderr"
+			"qualifiedName": "ExecOptions.cwd"
 		},
 		"507": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "ExecResult.durationMs"
+			"qualifiedName": "ExecOptions.timeoutSecs"
 		},
 		"508": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "ExecResult.stdoutTruncated"
+			"qualifiedName": "ExecResult"
 		},
 		"509": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "ExecResult.stderrTruncated"
+			"qualifiedName": "ExecResult.exitCode"
 		},
 		"510": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Me"
+			"qualifiedName": "ExecResult.stdout"
 		},
 		"511": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Me.id"
+			"qualifiedName": "ExecResult.stderr"
 		},
 		"512": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Me.email"
+			"qualifiedName": "ExecResult.durationMs"
 		},
 		"513": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Me.workspace"
+			"qualifiedName": "ExecResult.stdoutTruncated"
 		},
 		"514": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "OpaqueWireValue"
+			"qualifiedName": "ExecResult.stderrTruncated"
 		},
 		"515": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "OpenSessionResult"
+			"qualifiedName": "Me"
 		},
 		"516": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "OpenSessionResult.url"
+			"qualifiedName": "Me.id"
 		},
 		"517": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "OutboundPolicy"
+			"qualifiedName": "Me.email"
 		},
 		"518": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "OutboundPolicy.mode"
+			"qualifiedName": "Me.workspace"
 		},
 		"519": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "OutboundPolicy.hosts"
+			"qualifiedName": "OpaqueWireValue"
 		},
 		"520": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "OutboundPolicyMode"
+			"qualifiedName": "OpenSessionResult"
 		},
 		"521": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Record"
+			"qualifiedName": "OpenSessionResult.url"
 		},
 		"522": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Record.id"
+			"qualifiedName": "OutboundPolicy"
 		},
 		"523": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Record.sessionId"
+			"qualifiedName": "OutboundPolicy.mode"
 		},
 		"524": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Record.kind"
+			"qualifiedName": "OutboundPolicy.hosts"
 		},
 		"525": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Record.summary"
+			"qualifiedName": "OutboundPolicyMode"
 		},
 		"526": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Record.detail"
+			"qualifiedName": "Record"
 		},
 		"527": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "Record.createdAt"
+			"qualifiedName": "Record.id"
 		},
 		"528": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "RunaConfig"
+			"qualifiedName": "Record.sessionId"
 		},
 		"529": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "RunaConfig.apiKey"
+			"qualifiedName": "Record.kind"
 		},
 		"530": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "RunaConfig.baseUrl"
+			"qualifiedName": "Record.summary"
 		},
 		"531": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "RunaConfig.configFile"
+			"qualifiedName": "Record.detail"
 		},
 		"532": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "RunaConfig.fetch"
+			"qualifiedName": "Record.createdAt"
 		},
 		"533": {
-			"packageName": "typescript",
-			"packagePath": "lib/lib.dom.d.ts",
-			"qualifiedName": "fetch"
+			"packageName": "@cuna_labs/sdk",
+			"packagePath": "src/types.ts",
+			"qualifiedName": "RunaConfig"
 		},
 		"534": {
-			"packageName": "typescript",
-			"packagePath": "lib/lib.dom.d.ts",
-			"qualifiedName": "fetch"
+			"packageName": "@cuna_labs/sdk",
+			"packagePath": "src/types.ts",
+			"qualifiedName": "RunaConfig.apiKey"
 		},
 		"535": {
+			"packageName": "@cuna_labs/sdk",
+			"packagePath": "src/types.ts",
+			"qualifiedName": "RunaConfig.baseUrl"
+		},
+		"536": {
+			"packageName": "@cuna_labs/sdk",
+			"packagePath": "src/types.ts",
+			"qualifiedName": "RunaConfig.configFile"
+		},
+		"537": {
+			"packageName": "@cuna_labs/sdk",
+			"packagePath": "src/types.ts",
+			"qualifiedName": "RunaConfig.fetch"
+		},
+		"538": {
+			"packageName": "typescript",
+			"packagePath": "lib/lib.dom.d.ts",
+			"qualifiedName": "fetch"
+		},
+		"539": {
+			"packageName": "typescript",
+			"packagePath": "lib/lib.dom.d.ts",
+			"qualifiedName": "fetch"
+		},
+		"540": {
 			"packageName": "typescript",
 			"packagePath": "lib/lib.dom.d.ts",
 			"qualifiedName": "input"
 		},
-		"536": {
+		"541": {
 			"packageName": "typescript",
 			"packagePath": "lib/lib.dom.d.ts",
 			"qualifiedName": "init"
 		},
-		"537": {
+		"542": {
 			"packageName": "@types/node",
 			"packagePath": "globals.d.ts",
 			"qualifiedName": "fetch"
 		},
-		"538": {
+		"543": {
 			"packageName": "@types/node",
 			"packagePath": "globals.d.ts",
 			"qualifiedName": "input"
 		},
-		"539": {
+		"544": {
 			"packageName": "@types/node",
 			"packagePath": "globals.d.ts",
 			"qualifiedName": "init"
-		},
-		"540": {
-			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/types.ts",
-			"qualifiedName": "RunaConfig.diagnostics"
-		},
-		"541": {
-			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/types.ts",
-			"qualifiedName": "RunaConfig.tracing"
-		},
-		"542": {
-			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/index.ts",
-			"qualifiedName": "CunaConfig"
-		},
-		"543": {
-			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionAgent"
-		},
-		"544": {
-			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionCreateOptions"
 		},
 		"545": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionCreateOptions.idempotencyKey"
+			"qualifiedName": "RunaConfig.diagnostics"
 		},
 		"546": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionCreateOptions.agent"
+			"qualifiedName": "RunaConfig.tracing"
 		},
 		"547": {
 			"packageName": "@cuna_labs/sdk",
-			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionCreateOptions.vcpus"
+			"packagePath": "src/index.ts",
+			"qualifiedName": "CunaConfig"
 		},
 		"548": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionCreateOptions.memoryMiB"
+			"qualifiedName": "SessionAgent"
 		},
 		"549": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionCreateOptions.allowedHosts"
+			"qualifiedName": "SessionCreateOptions"
 		},
 		"550": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionCreateOptions.outboundPolicy"
+			"qualifiedName": "SessionCreateOptions.idempotencyKey"
 		},
 		"551": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionCreateOptions.runtimePort"
+			"qualifiedName": "SessionCreateOptions.agent"
 		},
 		"552": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot"
+			"qualifiedName": "SessionCreateOptions.vcpus"
 		},
 		"553": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.id"
+			"qualifiedName": "SessionCreateOptions.memoryMiB"
 		},
 		"554": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.userId"
+			"qualifiedName": "SessionCreateOptions.allowedHosts"
 		},
 		"555": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.slug"
+			"qualifiedName": "SessionCreateOptions.outboundPolicy"
 		},
 		"556": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.name"
+			"qualifiedName": "SessionCreateOptions.runtimePort"
 		},
 		"557": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.agent"
+			"qualifiedName": "SessionSnapshot"
 		},
 		"558": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.vcpus"
+			"qualifiedName": "SessionSnapshot.id"
 		},
 		"559": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.memoryMiB"
+			"qualifiedName": "SessionSnapshot.userId"
 		},
 		"560": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.status"
+			"qualifiedName": "SessionSnapshot.slug"
 		},
 		"561": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.runningSeconds"
+			"qualifiedName": "SessionSnapshot.name"
 		},
 		"562": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.createdAt"
+			"qualifiedName": "SessionSnapshot.agent"
 		},
 		"563": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.updatedAt"
+			"qualifiedName": "SessionSnapshot.vcpus"
 		},
 		"564": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionSnapshot.url"
+			"qualifiedName": "SessionSnapshot.memoryMiB"
 		},
 		"565": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "SessionStatus"
+			"qualifiedName": "SessionSnapshot.status"
 		},
 		"566": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "UnassignedWorkspace"
+			"qualifiedName": "SessionSnapshot.runningSeconds"
 		},
 		"567": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "UnassignedWorkspace.assigned"
+			"qualifiedName": "SessionSnapshot.createdAt"
 		},
 		"568": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "UnassignedWorkspace.waitlistPosition"
+			"qualifiedName": "SessionSnapshot.updatedAt"
 		},
 		"569": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
-			"qualifiedName": "UnassignedWorkspace.usage"
+			"qualifiedName": "SessionSnapshot.url"
 		},
 		"570": {
+			"packageName": "@cuna_labs/sdk",
+			"packagePath": "src/types.ts",
+			"qualifiedName": "SessionStatus"
+		},
+		"571": {
+			"packageName": "@cuna_labs/sdk",
+			"packagePath": "src/types.ts",
+			"qualifiedName": "UnassignedWorkspace"
+		},
+		"572": {
+			"packageName": "@cuna_labs/sdk",
+			"packagePath": "src/types.ts",
+			"qualifiedName": "UnassignedWorkspace.assigned"
+		},
+		"573": {
+			"packageName": "@cuna_labs/sdk",
+			"packagePath": "src/types.ts",
+			"qualifiedName": "UnassignedWorkspace.waitlistPosition"
+		},
+		"574": {
+			"packageName": "@cuna_labs/sdk",
+			"packagePath": "src/types.ts",
+			"qualifiedName": "UnassignedWorkspace.usage"
+		},
+		"575": {
 			"packageName": "@cuna_labs/sdk",
 			"packagePath": "src/types.ts",
 			"qualifiedName": "Workspace"

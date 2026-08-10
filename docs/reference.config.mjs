@@ -1,17 +1,19 @@
 const pages = Object.freeze({
-  "Core.md": ["Runa", "RunaConfig"],
+  "Core.md": ["Cuna", "Runa", "RunaConfig"],
   "Sessions.md": ["Session", "SessionsManager", "SessionAgent", "OutboundPolicyMode", "OutboundPolicy", "SessionCreateOptions", "SessionSnapshot", "SessionStatus", "ExecOptions", "ExecResult", "Acknowledgement", "OpenSessionResult"],
   "Account-and-records.md": ["Me", "Workspace", "AssignedWorkspace", "UnassignedWorkspace", "EstimatedUsage", "RecordsManager", "Record"],
-  "Shared.md": ["ConfigError", "ApiError", "CommandError", "RunaError", "OpaqueWireValue", "stdoutText", "stderrText"],
+  "Shared.md": ["ConfigError", "ApiError", "CommandError", "CunaError", "RunaError", "OpaqueWireValue", "stdoutText", "stderrText"],
 });
 
 const summaries = Object.freeze({
   Runa: "Constructible Runa client that owns managers, transport lifecycle, and cleanup.",
+  Cuna: "Canonical Cuna client alias with the same lifecycle and managers as Runa.",
   RunaConfig: "Configuration accepted while constructing a Runa client.",
   ConfigError: "Safe public error raised when selected client configuration is invalid.",
   ApiError: "Safe public error for an API failure or malformed successful response.",
   CommandError: "Reserved non-constructible public command-error type.",
   RunaError: "Base class for normalized public Runa SDK errors.",
+  CunaError: "Canonical Cuna alias for the normalized public SDK error base class.",
   Session: "Client-owned session handle with an immutable current snapshot and bounded operations.",
   SessionsManager: "Client-owned entry point for creating, listing, and retrieving sessions.",
   SessionAgent: "Accepted agent identifier for a session.",
@@ -38,11 +40,13 @@ const summaries = Object.freeze({
 
 const entryContracts = Object.freeze({
   Runa: "PRD-023#R-023-01",
+  Cuna: "PRD-023#R-023-01",
   RunaConfig: "PRD-023#R-023-01",
   ConfigError: "PRD-024#R-024-01",
   ApiError: "PRD-024#R-024-01",
   CommandError: "PRD-024#R-024-01",
   RunaError: "PRD-024#R-024-01",
+  CunaError: "PRD-024#R-024-01",
   Session: "PRD-031#R-031-01",
   SessionsManager: "PRD-027#R-027-01",
   SessionAgent: "PRD-022#R-022-02",

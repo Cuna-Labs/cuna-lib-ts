@@ -77,6 +77,14 @@ Literal discriminator for the workspace assignment variant.
 assigned: true
 ```
 
+#### id
+
+Canonical lowercase UUID returned for this public value.
+
+```ts
+id: string
+```
+
 #### usage
 
 Estimated usage available only for an assigned workspace.

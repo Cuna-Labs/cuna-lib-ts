@@ -113,6 +113,15 @@
         ]
       },
       {
+        "name": "id",
+        "kind": "property",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "id: string"
+        ]
+      },
+      {
         "name": "usage",
         "kind": "property",
         "optional": false,

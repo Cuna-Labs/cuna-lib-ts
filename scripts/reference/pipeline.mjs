@@ -13,10 +13,10 @@ import {
 } from "../../docs/reference.config.mjs";
 
 const requiredPageOwnership = Object.freeze({
-  "Core.md": Object.freeze(["Runa", "RunaConfig"]),
+  "Core.md": Object.freeze(["Cuna", "Runa", "RunaConfig"]),
   "Sessions.md": Object.freeze(["Session", "SessionsManager", "SessionAgent", "OutboundPolicyMode", "OutboundPolicy", "SessionCreateOptions", "SessionSnapshot", "SessionStatus", "ExecOptions", "ExecResult", "Acknowledgement", "OpenSessionResult"]),
   "Account-and-records.md": Object.freeze(["Me", "Workspace", "AssignedWorkspace", "UnassignedWorkspace", "EstimatedUsage", "RecordsManager", "Record"]),
-  "Shared.md": Object.freeze(["ConfigError", "ApiError", "CommandError", "RunaError", "OpaqueWireValue", "stdoutText", "stderrText"]),
+  "Shared.md": Object.freeze(["ConfigError", "ApiError", "CommandError", "CunaError", "RunaError", "OpaqueWireValue", "stdoutText", "stderrText"]),
 });
 
 const kindName = (node) => {
@@ -663,7 +663,7 @@ export async function runReferencePipeline({ write = true } = {}) {
   const reflection = JSON.parse(await readFile("docs/.reflection.json", "utf8"));
   const surface = JSON.parse(await readFile("evidence/export-snapshot.json", "utf8"));
   const expectedNames = [...surface.runtime_exports, ...surface.type_exports].sort();
-  assert.equal(expectedNames.length, 28);
+  assert.equal(expectedNames.length, 30);
   assert.deepEqual(Object.keys(curation).sort(), expectedNames);
   const reflectedRoots = (reflection.children ?? []).filter((entry) =>
     expectedNames.includes(entry.name));
