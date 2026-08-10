@@ -13,3 +13,12 @@ evidence/requirement-test-map.json
 release-artifacts/
 *.log
 .DS_Store
+
+# Cross-chat coordination mailbox. Local only, never published.
+_buzon/
+buzon/
+
+# Self-referential git worktrees created by local tooling. Committing one
+# stores a gitlink with no .gitmodules entry, which makes `git submodule
+# status` abort before it reaches the real `contracts` submodule.
+.codex-work/
