@@ -18,7 +18,7 @@ const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const tag = process.env.RUNA_RELEASE_TAG;
 const repository = process.env.GITHUB_REPOSITORY;
 assert.match(tag ?? "", /^ts-v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/u);
-assert.equal(repository, "Runa-Laboratories/runa-lib-ts");
+assert.equal(repository, "Cuna-Labs/cuna-lib-ts");
 const candidate = JSON.parse(await readFile("release-artifacts/candidate.json", "utf8"));
 assert.equal(tag, `ts-v${candidate.version}`);
 assert.equal(execFileSync("git", ["rev-list", "-n", "1", tag], {
@@ -106,7 +106,7 @@ try {
   const attestation = spawnSync("gh", [
     "attestation", "verify", path.join(directory, candidate.filename),
     "--repo", repository,
-    "--signer-workflow", "Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml",
+    "--signer-workflow", "Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml",
   ], { encoding: "utf8" });
   assert.equal(attestation.status, 0, attestation.stderr);
   const metadataResponse = await fetch(

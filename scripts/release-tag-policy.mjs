@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 
 export const TAG_ISSUER = "https://token.actions.githubusercontent.com";
 export const TAG_CERTIFICATE_IDENTITY =
-  "https://github.com/Runa-Laboratories/runa-lib-ts/.github/workflows/release.yml@refs/heads/main";
+  "https://github.com/Cuna-Labs/cuna-lib-ts/.github/workflows/release.yml@refs/heads/main";
 
 export function gitsignVerifyArgs(refName) {
   return Object.freeze([

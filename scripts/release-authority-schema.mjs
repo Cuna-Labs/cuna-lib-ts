@@ -7,7 +7,7 @@ const SHA256 = /^[a-f0-9]{64}$/u;
 const COMMIT = /^[a-f0-9]{40}$/u;
 const VERSION = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/u;
 const TEST_ID = /^TC-\d{3}-\d{2}$/u;
-const AUTHORITY_REPOSITORY = "Runa-Laboratories/runa-release-authority";
+const AUTHORITY_REPOSITORY = "Cuna-Labs/cuna-release-authority";
 const AUTHORITY_WORKFLOW = ".github/workflows/release-authority.yml";
 
 const sha256 = (value, field) => assert.match(value, SHA256, `Invalid ${field}.`);
@@ -67,7 +67,7 @@ export function validateTrustedRolePayload(role, payload) {
       "pull_request_required", "repository", "required_approving_reviews",
       "required_status_checks", "status",
     ], "repository controls");
-    assert.equal(payload.repository, "Runa-Laboratories/runa-lib-ts");
+    assert.equal(payload.repository, "Cuna-Labs/cuna-lib-ts");
     assert.equal(payload.branch, "main");
     assert.match(payload.commit_sha, COMMIT);
     assert.equal(payload.pull_request_required, true);

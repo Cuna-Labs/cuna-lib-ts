@@ -151,7 +151,7 @@ jobs:
           npm run release:authority:freshness:verify
           git tag -s -m "Release $RUNA_RELEASE_TAG" "$RUNA_RELEASE_TAG" "$GITHUB_SHA"
           gitsign verify \
-            --certificate-identity=https://github.com/Runa-Laboratories/runa-lib-ts/.github/workflows/release.yml@refs/heads/main \
+            --certificate-identity=https://github.com/Cuna-Labs/cuna-lib-ts/.github/workflows/release.yml@refs/heads/main \
             --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
             "$RUNA_RELEASE_TAG"
           gh auth setup-git

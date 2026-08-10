@@ -84,7 +84,7 @@ function signedAssets() {
       ...common, administrators_enforced: true, branch: "main", commit_sha: headSha,
       deletions_allowed: false, dismiss_stale_reviews: true,
       force_pushes_allowed: false, pull_request_required: true,
-      repository: "Runa-Laboratories/runa-lib-ts", required_approving_reviews: 0,
+      repository: "Cuna-Labs/cuna-lib-ts", required_approving_reviews: 0,
       required_status_checks: ["release-admission", "ts-quality-gates"],
     },
     cross_language: {
