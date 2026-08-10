@@ -114,7 +114,7 @@ export class DecodeFailure {
 function malformed(): never { throw new DecodeFailure(); }
 
 /** The value substituted for a credential when a result is serialized. */
-export const REDACTED = "[redacted]";
+const REDACTED = "[redacted]";
 
 /**
  * Freeze a result whose named fields are live capabilities, and attach a

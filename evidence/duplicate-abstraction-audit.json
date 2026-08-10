@@ -2,7 +2,7 @@
   "schema_version": 2,
   "status": "PASS",
   "method": "scripts/verify-duplicate-abstractions.mjs",
-  "audited_source_sha256": "bde3099dd448148172ceaaf1026b66350caf83cce60fb31eef7d9ba72dd009c7",
+  "audited_source_sha256": "1438b5fc3466f97e7393c7645b77087c8dc08e437bd13b02eb37ced17b97b1f6",
   "audited_files": [
     "src/agent-sessions.ts",
     "src/client.ts",
@@ -151,7 +151,7 @@
         "src/workspace-sync.ts"
       ],
       "observed": {
-        "object_has_own_calls": 23,
+        "object_has_own_calls": 24,
         "local_own_helpers": 2
       },
       "rationale": "Tiny private predicates stay at separate decode and caller-input trust boundaries; no public or cross-layer abstraction is created."
@@ -211,7 +211,7 @@
         "prohibited_marker_definitions": 1,
         "runtime_policy_consumers": 1,
         "exact_byte_scanner_consumers": 1,
-        "scanner_credential_pattern_families": 3
+        "scanner_credential_pattern_families": 4
       },
       "rationale": "Runtime fail-closed wire screening and the repository exact-byte scanner reuse one prohibited-marker predicate; credential byte patterns remain scanner-only because they are not wire-decoding policy."
     }
