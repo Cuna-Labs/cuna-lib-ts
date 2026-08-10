@@ -4,10 +4,39 @@ import { pathToFileURL } from "node:url";
 import { containsProhibitedMarker } from "../dist/internal/boundary-policy.js";
 import { WIRE_BRANDS } from "../dist/internal/wire-namespaces.js";
 
-// Gitlink workspaces are verified by their owning repository. Scanning their
-// checked-out contents here produces false positives for bytes that are not
-// part of this package candidate.
-const ignored = new Set([".codex-work", ".git", "node_modules", "coverage"]);
+/**
+ * Directories whose bytes are not this package candidate's. Gitlink workspaces
+ * are verified by their owning repository; the scratch directory holds a
+ * checked-out tree that local tooling parks there. Scanning either reports
+ * findings for files nobody in this repository wrote, and would fail this gate
+ * on somebody else's bytes.
+ *
+ * SPELLED, NEVER DERIVED, and the polarity is the whole reason. `WIRE_BRANDS`
+ * is an append-only ACCEPT list; this is an EXCLUSION list. Deriving one from
+ * the other inverts it: growing what the product accepts would grow what this
+ * detector refuses to look at, so every future brand would silently open a
+ * fresh blind spot. Measured on the version of this file that did derive it —
+ * a credential planted in the derived scratch directory produced
+ * `security: PASS (0 files)` and exit 0 with the credential still on disk.
+ *
+ * The rule generalises: an accepting surface must widen with the authority, a
+ * detector's blind spots must not. Literals are correct here precisely because
+ * this is not an accepting surface, and `credential-scanner-authority.test.mjs`
+ * pins the list so that no later edit can re-derive it.
+ *
+ * Deriving the exclusions from `.gitignore` instead was also rejected: `dist/`
+ * is gitignored and is the shipped payload, so that rule would stop scanning
+ * the very bytes that get published.
+ */
+export const ignoredDirectories = Object.freeze([
+  ".codex-work",
+  ".git",
+  ".runa-tmp",
+  "coverage",
+  "node_modules",
+]);
+
+const ignored = new Set(ignoredDirectories);
 
 /**
  * Every brand spelling this scanner hunts for, DERIVED from the one append-only
@@ -114,8 +143,14 @@ export function containedCredential(
   return urls.some((url) => opening.test(url) || /[?&](?:token|secret|key|t)=[^&\s]{16,}/i.test(url));
 }
 
-async function scanCandidate() {
-  const canonicalContractRoot = path.resolve("contracts");
+/**
+ * Scans one candidate tree. The root is a parameter so an acceptance test can
+ * plant a credential in a fixture and observe what this gate does and does not
+ * see — an exclusion that is never exercised is an assertion about behaviour
+ * nobody has measured.
+ */
+export async function scanCandidate(root = ".") {
+  const canonicalContractRoot = path.resolve(root, "contracts");
   const files = [];
   async function walk(directory) {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -128,7 +163,7 @@ async function scanCandidate() {
       else files.push(target);
     }
   }
-  await walk(".");
+  await walk(root);
   const failures = [];
   for (const file of files) {
     const bytes = await readFile(file);

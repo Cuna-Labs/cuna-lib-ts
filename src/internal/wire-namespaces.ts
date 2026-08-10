@@ -108,6 +108,35 @@ export function brandedEnvNames<Suffix extends string>(
 }
 
 /**
+ * One credential-token opening in one brand spelling, e.g. family `sk` yields
+ * the type of a secret key's prefix.
+ */
+export type BrandedCredentialPrefix<Family extends string> =
+  `${WireBrand}_${Family}_`;
+
+/**
+ * Every brand spelling of one credential family's opening, canonical first.
+ *
+ * A prefix rather than a whole grammar, because the credential this SDK holds
+ * is the customer's secret key and this SDK is not its issuer: it knows the
+ * namespace it must accept and deliberately does not constrain a body the
+ * service chose. `brandedCredentialPattern` closes the same opening over a
+ * body when the grammar IS ours to assert.
+ *
+ * The append-only rule is at its strongest here. Keys in the legacy spelling
+ * are issued and customer-held, so a spelling that leaves this list stops
+ * authenticating a credential somebody is holding right now, and the holder
+ * sees a configuration error rather than a rejected key.
+ */
+export function brandedCredentialPrefixes<Family extends string>(
+  family: Family,
+): readonly BrandedCredentialPrefix<Family>[] {
+  return WIRE_BRANDS.map(
+    (brand): BrandedCredentialPrefix<Family> => `${brand}_${family}_`,
+  );
+}
+
+/**
  * A credential-token grammar in both brand spellings, e.g. family `tc` and
  * body `[A-Za-z0-9_-]{43}` yields `^(?:cuna|runa)_tc_[A-Za-z0-9_-]{43}$`.
  */

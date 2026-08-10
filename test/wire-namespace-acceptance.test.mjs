@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { test, vi } from "vitest";
 
 import { ApiError, ConfigError, Runa } from "../dist/index.js";
 import { resolveConfig } from "../dist/config.js";
-import { brandedEnvNames } from "../dist/internal/wire-namespaces.js";
+import {
+  WIRE_BRANDS,
+  brandedCredentialPrefixes,
+  brandedEnvNames,
+} from "../dist/internal/wire-namespaces.js";
 import { API_KEY, SESSION_ID, jsonResponse, sessionFixture } from "./helpers.mjs";
 
 /*
@@ -414,6 +419,102 @@ test("agreeing spellings and a lone legacy spelling are resolved without a warni
     assert.deepEqual(warnings, []);
   } finally {
     vi.restoreAllMocks();
+  }
+});
+
+/*
+ * The API key is the branded namespace with the highest cost of a narrow
+ * accept, and its predicate was the last place in this package still comparing
+ * against two hand-written spellings. `config.ts` imports the brand authority
+ * for the variable NAMES and then, a hundred lines lower, wrote the credential
+ * prefixes out by hand — the same producer/consumer split as every case above,
+ * this time in shipped authentication.
+ *
+ * Keys in the legacy spelling are issued and customer-held, so the direction
+ * this predicate may move is fixed: it must accept everything it accepts today
+ * plus whatever the authority gains, and lose nothing. A rejected key does not
+ * even report itself as a key problem — `resolveConfig` fails closed with
+ * `ConfigError`, "configuration is invalid", for a credential that is valid.
+ *
+ * Every case is spelled by hand rather than drawn from `brandedCredentialPrefixes`.
+ * A dual-accept test parametrized over its own subject narrows with the subject:
+ * revert the fix and the case that would have failed simply stops existing.
+ */
+
+const secretKey = (brand) => [brand, "sk", "synthetic"].join("_");
+
+/*
+ * S-3's literal oracle. Position 0 is asserted as an exact string because a
+ * mutation that merely reverses the authority would reverse a derived
+ * expectation with it and still pass. Length is deliberately NOT asserted:
+ * unlike `brandedEnvNames`, where order decides which variable wins and an
+ * append must be reviewed, an accepted credential prefix ranks nothing, so a
+ * further spelling must be able to widen this surface in silence.
+ */
+test("the accepted API-key prefixes are the authority's spellings, canonical first", () => {
+  const prefixes = brandedCredentialPrefixes("sk");
+  assert.equal(prefixes[0], "cuna_sk_");
+  assert.equal(prefixes[1], "runa_sk_");
+});
+
+test("an API key is accepted in both brand spellings of the secret-key prefix", () => {
+  for (const name of ["CUNA_API_KEY", "RUNA_API_KEY"]) {
+    for (const key of [secretKey("cuna"), secretKey("runa")]) {
+      const resolved = withEnv({ ...CLEARED, [name]: key }, () => resolveConfig());
+      assert.equal(resolved.apiKey, key, `${key} was rejected via ${name}`);
+      assert.equal(resolved.apiKeySource, "environment", `${key} was rejected via ${name}`);
+    }
+  }
+});
+
+test("an API key is accepted in both brand spellings from the constructor too", () => {
+  for (const key of [secretKey("cuna"), secretKey("runa")]) {
+    const resolved = withEnv({ ...CLEARED }, () => resolveConfig({ apiKey: key }));
+    assert.equal(resolved.apiKey, key, `${key} was rejected by the constructor`);
+    assert.equal(resolved.apiKeySource, "constructor", `${key} was rejected by the constructor`);
+  }
+});
+
+test("a value outside every accepted secret-key prefix is still rejected", () => {
+  const rejected = [
+    secretKey("nuna"),
+    ["cuna", "tc", "synthetic"].join("_"),
+    ["cuna", "sk"].join("_"),
+    ["sk", "synthetic"].join("_"),
+    "synthetic",
+    "   ",
+    "",
+  ];
+  for (const key of rejected) {
+    assert.throws(
+      () => withEnv({ ...CLEARED, CUNA_API_KEY: key }, () => resolveConfig()),
+      ConfigError,
+      `${JSON.stringify(key)} was accepted as an API key`,
+    );
+  }
+});
+
+/*
+ * Reverting to the two hand-written prefixes preserves behaviour exactly today,
+ * so no assertion above can see it — and agreeing with the authority right up
+ * until the authority grows is precisely what a copy does. Absence of the
+ * spelling is the one property a copy cannot satisfy.
+ *
+ * Scoped to the credential prefix, not to the whole file: `config.ts`
+ * deliberately spells the environment-variable names, which have their own
+ * literal oracle above. The presence assertion is the negative control — a
+ * misread or renamed file would otherwise pass this vacuously.
+ */
+test("the configuration module spells no secret-key prefix of its own", async () => {
+  const source = (await readFile("src/config.ts", "utf8")).toLowerCase();
+  assert.equal(source.includes("cuna_api_key"), true, "config.ts was not read");
+  assert.equal(source.includes("cuna_sk"), false, "the canonical prefix is spelled in config.ts");
+  for (const brand of WIRE_BRANDS) {
+    assert.equal(
+      source.includes(`${brand}_sk`),
+      false,
+      `${brand} spells a secret-key prefix in config.ts`,
+    );
   }
 });
 

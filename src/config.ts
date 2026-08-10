@@ -3,6 +3,7 @@ import { TextDecoder } from "node:util";
 
 import { ConfigError } from "./errors.js";
 import {
+  brandedCredentialPrefixes,
   brandedEnvNames,
   type BrandedEnvName,
   type Covers,
@@ -158,11 +159,30 @@ function readConfigFile(path: string): ConfigFileShape {
   }
 }
 
+/**
+ * Every brand spelling of the secret-key opening this SDK authenticates with,
+ * read from the brand authority rather than written out beside it.
+ *
+ * This predicate is an ACCEPTING surface for a credential that is already in a
+ * customer's hands, so it may only ever widen. It nevertheless carried two
+ * hand-written prefixes while the environment names a hundred lines above
+ * already derived theirs from the same list — a namespace minted by the issuer
+ * and compared here against a private copy of its spelling, in the one module
+ * that had the authority imported and did not use it.
+ *
+ * The copy fails silently and in one direction. The authority is append-only,
+ * so it grows and a literal does not: the day a further spelling is issued,
+ * this predicate rejects a valid key, and it rejects it as `ConfigError` —
+ * "configuration is invalid" — which sends the holder to look at everything
+ * except the credential that is fine.
+ */
+const API_KEY_PREFIXES = brandedCredentialPrefixes("sk");
+
 function validApiKey(value: unknown): value is string {
   return (
     typeof value === "string" &&
     value.trim().length > 0 &&
-    (value.startsWith("cuna_sk_") || value.startsWith("runa_sk_"))
+    API_KEY_PREFIXES.some((prefix) => value.startsWith(prefix))
   );
 }
 

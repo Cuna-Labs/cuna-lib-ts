@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { test } from "vitest";
 
 import { WIRE_BRANDS } from "../dist/internal/wire-namespaces.js";
@@ -7,6 +9,8 @@ import {
   containsCredentialMaterial,
   credentialBrands,
   credentialFamilies,
+  ignoredDirectories,
+  scanCandidate,
 } from "../scripts/verify-security.mjs";
 
 /*
@@ -56,15 +60,76 @@ test("the scanner's brand list is the wire-brand authority, canonical spelling f
 /*
  * Equality with the authority is satisfied just as well by a second literal
  * that happens to agree today, and that literal is exactly what rots. Absence
- * of any brand spelling in the source is the property that cannot be faked:
- * a scanner that spells no brand must have derived them.
+ * of any brand spelling is the property that cannot be faked: a DETECTOR that
+ * spells no brand must have derived them.
+ *
+ * Scoped to the detector, with the exclusion list cut out, because the two have
+ * opposite polarity. What the scanner HUNTS FOR must widen with the accept
+ * list; what it REFUSES TO LOOK AT must not, or every future brand opens a new
+ * blind spot. So the exclusion list is spelled, deliberately, and the cut is
+ * asserted to have happened rather than assumed — a regex that silently matched
+ * nothing would restore the original check and fail the moment the list is
+ * spelled, which is now the correct state.
  */
-test("the scanner spells no brand of its own", async () => {
+test("the scanner spells no brand outside its literal exclusion list", async () => {
   const source = await readFile("scripts/verify-security.mjs", "utf8");
-  const normalized = source.toLowerCase();
-  assert.equal(normalized.includes("cuna"), false, "the canonical brand is spelled in the scanner");
+  const detector = source.replace(
+    /export const ignoredDirectories = Object\.freeze\(\[[\s\S]*?\]\);/u,
+    "",
+  );
+  assert.notEqual(detector, source, "the exclusion list was not located");
+  const normalized = detector.toLowerCase();
+  assert.equal(normalized.includes("cuna"), false, "the canonical brand is spelled in the detector");
   for (const brand of WIRE_BRANDS) {
-    assert.equal(normalized.includes(brand), false, `${brand} is spelled in the scanner`);
+    assert.equal(normalized.includes(brand), false, `${brand} is spelled in the detector`);
+  }
+});
+
+/*
+ * The exclusion list pinned to literals, because it was briefly derived from
+ * `WIRE_BRANDS` and that inverted it. `WIRE_BRANDS` is an append-only ACCEPT
+ * list; growing what the product accepts must never grow what a credential
+ * detector declines to open. Measured on the derived version: a credential
+ * planted in the derived scratch directory produced `security: PASS (0 files)`
+ * and exit 0.
+ *
+ * Both directions are asserted. The equality fires on any addition at all,
+ * including one nobody meant to make; the canonical spelling is named
+ * separately because a re-derivation is the specific edit this pins against and
+ * it should say so when it fails.
+ */
+test("the scanner's excluded directories are literals no authority can grow", () => {
+  assert.deepEqual([...ignoredDirectories], [
+    ".codex-work", ".git", ".runa-tmp", "coverage", "node_modules",
+  ]);
+  assert.equal(ignoredDirectories.includes(".cuna-tmp"), false,
+    "an exclusion derived from the accept list turns every future brand into a blind spot");
+});
+
+/*
+ * What the exclusions actually do, measured rather than asserted from the
+ * source. Every excluded directory is a deliberate blind spot; `plain/` is the
+ * negative control, and without it a detector that had stopped working
+ * entirely would satisfy every "reports nothing" expectation here.
+ */
+test("an excluded directory is a blind spot, and only an excluded directory is", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "scan-fixture-"));
+  try {
+    const leak = credential("cuna", "sk");
+    for (const directory of ["plain", ...ignoredDirectories]) {
+      await mkdir(path.join(root, directory), { recursive: true });
+      await writeFile(path.join(root, directory, "leak.txt"), leak);
+    }
+    const { failures, scanned } = await scanCandidate(root);
+    assert.equal(scanned, 1, "a file outside plain/ was scanned");
+    assert.deepEqual(
+      failures.map((failure) => path.basename(path.dirname(failure.path))),
+      ["plain"],
+      "the planted credential was missed, or an excluded directory was read",
+    );
+    assert.equal(failures[0].category, "credential-material");
+  } finally {
+    await rm(root, { recursive: true, force: true });
   }
 });
 
