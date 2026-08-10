@@ -1,6 +1,88 @@
-// @generated {"contract_id":"runa-sdk-contract","generator_path":"tools/runa-contract-generator.mjs","generator_sha256":"879fbef4d654c1f7769e1724c065133d6744bbda6b913d5bd3cd5b8104ce31e4","generator_version":"0.2.0","projection_path":"runa-sdk.projection.json","projection_sha256":"2721f5b7de5a033e5cc34dc6efb53ddf74e6110cd71168c0075bdb5679063791","projection_version":"1.7.0","snapshot_path":"runa-sdk-contract.snapshot.json","snapshot_sha256":"3e2af6adcd6a6348c78e703b756d1a8a95c4baf17700dd919f6dd4f7a5112f86","snapshot_version":"1.7.0"}
+// @generated {"contract_id":"runa-sdk-contract","generator_path":"tools/runa-contract-generator.mjs","generator_sha256":"879fbef4d654c1f7769e1724c065133d6744bbda6b913d5bd3cd5b8104ce31e4","generator_version":"0.2.0","projection_path":"runa-sdk.projection.json","projection_sha256":"693dec9fd0d00fb541b4238e47d8f6bbd5211e4f18dcd133ae60b58462b44089","projection_version":"1.7.0","snapshot_path":"runa-sdk-contract.snapshot.json","snapshot_sha256":"6dec7457e26b733b2a29b63b4effa39ec362957e227e67fba16fff17ed1c785c","snapshot_version":"1.7.0"}
 export type GeneratedWireValue = null | boolean | number | string | GeneratedWireValue[] | { readonly [key: string]: GeneratedWireValue };
 export const GENERATED_WIRE_SCHEMAS = {
+  "AgentAuth": {
+    "additionalProperties": false,
+    "description": "Deprecated machine-scoped authentication state returned by `sessions.agentAuth`. It carries no process generation and is preserved only for already-released SDKs.",
+    "oneOf": [
+      {
+        "properties": {
+          "method": {
+            "const": "none"
+          },
+          "state": {
+            "const": "not_applicable"
+          }
+        }
+      },
+      {
+        "properties": {
+          "method": {
+            "const": "interactive_login"
+          },
+          "state": {
+            "enum": [
+              "installing",
+              "login_required",
+              "authenticated",
+              "unavailable"
+            ]
+          }
+        }
+      },
+      {
+        "properties": {
+          "method": {
+            "const": "api_key"
+          },
+          "state": {
+            "enum": [
+              "installing",
+              "configured",
+              "unavailable"
+            ]
+          }
+        }
+      }
+    ],
+    "properties": {
+      "agent": {
+        "enum": [
+          "claude-code",
+          "codex",
+          "openclaw",
+          null
+        ],
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "method": {
+        "enum": [
+          "none",
+          "interactive_login",
+          "api_key"
+        ]
+      },
+      "state": {
+        "enum": [
+          "not_applicable",
+          "installing",
+          "login_required",
+          "authenticated",
+          "configured",
+          "unavailable"
+        ]
+      }
+    },
+    "required": [
+      "agent",
+      "method",
+      "state"
+    ],
+    "type": "object"
+  },
   "AgentSession": {
     "additionalProperties": false,
     "dependentRequired": {
@@ -816,6 +898,10 @@ export const GENERATED_WIRE_SCHEMAS = {
         },
         "maxItems": 128,
         "type": "array"
+      },
+      "background": {
+        "description": "When true, provisioning may continue asynchronously and the 201 response may contain status creating. Omission or false preserves synchronous creation.",
+        "type": "boolean"
       },
       "memory_mib": {
         "maximum": 16384,

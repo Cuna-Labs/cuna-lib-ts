@@ -37,7 +37,7 @@ test("release trust is pinned to one accepted Ed25519 root for every authority r
   );
 });
 
-test("contract authority accepts only the active Cuna identity and exact signed legacy identity", () => {
+test("contract authority accepts only the active Cuna identity", () => {
   const identity = {
     approvedCheckout: "b".repeat(40),
     canonicalContractSha256: "c".repeat(64),
@@ -61,9 +61,9 @@ test("contract authority accepts only the active Cuna identity and exact signed 
   assert.equal(validateAuthorityContractProvenance(
     provenance(CANONICAL_CONTRACT_REPOSITORY), identity,
   ), true);
-  assert.equal(validateAuthorityContractProvenance(
+  assert.throws(() => validateAuthorityContractProvenance(
     provenance("Runa-Laboratories/runa-sdk-contract"), identity,
-  ), true);
+  ), /unaccepted contract repository/u);
   assert.throws(() => validateAuthorityContractProvenance(
     provenance("attacker/sdk-contract"), identity,
   ), /unaccepted contract repository/u);

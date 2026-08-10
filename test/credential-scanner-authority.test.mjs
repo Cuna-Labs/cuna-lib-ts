@@ -178,7 +178,8 @@ test("every credential family the canonical contract declares is one the scanner
   // Negative control: a broken extractor yields an empty set, and containment
   // over an empty set passes vacuously. `tc` is declared by the artifact today.
   assert.equal(declared.has("tc"), true, "the contract extractor found nothing");
-  assert(declared.size >= 5, `the contract extractor found only ${declared.size} families`);
+  assert.deepEqual([...declared].sort(), ["at", "ct", "rt", "tc"],
+    "the canonical credential-family snapshot drifted");
   for (const family of declared) {
     assert.equal(credentialFamilies.includes(family), true,
       `the contract declares ${family} and the scanner does not hunt for it`);

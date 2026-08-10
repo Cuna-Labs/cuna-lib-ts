@@ -3,8 +3,8 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { test } from "vitest";
 
-const OPENAPI_SHA256 = "a490e74c94b747b4a61022711bb5df63f5dfb8a9e673de1cc0c477b54a038208";
-const PROJECTION_SHA256 = "2721f5b7de5a033e5cc34dc6efb53ddf74e6110cd71168c0075bdb5679063791";
+const OPENAPI_SHA256 = "66ba7497ec55b60236a0ccd036aab593523ef3819036009518465fcf474ef0aa";
+const PROJECTION_SHA256 = "693dec9fd0d00fb541b4238e47d8f6bbd5211e4f18dcd133ae60b58462b44089";
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
 test("TypeScript workspace authority is frozen to the exact OpenAPI 1.7 artifacts", async () => {
@@ -38,8 +38,8 @@ test("TypeScript workspace authority is frozen to the exact OpenAPI 1.7 artifact
   };
   collectReferences(projection.operations);
   collectReferences(projection.schemas);
-  assert.equal(Object.keys(projection.schemas).length, 50);
-  assert.equal(referencedSchemas.size, 46);
+  assert.equal(Object.keys(projection.schemas).length, 51);
+  assert.equal(referencedSchemas.size, 47);
   assert.deepEqual(
     [...referencedSchemas].filter((name) => !Object.hasOwn(projection.schemas, name)),
     [],

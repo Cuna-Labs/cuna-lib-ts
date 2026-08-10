@@ -11,15 +11,14 @@ import path from "node:path";
 import { promisify } from "node:util";
 
 const execute = promisify(execFile);
-const CANONICAL_CONTRACT_COMMIT = "3be48919c7361bcaaeae6e8271979926d314a288";
-const CANONICAL_SNAPSHOT_SHA256 = "3e2af6adcd6a6348c78e703b756d1a8a95c4baf17700dd919f6dd4f7a5112f86";
-const CANONICAL_ARTIFACT_MANIFEST_SHA256 = "1b70b9f74d280e6b8f5745c9a4afeca73b753e005cb478133f03d61dfd3bf9cc";
-const CANONICAL_PROJECTION_SHA256 = "f09bc5e4842f2c3525499afd559e096f5741bd70aafad7e8bc3dfcb11c3c8947";
-const CANONICAL_SDK_PROJECTION_SHA256 = "7dcfa22863fc75051ab367441eee7d85f25e8aa91ac7b2b562ef8b4e75aaf7fb";
+const CANONICAL_CONTRACT_COMMIT = "6fb9770949fbb3e7e28ded47c14f898ae913cd78";
+const CANONICAL_SNAPSHOT_SHA256 = "6dec7457e26b733b2a29b63b4effa39ec362957e227e67fba16fff17ed1c785c";
+const CANONICAL_ARTIFACT_MANIFEST_SHA256 = "9b79c8dbc6c5f7ff22000fe2118b3c99c409ebbf609fa5f4ff567b2087d550e7";
+const CANONICAL_PROJECTION_SHA256 = "e333edba4405e26315255ef84d1dd91ea946b30af1e64e5eff0bbb8b8326ce8b";
+const CANONICAL_SDK_PROJECTION_SHA256 = "693dec9fd0d00fb541b4238e47d8f6bbd5211e4f18dcd133ae60b58462b44089";
 const CANONICAL_GENERATOR_SHA256 = "879fbef4d654c1f7769e1724c065133d6744bbda6b913d5bd3cd5b8104ce31e4";
 const ACCEPTED_CANONICAL_REPOSITORIES = new Set([
   "Cuna-Labs/cuna-sdk-contract",
-  "Runa-Laboratories/runa-sdk-contract",
 ]);
 const generatedRoot = path.resolve("src/internal/contract/generated");
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");

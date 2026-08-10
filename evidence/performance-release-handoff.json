@@ -5,8 +5,8 @@
   "blocker": {
     "id": "TS-050-AUTH-001",
     "decision": "Approve exact six-cell execution, the security-remediated Vitest substitution, and bootstrap baseline promotion.",
-    "owner": "Runa SDK technical and release owners"
+    "owner": "Cuna SDK technical and release owners"
   },
-  "artifact_sha256": "cdd196219a45be8872b55918788855a5052df47f4adc69bbc01f7ed3f72f23e4",
+  "artifact_sha256": "61cfa6951f3c4988cfd024faefdfc2e0974a1ac84a526035ef509fdd1ba2a7d3",
   "catalog_sha256": "cd52a60ba3c71da47d4ddf2b9a41c1e98cc93b7d443c5e44eeee0340840fded5"
 }

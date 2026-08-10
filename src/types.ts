@@ -287,6 +287,7 @@ export type OperationKey =
   | "machineCreates.get"
   | "machineCreates.reconcile"
   | "records.list"
+  | "sessions.agentAuth"
   | "sessions.checkpoint"
   | "sessions.create"
   | "sessions.delete"

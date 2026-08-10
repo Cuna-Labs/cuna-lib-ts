@@ -11,7 +11,6 @@ const COMMIT = /^[a-f0-9]{40}$/u;
 export const CANONICAL_CONTRACT_REPOSITORY = "Cuna-Labs/cuna-sdk-contract";
 const ACCEPTED_CANONICAL_CONTRACT_REPOSITORIES = new Set([
   CANONICAL_CONTRACT_REPOSITORY,
-  "Runa-Laboratories/runa-sdk-contract",
 ]);
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const exactKeys = (value, fields, label) => {

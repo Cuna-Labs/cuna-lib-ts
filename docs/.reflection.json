@@ -241,16 +241,33 @@
 					"flags": {
 						"isReadonly": true
 					},
+					"comment": {
+						"summary": [
+							{
+								"kind": "text",
+								"text": "The adapter contract version exactly as the service minted it. Both brand\nspellings are accepted; the value is echoed, never normalized."
+							}
+						]
+					},
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 17,
+							"line": 21,
 							"character": 13
 						}
 					],
 					"type": {
-						"type": "literal",
-						"value": "runa.agent-auth.v1"
+						"type": "union",
+						"types": [
+							{
+								"type": "literal",
+								"value": "cuna.agent-auth.v1"
+							},
+							{
+								"type": "literal",
+								"value": "runa.agent-auth.v1"
+							}
+						]
 					}
 				},
 				{
@@ -264,7 +281,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 18,
+							"line": 22,
 							"character": 13
 						}
 					],
@@ -286,7 +303,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 19,
+							"line": 23,
 							"character": 13
 						}
 					],
@@ -306,7 +323,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 20,
+							"line": 24,
 							"character": 13
 						}
 					],
@@ -326,7 +343,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 21,
+							"line": 25,
 							"character": 13
 						}
 					],
@@ -372,7 +389,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 23,
+					"line": 27,
 					"character": 12
 				}
 			],
@@ -399,7 +416,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 24,
+					"line": 28,
 					"character": 12
 				}
 			],
@@ -442,7 +459,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 25,
+					"line": 29,
 					"character": 12
 				}
 			],
@@ -510,7 +527,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 28,
+							"line": 32,
 							"character": 13
 						}
 					],
@@ -530,7 +547,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 29,
+							"line": 33,
 							"character": 13
 						}
 					],
@@ -559,7 +576,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 31,
+							"line": 35,
 							"character": 13
 						}
 					],
@@ -588,7 +605,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 33,
+							"line": 37,
 							"character": 13
 						}
 					],
@@ -608,7 +625,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 34,
+							"line": 38,
 							"character": 13
 						}
 					],
@@ -628,7 +645,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 35,
+							"line": 39,
 							"character": 13
 						}
 					],
@@ -650,7 +667,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 36,
+							"line": 40,
 							"character": 13
 						}
 					],
@@ -670,7 +687,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 37,
+							"line": 41,
 							"character": 13
 						}
 					],
@@ -692,7 +709,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 38,
+							"line": 42,
 							"character": 13
 						}
 					],
@@ -714,7 +731,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 39,
+							"line": 43,
 							"character": 13
 						}
 					],
@@ -736,7 +753,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 40,
+							"line": 44,
 							"character": 13
 						}
 					],
@@ -759,7 +776,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 41,
+							"line": 45,
 							"character": 13
 						}
 					],
@@ -780,7 +797,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 42,
+							"line": 46,
 							"character": 13
 						}
 					],
@@ -809,7 +826,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 44,
+							"line": 48,
 							"character": 13
 						}
 					],
@@ -830,7 +847,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 45,
+							"line": 49,
 							"character": 13
 						}
 					],
@@ -850,7 +867,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 46,
+							"line": 50,
 							"character": 13
 						}
 					],
@@ -870,7 +887,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 47,
+							"line": 51,
 							"character": 13
 						}
 					],
@@ -890,7 +907,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 48,
+							"line": 52,
 							"character": 13
 						}
 					],
@@ -928,7 +945,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 27,
+					"line": 31,
 					"character": 17
 				}
 			]
@@ -967,7 +984,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 52,
+							"line": 56,
 							"character": 13
 						}
 					],
@@ -997,7 +1014,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 53,
+							"line": 57,
 							"character": 13
 						}
 					],
@@ -1019,7 +1036,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 51,
+					"line": 55,
 					"character": 17
 				}
 			]
@@ -1043,7 +1060,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 56,
+							"line": 60,
 							"character": 13
 						}
 					],
@@ -1064,7 +1081,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 57,
+							"line": 61,
 							"character": 13
 						}
 					],
@@ -1086,7 +1103,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 55,
+					"line": 59,
 					"character": 17
 				}
 			]
@@ -1109,7 +1126,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 60,
+							"line": 64,
 							"character": 13
 						}
 					],
@@ -1129,7 +1146,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 61,
+							"line": 65,
 							"character": 13
 						}
 					],
@@ -1151,7 +1168,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 62,
+							"line": 66,
 							"character": 13
 						}
 					],
@@ -1179,7 +1196,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 64,
+							"line": 68,
 							"character": 13
 						}
 					],
@@ -1207,7 +1224,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 66,
+							"line": 70,
 							"character": 13
 						}
 					],
@@ -1228,7 +1245,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 67,
+							"line": 71,
 							"character": 13
 						}
 					],
@@ -1249,7 +1266,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 68,
+							"line": 72,
 							"character": 13
 						}
 					],
@@ -1272,7 +1289,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 69,
+							"line": 73,
 							"character": 13
 						}
 					],
@@ -1300,7 +1317,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 59,
+					"line": 63,
 					"character": 17
 				}
 			]
@@ -1311,16 +1328,33 @@
 			"variant": "declaration",
 			"kind": 2097152,
 			"flags": {},
+			"comment": {
+				"summary": [
+					{
+						"kind": "text",
+						"text": "The terminal-stream protocol identity. Both brand spellings are accepted on\na grant and as a requested protocol; the client always sends the single\nspelling the service mints today."
+					}
+				]
+			},
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 71,
+					"line": 80,
 					"character": 12
 				}
 			],
 			"type": {
-				"type": "literal",
-				"value": "runa.terminal.v1"
+				"type": "union",
+				"types": [
+					{
+						"type": "literal",
+						"value": "cuna.terminal.v1"
+					},
+					{
+						"type": "literal",
+						"value": "runa.terminal.v1"
+					}
+				]
 			}
 		},
 		{
@@ -1332,7 +1366,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 72,
+					"line": 81,
 					"character": 12
 				}
 			],
@@ -1371,7 +1405,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 73,
+					"line": 82,
 					"character": 12
 				}
 			],
@@ -1411,7 +1445,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 75,
+							"line": 84,
 							"character": 13
 						}
 					],
@@ -1433,7 +1467,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 76,
+							"line": 85,
 							"character": 13
 						}
 					],
@@ -1457,7 +1491,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 74,
+					"line": 83,
 					"character": 17
 				}
 			]
@@ -1488,7 +1522,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 80,
+							"line": 89,
 							"character": 13
 						}
 					],
@@ -1508,7 +1542,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 81,
+							"line": 90,
 							"character": 13
 						}
 					],
@@ -1529,13 +1563,15 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 82,
+							"line": 91,
 							"character": 13
 						}
 					],
 					"type": {
-						"type": "literal",
-						"value": "runa.terminal.v1"
+						"type": "reference",
+						"target": 237,
+						"name": "TerminalConnectionProtocol",
+						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
@@ -1550,7 +1586,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 83,
+							"line": 92,
 							"character": 13
 						}
 					],
@@ -1574,7 +1610,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 79,
+					"line": 88,
 					"character": 17
 				}
 			]
@@ -1605,7 +1641,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 90,
+							"line": 99,
 							"character": 13
 						}
 					],
@@ -1625,7 +1661,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 91,
+							"line": 100,
 							"character": 13
 						}
 					],
@@ -1645,7 +1681,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 92,
+							"line": 101,
 							"character": 13
 						}
 					],
@@ -1665,7 +1701,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 93,
+							"line": 102,
 							"character": 13
 						}
 					],
@@ -1685,13 +1721,15 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 94,
+							"line": 103,
 							"character": 13
 						}
 					],
 					"type": {
-						"type": "literal",
-						"value": "runa.terminal.v1"
+						"type": "reference",
+						"target": 237,
+						"name": "TerminalConnectionProtocol",
+						"package": "@cuna_labs/sdk"
 					}
 				},
 				{
@@ -1705,7 +1743,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 95,
+							"line": 104,
 							"character": 13
 						}
 					],
@@ -1734,7 +1772,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 96,
+							"line": 105,
 							"character": 13
 						}
 					],
@@ -1761,7 +1799,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 89,
+					"line": 98,
 					"character": 17
 				}
 			]
@@ -1790,7 +1828,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 100,
+							"line": 109,
 							"character": 4
 						}
 					],
@@ -1804,7 +1842,7 @@
 							"sources": [
 								{
 									"fileName": "dist/agent-sessions.d.ts",
-									"line": 100,
+									"line": 109,
 									"character": 4
 								}
 							],
@@ -1866,7 +1904,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 101,
+							"line": 110,
 							"character": 4
 						}
 					],
@@ -1880,7 +1918,7 @@
 							"sources": [
 								{
 									"fileName": "dist/agent-sessions.d.ts",
-									"line": 101,
+									"line": 110,
 									"character": 4
 								}
 							],
@@ -1940,7 +1978,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 102,
+							"line": 111,
 							"character": 4
 						}
 					],
@@ -1954,7 +1992,7 @@
 							"sources": [
 								{
 									"fileName": "dist/agent-sessions.d.ts",
-									"line": 102,
+									"line": 111,
 									"character": 4
 								}
 							],
@@ -2001,7 +2039,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 104,
+							"line": 113,
 							"character": 4
 						}
 					],
@@ -2023,7 +2061,7 @@
 							"sources": [
 								{
 									"fileName": "dist/agent-sessions.d.ts",
-									"line": 104,
+									"line": 113,
 									"character": 4
 								}
 							],
@@ -2072,7 +2110,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 105,
+							"line": 114,
 							"character": 4
 						}
 					],
@@ -2086,7 +2124,7 @@
 							"sources": [
 								{
 									"fileName": "dist/agent-sessions.d.ts",
-									"line": 105,
+									"line": 114,
 									"character": 4
 								}
 							],
@@ -2144,7 +2182,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 106,
+							"line": 115,
 							"character": 4
 						}
 					],
@@ -2158,7 +2196,7 @@
 							"sources": [
 								{
 									"fileName": "dist/agent-sessions.d.ts",
-									"line": 106,
+									"line": 115,
 									"character": 4
 								}
 							],
@@ -2205,7 +2243,7 @@
 					"sources": [
 						{
 							"fileName": "dist/agent-sessions.d.ts",
-							"line": 107,
+							"line": 116,
 							"character": 4
 						}
 					],
@@ -2219,7 +2257,7 @@
 							"sources": [
 								{
 									"fileName": "dist/agent-sessions.d.ts",
-									"line": 107,
+									"line": 116,
 									"character": 4
 								}
 							],
@@ -2288,7 +2326,7 @@
 			"sources": [
 				{
 					"fileName": "dist/agent-sessions.d.ts",
-					"line": 99,
+					"line": 108,
 					"character": 17
 				}
 			]

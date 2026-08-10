@@ -403,7 +403,7 @@ try {
     blocker: {
       id: "TS-050-AUTH-001",
       decision: "Approve exact six-cell execution, the security-remediated Vitest substitution, and bootstrap baseline promotion.",
-      owner: "Runa SDK technical and release owners",
+      owner: "Cuna SDK technical and release owners",
     },
     artifact_sha256: artifactSha256,
     catalog_sha256: catalogSha256,

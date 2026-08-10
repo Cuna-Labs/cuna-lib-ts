@@ -19,7 +19,7 @@
     {
       "file": "prds/libs/shared/PRD-002-rest-contract-baseline.md",
       "scope": "shared-applicable",
-      "sha256": "3d0dd27fff5f613bb137731e7f8c678b90deaf352cfa93b138111b3ca199ea55",
+      "sha256": "9d05193cb6f3ab2bb950bfe78503d9a38792d89431ac255cda521b69cac8e79d",
       "requirement_count": 26,
       "acceptance_test_count": 21
     },

@@ -17,6 +17,7 @@ test("private transport bridge exposes exactly the canonical 1.7 SDK operations"
     "machineCreates.reconcile",
     "me.get",
     "records.list",
+    "sessions.agentAuth",
     "sessions.checkpoint",
     "sessions.create",
     "sessions.delete",
