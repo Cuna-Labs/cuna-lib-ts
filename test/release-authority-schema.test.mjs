@@ -62,7 +62,7 @@ test("trusted signatures cannot substitute for closed release-role semantics", (
       ...common, administrators_enforced: true, branch: "main",
       commit_sha: "a".repeat(40), deletions_allowed: false,
       dismiss_stale_reviews: true, force_pushes_allowed: false,
-      pull_request_required: true, repository: "Runa-Laboratories/runa-lib-ts",
+      pull_request_required: true, repository: "Cuna-Labs/cuna-lib-ts",
       required_approving_reviews: 0,
       required_status_checks: ["release-admission", "ts-quality-gates"],
     },
@@ -96,7 +96,7 @@ test("trusted signatures cannot substitute for closed release-role semantics", (
       schema_version: 1, ...common, candidate_sha256: digest,
       oracle: {
         provider: "github-actions",
-        repository: "Runa-Laboratories/runa-release-authority",
+        repository: "Cuna-Labs/cuna-release-authority",
         workflow: ".github/workflows/release-authority.yml",
         run_id: 123, run_attempt: 1, head_sha: "d".repeat(40),
       },

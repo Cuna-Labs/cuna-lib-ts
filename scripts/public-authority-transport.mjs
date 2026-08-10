@@ -10,7 +10,7 @@ import {
   validateTrustedRolePayload,
 } from "./release-authority-schema.mjs";
 
-export const AUTHORITY_REPOSITORY = "Runa-Laboratories/runa-release-authority";
+export const AUTHORITY_REPOSITORY = "Cuna-Labs/cuna-release-authority";
 export const AUTHORITY_WORKFLOW = ".github/workflows/release-authority.yml";
 const API_ROOT = "https://api.github.com";
 const ASSET_NAMES = Object.freeze([

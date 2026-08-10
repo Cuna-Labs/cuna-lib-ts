@@ -19,7 +19,7 @@ assert.equal(validateApprovedLicense(
 ), true);
 assert.deepEqual(packedManifest.repository, {
   type: "git",
-  url: "git+https://github.com/Runa-Laboratories/runa-lib-ts.git",
+  url: "git+https://github.com/Cuna-Labs/cuna-lib-ts.git",
 });
 assert.deepEqual(packedManifest.publishConfig, {
   access: "public",

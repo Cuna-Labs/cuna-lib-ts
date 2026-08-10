@@ -84,7 +84,7 @@ export function verifyDetachedAuthorityBundle(bundleBytes, bundle, detached, pol
     ]) || detached.schema_version !== 2 ||
         detached.canonicalization !== "RFC8785-JCS") return false;
     if (detached.authority_repository !==
-          "Runa-Laboratories/runa-release-authority" ||
+          "Cuna-Labs/cuna-release-authority" ||
         detached.authority_workflow !==
           ".github/workflows/release-authority.yml" ||
         !Number.isSafeInteger(detached.authority_run_id) ||

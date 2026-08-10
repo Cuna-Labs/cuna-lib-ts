@@ -60,13 +60,13 @@ try {
   const registrySha256 = hash(registryBytes);
   assert.equal(registrySha256, candidate.sha256);
   const repository = process.env.GITHUB_REPOSITORY;
-  assert.equal(repository, "Runa-Laboratories/runa-lib-ts");
+  assert.equal(repository, "Cuna-Labs/cuna-lib-ts");
   assert.equal(path.extname(bundle), ".jsonl");
   const verifyResult = spawnSync("gh", [
     "attestation", "verify",
     path.resolve("release-artifacts", candidate.filename),
     "--repo", repository,
-    "--signer-workflow", "Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml",
+    "--signer-workflow", "Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml",
   ], { encoding: "utf8" });
   assert.equal(verifyResult.status, 0, "R-018-12: GitHub attestation verification failed");
   const apiResult = spawnSync("gh", [
