@@ -29,9 +29,14 @@ await walk(".");
 // first — passed this gate without a word. The families mirror the CLI's single
 // namespace authority (`runa-cli/src/core/namespace.ts`): sk secret key, at
 // access token, rt refresh token, ct continuation, tc terminal connect, se/sc
-// session credentials, cb browser callback nonce.
+// session credentials, cb browser callback nonce, cr continuation resume handle.
+//
+// `cr` was the ninth family and nothing detected it. `app-website` mints
+// `cuna_cr_<43>` as a bearer capability that keys `localStorage`, names a
+// `BroadcastChannel` and rides in a URL fragment; this gate returned no match
+// for it, as did every other detector the product owns.
 const credentialBrands = ["cuna", "runa"];
-const credentialFamilies = ["sk", "at", "rt", "ct", "tc", "se", "sc", "cb"];
+const credentialFamilies = ["sk", "at", "rt", "ct", "tc", "se", "sc", "cb", "cr"];
 const credentialOpening =
   `(?:${credentialBrands.join("|")})_(?:${credentialFamilies.join("|")})_`;
 const secretPatterns = [
