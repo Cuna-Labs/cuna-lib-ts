@@ -3,6 +3,7 @@ import { test, vi } from "vitest";
 
 import { ApiError, ConfigError, Runa } from "../dist/index.js";
 import { resolveConfig } from "../dist/config.js";
+import { brandedEnvNames } from "../dist/internal/wire-namespaces.js";
 import { API_KEY, SESSION_ID, jsonResponse, sessionFixture } from "./helpers.mjs";
 
 /*
@@ -273,6 +274,34 @@ const CLEARED = {
   CUNA_BASE_URL: undefined,
   RUNA_BASE_URL: undefined,
 };
+
+/*
+ * A literal oracle over the derivation itself, and the reason every case below
+ * spells its variable names out by hand instead of looping over
+ * `brandedEnvNames(...)`.
+ *
+ * A dual-accept test that draws its cases from the list under test can only
+ * ever confirm that the implementation agrees with itself. Revert the fix so
+ * the resolver reads one spelling and such a test does not fail — the missing
+ * case simply stops existing and the suite goes green on defective code. That
+ * is this workspace's recurring defect class reappearing inside the test
+ * written to prevent it, so the oracle has to be independent of its subject.
+ *
+ * `Covers<>` in `config.ts` catches one half of this: SHRINKING `WIRE_BRANDS`
+ * is a compile error. It does not catch the other half. Reordering the list
+ * compiles cleanly and silently swaps which variable wins, because precedence
+ * is list order. The type system guards the source; only a literal oracle
+ * guards the order.
+ *
+ * Appending a third brand is meant to fail this test. The list is append-only
+ * and now decides precedence, so a new spelling landing in a ranked position
+ * should require a deliberate edit here rather than inheriting a rank in
+ * silence.
+ */
+test("the configuration names derive to exactly both spellings, canonical first", () => {
+  assert.deepEqual(brandedEnvNames("BASE_URL"), ["CUNA_BASE_URL", "RUNA_BASE_URL"]);
+  assert.deepEqual(brandedEnvNames("API_KEY"), ["CUNA_API_KEY", "RUNA_API_KEY"]);
+});
 
 test("the API endpoint is read in both brand spellings", () => {
   for (const [name, url] of [
