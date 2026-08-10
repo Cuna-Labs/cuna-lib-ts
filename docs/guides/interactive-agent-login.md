@@ -21,3 +21,9 @@ already admitted `AgentSession` object to `agentAuth`; the SDK rejects a
 sibling ID, a changed process epoch or auth mode, stale observations, and
 responses that are not marked `Cache-Control: no-store`. No provider secrets,
 terminal output, account identity, or machine-level shortcut are exposed.
+
+Synchronous creation can legitimately use the platform's 25-minute durable
+provisioning lease and its five-minute recovery window. The SDK therefore
+allows 31 minutes for `sessions.create` before timing out. Prefer the default
+background flow for interactive agents so callers receive a session handle
+immediately.
