@@ -7,6 +7,7 @@ type CanonicalOperationDescriptor =
   (typeof CANONICAL_OPERATIONS)[OperationKey];
 type ResponseKind =
   | "acknowledgement"
+  | "agent-auth"
   | "agent-session"
   | "agent-session-page"
   | "terminal-connection-grant"
@@ -16,7 +17,10 @@ type ResponseKind =
   | "open"
   | "records"
   | "session"
-  | "sessions";
+  | "sessions"
+  | "workspace-binding"
+  | "workspace-sync"
+  | "machine-create";
 type ErrorKind = "legacy" | "problem";
 
 export type OperationDescriptor = CanonicalOperationDescriptor & {
@@ -32,11 +36,26 @@ const PROBLEM_OPERATIONS = new Set<OperationKey>([
   "agentSessions.rename",
   "agentSessions.terminate",
   "agentSessions.createTerminalConnection",
+  "agentSessions.agentAuth",
+  "sessions.create",
+  "workspaceBindings.create",
+  "workspaceBindings.get",
+  "workspaces.sync.begin",
+  "workspaces.sync.negotiate",
+  "workspaces.sync.chunk",
+  "workspaces.sync.chunkDownload",
+  "workspaces.sync.commit",
+  "workspaces.sync.changes",
+  "workspaces.sync.reconcile",
+  "machineCreates.get",
+  "machineCreates.reconcile",
 ]);
 
 // The canonical contract owns transport metadata. This private bridge only
 // selects the existing handwritten decoder for each canonical operation.
 const RESPONSE_KINDS = Object.freeze({
+  "workspaceBindings.create": "workspace-binding",
+  "workspaceBindings.get": "workspace-binding",
   "capabilities.get": "capability-snapshot",
   "agentSessions.create": "agent-session",
   "agentSessions.get": "agent-session",
@@ -46,6 +65,7 @@ const RESPONSE_KINDS = Object.freeze({
   "agentSessions.createTerminalConnection": "terminal-connection-grant",
   "me.get": "me",
   "records.list": "records",
+  "agentSessions.agentAuth": "agent-auth",
   "sessions.checkpoint": "acknowledgement",
   "sessions.create": "session",
   "sessions.delete": "acknowledgement",
@@ -57,6 +77,15 @@ const RESPONSE_KINDS = Object.freeze({
   "sessions.resume": "session",
   "sessions.start": "session",
   "sessions.stop": "session",
+  "workspaces.sync.begin": "workspace-sync",
+  "workspaces.sync.negotiate": "workspace-sync",
+  "workspaces.sync.chunk": "workspace-sync",
+  "workspaces.sync.chunkDownload": "workspace-sync",
+  "workspaces.sync.commit": "workspace-sync",
+  "workspaces.sync.changes": "workspace-sync",
+  "workspaces.sync.reconcile": "workspace-sync",
+  "machineCreates.get": "machine-create",
+  "machineCreates.reconcile": "machine-create",
 } as const satisfies Readonly<Record<OperationKey, ResponseKind>>);
 
 const OPERATIONS = Object.freeze(Object.fromEntries(

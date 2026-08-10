@@ -129,6 +129,8 @@ export interface SessionSnapshot {
  * @runa-contract sessioncreateoptions-summary PRD-028#R-028-01
  */
 export interface SessionCreateOptions {
+  /** Stable printable retry key. Reuse it only for the same create intent. */
+  readonly idempotencyKey?: string;
   /** Optional selected session agent. */
   readonly agent?: SessionAgent;
   /** Optional virtual CPU quantity. */
@@ -232,6 +234,8 @@ export interface EstimatedUsage {
 export interface AssignedWorkspace {
   /** Literal discriminator for the assigned workspace variant. */
   readonly assigned: true;
+  /** Canonical public workspace UUID used by synchronization APIs. */
+  readonly id: string;
   /** Estimated usage for this assigned workspace. */
   readonly usage: EstimatedUsage;
   /** Absent waitlist position in the assigned variant. */
@@ -271,6 +275,7 @@ export interface Me {
 }
 
 export type OperationKey =
+  | "agentSessions.agentAuth"
   | "agentSessions.create"
   | "agentSessions.createTerminalConnection"
   | "agentSessions.get"
@@ -279,6 +284,8 @@ export type OperationKey =
   | "agentSessions.terminate"
   | "capabilities.get"
   | "me.get"
+  | "machineCreates.get"
+  | "machineCreates.reconcile"
   | "records.list"
   | "sessions.checkpoint"
   | "sessions.create"
@@ -290,7 +297,16 @@ export type OperationKey =
   | "sessions.pause"
   | "sessions.resume"
   | "sessions.start"
-  | "sessions.stop";
+  | "sessions.stop"
+  | "workspaceBindings.create"
+  | "workspaceBindings.get"
+  | "workspaces.sync.begin"
+  | "workspaces.sync.changes"
+  | "workspaces.sync.chunk"
+  | "workspaces.sync.chunkDownload"
+  | "workspaces.sync.commit"
+  | "workspaces.sync.negotiate"
+  | "workspaces.sync.reconcile";
 
 export type NormalizedErrorCode =
   | "config_error"
@@ -301,7 +317,7 @@ export type NormalizedErrorCode =
 interface EventBase {
   readonly request_id: string;
   readonly operation_key: OperationKey;
-  readonly method: "GET" | "POST" | "PATCH" | "DELETE";
+  readonly method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   readonly relative_path_template: string;
   readonly sdk_language: "typescript";
   readonly sdk_version: string;
@@ -390,7 +406,7 @@ export interface TraceSink {
 export interface RunaConfig {
   /** Optional constructor API key selected before environment or explicit-file sources. */
   readonly apiKey?: string;
-  /** Optional explicit Runa API origin; only https://api.runacode.io is accepted. */
+  /** Optional Cuna API origin; api.getcuna.com is canonical and api.runacode.io is legacy. */
   readonly baseUrl?: string;
   /** Optional explicit JSON configuration file, or null to disable file loading. */
   readonly configFile?: string | null;

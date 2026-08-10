@@ -8,7 +8,8 @@ import type {
   TraceSink,
 } from "./types.js";
 
-export const DEFAULT_BASE_URL = "https://api.runacode.io";
+export const DEFAULT_BASE_URL = "https://api.getcuna.com";
+export const LEGACY_BASE_URL = "https://api.runacode.io";
 
 interface ConfigFileShape {
   readonly api_key?: string;
@@ -78,13 +79,14 @@ function validApiKey(value: unknown): value is string {
   return (
     typeof value === "string" &&
     value.trim().length > 0 &&
-    value.startsWith("runa_sk_")
+    (value.startsWith("cuna_sk_") || value.startsWith("runa_sk_"))
   );
 }
 
 function normalizeBaseUrl(value: unknown): string {
   if (typeof value !== "string") fail();
-  if (value !== DEFAULT_BASE_URL && value !== `${DEFAULT_BASE_URL}/`) fail();
+  if (![DEFAULT_BASE_URL, `${DEFAULT_BASE_URL}/`, LEGACY_BASE_URL, `${LEGACY_BASE_URL}/`]
+    .includes(value)) fail();
   let parsed: URL;
   try {
     parsed = new URL(value);
@@ -99,11 +101,11 @@ function normalizeBaseUrl(value: unknown): string {
     (parsed.pathname !== "" && parsed.pathname !== "/") ||
     parsed.search !== "" ||
     parsed.hash !== "" ||
-    parsed.origin !== DEFAULT_BASE_URL
+    (parsed.origin !== DEFAULT_BASE_URL && parsed.origin !== LEGACY_BASE_URL)
   ) {
     fail();
   }
-  return DEFAULT_BASE_URL;
+  return parsed.origin;
 }
 
 function validateDiagnostics(value: unknown): DiagnosticSink | undefined {
@@ -156,6 +158,9 @@ export function resolveConfig(config: RunaConfig = {}): EffectiveConfig {
   if (unsafe.apiKey !== undefined) {
     apiKey = unsafe.apiKey;
     apiKeySource = "constructor";
+  } else if (process.env.CUNA_API_KEY !== undefined) {
+    apiKey = process.env.CUNA_API_KEY;
+    apiKeySource = "environment";
   } else if (process.env.RUNA_API_KEY !== undefined) {
     apiKey = process.env.RUNA_API_KEY;
     apiKeySource = "environment";

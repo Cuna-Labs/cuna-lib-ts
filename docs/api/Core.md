@@ -33,6 +33,30 @@ Stable sessions manager owned by this client.
 sessions: SessionsManager
 ```
 
+#### workspaceBindings
+
+Stable canonical workspace binding manager owned by this client.
+
+```ts
+workspaceBindings: WorkspaceBindingsManager
+```
+
+#### workspaceSync
+
+Stable workspace synchronization manager owned by this client.
+
+```ts
+workspaceSync: WorkspaceSyncManager
+```
+
+#### machineCreates
+
+Stable machine-create recovery manager owned by this client.
+
+```ts
+machineCreates: MachineCreatesManager
+```
+
 #### agentSessions
 
 Stable AgentSession manager owned by this client.

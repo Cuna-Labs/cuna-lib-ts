@@ -2,7 +2,7 @@
   "schema_version": 2,
   "status": "PASS",
   "method": "scripts/verify-duplicate-abstractions.mjs",
-  "audited_source_sha256": "5dfaf83a6ee7e26d15e6eef75732fc5598274f7fdf8ae9063e4db97a125a4cbb",
+  "audited_source_sha256": "2bddba8a9bcb3b6b86469a8497651fad592ff208ef095f36a8c69f32a2afe9e6",
   "audited_files": [
     "src/agent-sessions.ts",
     "src/client.ts",
@@ -23,10 +23,13 @@
     "src/internal/sanitize.ts",
     "src/internal/test-seams.ts",
     "src/internal/transport.ts",
+    "src/machine-creates.ts",
     "src/session.ts",
     "src/text.ts",
     "src/types.ts",
     "src/version.ts",
+    "src/workspace-bindings.ts",
+    "src/workspace-sync.ts",
     "scripts/acceptance-receipts.mjs",
     "scripts/aggregate-compatibility.mjs",
     "scripts/attestation-bundle.mjs",
@@ -99,18 +102,21 @@
       "observed": {
         "decoder_exports": [
           "decodeAcknowledgement",
-          "decodeAgentAuthenticationStatus",
           "decodeAgentSession",
           "decodeAgentSessionPage",
           "decodeCapabilitySnapshot",
           "decodeExec",
+          "decodeMachineCreateRequest",
           "decodeMe",
           "decodeOpen",
           "decodeProblem",
           "decodeRecords",
           "decodeSession",
           "decodeSessions",
-          "decodeTerminalConnectionGrant"
+          "decodeTerminalConnectionGrant",
+          "decodeWorkspaceBinding",
+          "decodeWorkspaceSyncEnvelope",
+          "decodeWorkspaceSyncProblem"
         ],
         "out_of_owner_definitions": 0
       },
@@ -122,6 +128,8 @@
       "owners": [
         "src/client.ts",
         "src/session.ts",
+        "src/workspace-bindings.ts",
+        "src/workspace-sync.ts",
         "src/internal/transport.ts"
       ],
       "observed": {
@@ -137,10 +145,12 @@
       "owners": [
         "src/domain.ts",
         "src/client.ts",
-        "src/session.ts"
+        "src/session.ts",
+        "src/workspace-bindings.ts",
+        "src/workspace-sync.ts"
       ],
       "observed": {
-        "object_has_own_calls": 14,
+        "object_has_own_calls": 23,
         "local_own_helpers": 2
       },
       "rationale": "Tiny private predicates stay at separate decode and caller-input trust boundaries; no public or cross-layer abstraction is created."

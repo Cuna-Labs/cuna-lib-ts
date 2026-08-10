@@ -8,7 +8,7 @@ export function validateApprovedLicense(licenseText, packageMetadata) {
   assert.match(licenseText,
     /^\s*Apache License\r?\n\s*Version 2\.0, January 2004\r?\n/u,
     "LICENSE must contain the Apache License 2.0 text.");
-  assert.match(licenseText, /Copyright 2026 Runa Laboratories/u,
-    "LICENSE must identify Runa Laboratories as the copyright owner.");
+  assert.match(licenseText, /Copyright 2026 Cuna Labs/u,
+    "LICENSE must identify Cuna Labs as the copyright owner.");
   return true;
 }

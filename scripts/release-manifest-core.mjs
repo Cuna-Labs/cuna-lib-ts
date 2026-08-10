@@ -47,14 +47,14 @@ export function canonicalizeJson(value) {
 
 export const EXPECTED_RELEASE_POLICY = Object.freeze({
   packageMetadata: {
-    repository: "https://github.com/Runa-Laboratories/runa-lib-ts",
+    repository: "https://github.com/Cuna-Labs/cuna-lib-ts",
     repositoryVisibility: "public",
     packageAccess: "public",
   },
   releaseAuthority: {
     status: "configured",
     authority: {
-      repository: "Runa-Laboratories/runa-release-authority",
+      repository: "Cuna-Labs/cuna-release-authority",
       workflow: ".github/workflows/release-authority.yml",
       artifact: "release-authority-bundle",
       branch: "main",
@@ -69,7 +69,7 @@ export const EXPECTED_RELEASE_POLICY = Object.freeze({
   },
   provenance: {
     attestation: "actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d",
-    verifier: "gh attestation verify <artifact> --repo Runa-Laboratories/runa-lib-ts --signer-workflow Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml",
+    verifier: "gh attestation verify <artifact> --repo Cuna-Labs/cuna-lib-ts --signer-workflow Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml",
   },
   publisher: { ci: {
     environment: "npm", idToken: "write", minimumNode: "22.14.0",
@@ -77,8 +77,8 @@ export const EXPECTED_RELEASE_POLICY = Object.freeze({
     workflow: ".github/workflows/release.yml",
   } },
   registry: {
-    package: "@runa_laboratories/sdk", url: "https://registry.npmjs.org/",
-    verificationPath: "GET https://registry.npmjs.org/@runa_laboratories%2fsdk/${version}",
+    package: "@cuna_labs/sdk", url: "https://registry.npmjs.org/",
+    verificationPath: "GET https://registry.npmjs.org/@cuna_labs%2fsdk/${version}",
   },
   sbom: {
     format: "CycloneDX 1.6 JSON",
@@ -92,12 +92,12 @@ export const EXPECTED_RELEASE_POLICY = Object.freeze({
       requiredStatusChecks: ["ts-quality-gates", "release-admission"],
     },
     provider: "github", releaseBranch: "main",
-    repository: "Runa-Laboratories/runa-lib-ts",
-    repositoryUri: "https://github.com/Runa-Laboratories/runa-lib-ts",
+    repository: "Cuna-Labs/cuna-lib-ts",
+    repositoryUri: "https://github.com/Cuna-Labs/cuna-lib-ts",
   },
   tag: {
     signature: {
-      certificateIdentity: "https://github.com/Runa-Laboratories/runa-lib-ts/.github/workflows/release.yml@refs/heads/main",
+      certificateIdentity: "https://github.com/Cuna-Labs/cuna-lib-ts/.github/workflows/release.yml@refs/heads/main",
       issuer: "https://token.actions.githubusercontent.com",
       technology: "sigstore-keyless",
     },
@@ -106,8 +106,8 @@ export const EXPECTED_RELEASE_POLICY = Object.freeze({
   trustedPublisher: {
     allowedAction: "npm publish", audience: "npm:registry.npmjs.org",
     environment: "npm", issuer: "https://token.actions.githubusercontent.com",
-    organization: "Runa-Laboratories", repository: "runa-lib-ts",
-    subject: "repo:Runa-Laboratories/runa-lib-ts:environment:npm",
+    organization: "Cuna-Labs", repository: "cuna-lib-ts",
+    subject: "repo:Cuna-Labs/cuna-lib-ts:environment:npm",
     workflow: "release.yml",
   },
 });
@@ -170,7 +170,7 @@ export async function createReleaseManifestCore({
   assert.equal(provenanceManifest.status, "PASS");
   assert.equal(provenanceManifest.predicate_type, "https://slsa.dev/provenance/v1");
   assert.equal(provenanceManifest.signer_workflow,
-    "Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml");
+    "Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml");
   assert.equal(provenanceManifest.filename,
     `${candidate.filename}.intoto.jsonl`);
   assert.equal(provenanceManifest.generator,
@@ -179,7 +179,7 @@ export async function createReleaseManifestCore({
     EXPECTED_RELEASE_POLICY.provenance.verifier);
   assert.match(provenanceManifest.attestation_id, /^[A-Za-z0-9._:-]+$/u);
   assert.match(provenanceManifest.attestation_url,
-    /^https:\/\/github\.com\/Runa-Laboratories\/runa-lib-ts\/attestations\/[A-Za-z0-9._:-]+$/u);
+    /^https:\/\/github\.com\/Cuna-Labs\/cuna-lib-ts\/attestations\/[A-Za-z0-9._:-]+$/u);
   const provenanceVerifierBytes = await readBytes(
     handoffRoot, "evidence/provenance-verifier.json");
   const provenanceVerifier = JSON.parse(provenanceVerifierBytes.toString("utf8"));
@@ -196,7 +196,7 @@ export async function createReleaseManifestCore({
   assert.equal(provenanceVerifier.build_definition_sha256,
     sha256(await readBytes(repositoryRoot, ".github/workflows/ci.yml")));
   assert.equal(provenanceVerifier.builder_identity,
-    "https://github.com/Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml@refs/heads/main");
+    "https://github.com/Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml@refs/heads/main");
   assert.equal(Number.isFinite(Date.parse(provenanceVerifier.verified_at)), true);
   assert(Date.parse(provenanceVerifier.verified_at) >=
     Date.parse(provenanceVerifier.build_finished_at));
@@ -229,7 +229,7 @@ export async function createReleaseManifestCore({
       build_finished_at: candidate.build_finished_at,
     },
     contract: {
-      repository: "Runa-Laboratories/runa-sdk-contract",
+      repository: "Cuna-Labs/cuna-sdk-contract",
       approved_checkout: contractIdentity.approvedCheckout,
       canonical_ref: contractIdentity.canonicalRef,
       canonical_contract_sha256: contractIdentity.canonicalContractSha256,

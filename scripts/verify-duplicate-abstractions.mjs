@@ -26,9 +26,11 @@ const decodeExports = [...sources["src/domain.ts"].matchAll(
   /export function (decode[A-Za-z]+)\(/g)].map((match) => match[1]).sort();
 assert.deepEqual(decodeExports, [
   "decodeAcknowledgement", "decodeAgentSession",
-  "decodeAgentSessionPage", "decodeCapabilitySnapshot", "decodeExec", "decodeMe", "decodeOpen",
+  "decodeAgentSessionPage", "decodeCapabilitySnapshot", "decodeExec",
+  "decodeMachineCreateRequest", "decodeMe", "decodeOpen",
   "decodeProblem", "decodeRecords", "decodeSession", "decodeSessions",
-  "decodeTerminalConnectionGrant",
+  "decodeTerminalConnectionGrant", "decodeWorkspaceBinding",
+  "decodeWorkspaceSyncEnvelope", "decodeWorkspaceSyncProblem",
 ]);
 assert.equal(occurrences(/export function decode[A-Za-z]+\(/g,
   files.filter((file) => file !== "src/domain.ts")), 0);
@@ -52,7 +54,10 @@ const decisions = [
   {
     concept: "request-validation-and-policy",
     disposition: "layered-distinct",
-    owners: ["src/client.ts", "src/session.ts", "src/internal/transport.ts"],
+    owners: [
+      "src/client.ts", "src/session.ts", "src/workspace-bindings.ts",
+      "src/workspace-sync.ts", "src/internal/transport.ts",
+    ],
     observed: {
       create_body_validator: occurrences(/function createBody\(/g),
       exec_body_validator: occurrences(/function prepareExec\(/g),
@@ -63,10 +68,16 @@ const decisions = [
   {
     concept: "own-property-checks",
     disposition: "intentional-local",
-    owners: ["src/domain.ts", "src/client.ts", "src/session.ts"],
+    owners: [
+      "src/domain.ts", "src/client.ts", "src/session.ts",
+      "src/workspace-bindings.ts", "src/workspace-sync.ts",
+    ],
     observed: {
       object_has_own_calls: occurrences(/Object\.hasOwn\(/g,
-        ["src/domain.ts", "src/client.ts", "src/session.ts"]),
+        [
+          "src/domain.ts", "src/client.ts", "src/session.ts",
+          "src/workspace-bindings.ts", "src/workspace-sync.ts",
+        ]),
       local_own_helpers: occurrences(/function own\(/g,
         ["src/client.ts", "src/session.ts"]),
     },

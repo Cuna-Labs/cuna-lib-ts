@@ -1,4 +1,4 @@
-import { Runa } from "@runa_laboratories/sdk";
+import { Runa } from "@cuna_labs/sdk";
 
 const runa = new Runa();
 try {

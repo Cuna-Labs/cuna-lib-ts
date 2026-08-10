@@ -1,5 +1,10 @@
 import { createHash, verify } from "node:crypto";
 
+const ACCEPTED_AUTHORITY_REPOSITORIES = new Set([
+  "Cuna-Labs/cuna-release-authority",
+  "Runa-Laboratories/runa-release-authority",
+]);
+
 const exactKeys = (value, fields) =>
   value !== null && typeof value === "object" && !Array.isArray(value) &&
   Object.keys(value).sort().join() === [...fields].sort().join();
@@ -83,8 +88,7 @@ export function verifyDetachedAuthorityBundle(bundleBytes, bundle, detached, pol
       "canonicalization", "key_id", "schema_version", "signature",
     ]) || detached.schema_version !== 2 ||
         detached.canonicalization !== "RFC8785-JCS") return false;
-    if (detached.authority_repository !==
-          "Runa-Laboratories/runa-release-authority" ||
+    if (!ACCEPTED_AUTHORITY_REPOSITORIES.has(detached.authority_repository) ||
         detached.authority_workflow !==
           ".github/workflows/release-authority.yml" ||
         !Number.isSafeInteger(detached.authority_run_id) ||

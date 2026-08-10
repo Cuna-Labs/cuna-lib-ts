@@ -21,15 +21,6 @@ export function sessionFixture(overrides = {}) {
   };
 }
 
-export function agentAuthenticationFixture(overrides = {}) {
-  return {
-    agent: "codex",
-    method: "interactive_login",
-    state: "authenticated",
-    ...overrides,
-  };
-}
-
 export function capabilitySnapshotFixture(overrides = {}) {
   const etag = "a".repeat(64);
   return {
@@ -60,6 +51,7 @@ export function meFixture(assigned = true) {
         email: "sdk@example.invalid",
         workspace: {
           assigned: true,
+          id: "77777777-7777-4777-8777-777777777777",
           usage: {
             est_spend_usd: 1,
             est_remaining_usd: 2,

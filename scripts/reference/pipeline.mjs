@@ -309,7 +309,7 @@ const validateRegistries = async (operations, sourceTags) => {
 
 const safeCorpus = (files) => {
   const prohibited = [
-    /runa_sk_[A-Za-z0-9_-]+/i,
+    /(?:cuna|runa)_sk_[A-Za-z0-9_-]+/i,
     /Authorization\s*:/i,
     /\/__runa\/auth\?t=/i,
     /\b(private|protected)\s+(member|source|symbol)/i,
@@ -323,7 +323,7 @@ const safeCorpus = (files) => {
       if (pattern.test(content)) throw new Error(`R-048-11: unsafe-content:${file}`);
     }
     for (const match of content.matchAll(/https:\/\/[A-Za-z0-9._-]+/g)) {
-      if (new URL(match[0]).hostname !== "api.runacode.io") {
+      if (!["api.getcuna.com", "api.runacode.io"].includes(new URL(match[0]).hostname)) {
         throw new Error(`R-048-11: non-runa-host:${file}`);
       }
     }
@@ -363,6 +363,8 @@ const memberDescriptions = Object.freeze({
   id: "Canonical lowercase UUID returned for this public value.",
   kind: "Record kind returned by the API.",
   list: "Lists the complete public collection for this manager.",
+  idempotencyKey: "Optional caller-stable key used to make one create request retry-safe.",
+  machineCreates: "Stable machine-create recovery manager owned by this client.",
   me: "Reads the caller profile and workspace state.",
   memoryMiB: "Memory quantity in mebibytes.",
   mode: "Selected allow-list or deny-list policy mode.",
@@ -401,6 +403,8 @@ const memberDescriptions = Object.freeze({
   vcpus: "Virtual CPU quantity returned by the API or supplied during creation.",
   waitlistPosition: "Non-negative waitlist position for an unassigned workspace.",
   workspace: "Assigned or unassigned workspace state for the caller.",
+  workspaceBindings: "Stable canonical workspace binding manager owned by this client.",
+  workspaceSync: "Stable workspace synchronization manager owned by this client.",
 });
 
 const returnDescriptions = Object.freeze({

@@ -8,7 +8,11 @@ import { promisify } from "node:util";
 const execute = promisify(execFile);
 const SHA256 = /^[a-f0-9]{64}$/u;
 const COMMIT = /^[a-f0-9]{40}$/u;
-const REPOSITORY = "Runa-Laboratories/runa-sdk-contract";
+export const CANONICAL_CONTRACT_REPOSITORY = "Cuna-Labs/cuna-sdk-contract";
+const ACCEPTED_CANONICAL_CONTRACT_REPOSITORIES = new Set([
+  CANONICAL_CONTRACT_REPOSITORY,
+  "Runa-Laboratories/runa-sdk-contract",
+]);
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const exactKeys = (value, fields, label) => {
   assert(value !== null && typeof value === "object" && !Array.isArray(value),
@@ -44,7 +48,9 @@ export async function loadCanonicalContractIdentity(repositoryRoot = ".") {
   assert.match(approvedCheckout, COMMIT);
   assert.equal(provenance.schema_version, 3);
   assert.equal(provenance.status, "APPROVED");
-  assert.equal(provenance.canonical_repository, REPOSITORY);
+  assert.equal(ACCEPTED_CANONICAL_CONTRACT_REPOSITORIES.has(
+    provenance.canonical_repository,
+  ), true, "Canonical provenance references an unaccepted contract repository.");
   assert.match(provenance.canonical_ref, COMMIT);
   assert.equal(provenance.source_revision, provenance.canonical_ref);
   assert.equal(provenance.reason, null);
@@ -76,10 +82,13 @@ export function validateAuthorityContractProvenance(value, identity) {
   ], "authority contract provenance");
   assert.equal(value.schema_version, 1);
   assert.equal(value.status, "APPROVED");
-  assert.equal(value.canonical_repository, REPOSITORY);
+  assert.equal(ACCEPTED_CANONICAL_CONTRACT_REPOSITORIES.has(
+    value.canonical_repository,
+  ), true, "Authority provenance references an unaccepted contract repository.");
   assert.equal(value.canonical_ref, identity.canonicalRef);
   assert.equal(value.approval_sha, identity.approvedCheckout);
-  assert.equal(value.approver_identity, `https://github.com/${REPOSITORY}`);
+  assert.equal(value.approver_identity,
+    `https://github.com/${value.canonical_repository}`);
   assert.equal(Number.isFinite(Date.parse(value.approved_at)), true);
   assert.equal(value.canonical_contract_sha256, identity.canonicalContractSha256);
   assert.equal(value.projection_sha256, identity.projectionSha256);

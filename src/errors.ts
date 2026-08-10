@@ -1,3 +1,5 @@
+import type { WorkspaceSyncProblem } from "./workspace-sync.js";
+
 /**
  * Base class for normalized public Runa SDK errors.
  * @runa-contract runaerror-summary PRD-024#R-024-01
@@ -35,7 +37,9 @@ export interface Problem {
   readonly action?: ProblemAction;
 }
 
-const API_PROBLEMS = new WeakMap<ApiError, Problem>();
+export type ApiProblem = Problem | WorkspaceSyncProblem;
+
+const API_PROBLEMS = new WeakMap<ApiError, ApiProblem>();
 
 /**
  * Safe public error raised when selected client configuration is invalid.
@@ -78,7 +82,7 @@ export class ApiError extends RunaError {
     | "The Runa API request failed."
     | "The Runa API returned an invalid response.";
   /** Validated Problem metadata when the operation uses the Problem error model. */
-  get problem(): Problem | undefined {
+  get problem(): ApiProblem | undefined {
     return API_PROBLEMS.get(this);
   }
 
@@ -110,7 +114,7 @@ export class ApiError extends RunaError {
 }
 
 /** @internal Constructs an API error with already validated Problem metadata. */
-export function apiErrorWithProblem(status: number, problem: Problem): ApiError {
+export function apiErrorWithProblem(status: number, problem: ApiProblem): ApiError {
   const error = new ApiError(status);
   API_PROBLEMS.set(error, problem);
   return error;

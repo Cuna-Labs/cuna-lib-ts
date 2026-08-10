@@ -7,13 +7,13 @@ test("signed provenance predicate rejects every identity and build-input mutatio
   const expected = {
     sourceCommit: commit,
     workflowRef: "refs/heads/main",
-    repository: "https://github.com/Runa-Laboratories/runa-lib-ts",
+    repository: "https://github.com/Cuna-Labs/cuna-lib-ts",
     workflowPath: ".github/workflows/ci.yml",
     eventName: "push", repositoryId: "123", repositoryOwnerId: "456",
     runnerEnvironment: "github-hosted",
-    sourceUri: "git+https://github.com/Runa-Laboratories/runa-lib-ts@refs/heads/main",
-    builderIdentity: "https://github.com/Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml@refs/heads/main",
-    invocationId: "https://github.com/Runa-Laboratories/runa-lib-ts/actions/runs/7/attempts/2",
+    sourceUri: "git+https://github.com/Cuna-Labs/cuna-lib-ts@refs/heads/main",
+    builderIdentity: "https://github.com/Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml@refs/heads/main",
+    invocationId: "https://github.com/Cuna-Labs/cuna-lib-ts/actions/runs/7/attempts/2",
   };
   const valid = {
     buildDefinition: {

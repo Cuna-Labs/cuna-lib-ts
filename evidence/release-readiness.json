@@ -1,13 +1,13 @@
 {
   "schema_version": 2,
   "decision": "BLOCKED",
-  "projection_sha256": "02a554b22592f0267475b847a2bb1c7df64e2b688cdb69b0a4a8b392695e1c55",
-  "candidate_sha256": "beecdc02ef8efa38cc02968912e42ad42b7c61131414296c3418bca4f1265a15",
+  "projection_sha256": null,
+  "candidate_sha256": "8dab197dde9c64570cab0ddba48f8cc6317ee7b6cf25104e734efbc7400dc4cd",
   "blockers": [
     {
       "id": "TS-REL-001",
       "gate": "canonical-contract-provenance",
-      "reason": "Canonical repository provenance is not approved."
+      "reason": "Commit-pinned canonical contract identity is missing or invalid."
     },
     {
       "id": "TS-REL-002",
@@ -92,12 +92,12 @@
     {
       "id": "TS-REL-018",
       "gate": "sbom-validation",
-      "reason": "No accepted release trust root is configured."
+      "reason": "Evidence signature, role, status, or freshness is invalid."
     },
     {
       "id": "TS-REL-019",
       "gate": "external-release-interfaces",
-      "reason": "No accepted release trust root is configured."
+      "reason": "Evidence signature, role, status, or freshness is invalid."
     }
   ]
 }

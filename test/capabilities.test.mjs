@@ -39,7 +39,7 @@ test("capabilities.get sends the exact account query and decodes leased evidence
   assert.equal(Object.isFrozen(snapshot.capabilities), true);
   assert.equal(Object.isFrozen(snapshot.capabilities[0].surfaces), true);
   assert.equal(calls.length, 1);
-  assert.equal(calls[0].url.href, "https://api.runacode.io/v1/capabilities?scope=account");
+  assert.equal(calls[0].url.href, "https://api.getcuna.com/v1/capabilities?scope=account");
   assert.equal(calls[0].init.method, "GET");
   assert.equal(calls[0].init.headers.Authorization, `Bearer ${API_KEY}`);
   assert.equal(calls[0].init.redirect, "manual");
@@ -63,7 +63,7 @@ test("machine discovery binds the resource query to the returned subject", async
   assert.equal(snapshot.subjectId, SESSION_ID);
   assert.equal(
     target.href,
-    `https://api.runacode.io/v1/capabilities?scope=machine&resource_id=${SESSION_ID}`,
+    `https://api.getcuna.com/v1/capabilities?scope=machine&resource_id=${SESSION_ID}`,
   );
   await runa.close();
 });
@@ -86,7 +86,7 @@ test("agent-session discovery binds the resource query to the returned subject",
   assert.equal(snapshot.subjectId, SESSION_ID);
   assert.equal(
     target.href,
-    `https://api.runacode.io/v1/capabilities?scope=agent_session&resource_id=${SESSION_ID}`,
+    `https://api.getcuna.com/v1/capabilities?scope=agent_session&resource_id=${SESSION_ID}`,
   );
   await runa.close();
 });

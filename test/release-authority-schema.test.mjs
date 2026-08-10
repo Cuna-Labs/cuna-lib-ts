@@ -39,7 +39,7 @@ test("trusted signatures cannot substitute for closed release-role semantics", (
       classification: "initial",
     },
     publication: {
-      ...common, candidate_sha256: digest, package_name: "@runa_laboratories/sdk",
+      ...common, candidate_sha256: digest, package_name: "@cuna_labs/sdk",
       version: "0.1.0", registry: "https://registry.npmjs.org",
       dist_tag: "next", oidc_trusted_publisher: true,
       provenance_attestation_required: true,
@@ -62,7 +62,7 @@ test("trusted signatures cannot substitute for closed release-role semantics", (
       ...common, administrators_enforced: true, branch: "main",
       commit_sha: "a".repeat(40), deletions_allowed: false,
       dismiss_stale_reviews: true, force_pushes_allowed: false,
-      pull_request_required: true, repository: "Runa-Laboratories/runa-lib-ts",
+      pull_request_required: true, repository: "Cuna-Labs/cuna-lib-ts",
       required_approving_reviews: 0,
       required_status_checks: ["release-admission", "ts-quality-gates"],
     },
@@ -88,7 +88,7 @@ test("trusted signatures cannot substitute for closed release-role semantics", (
           sdist: { filename: "runa_sdk-0.1.0.tar.gz", sha256: sdist },
         },
         typescript_artifact: {
-          filename: "runa_laboratories-sdk-0.1.0.tgz", sha256: digest,
+          filename: "cuna_labs-sdk-0.1.0.tgz", sha256: digest,
         },
       };
     })(),
@@ -96,7 +96,7 @@ test("trusted signatures cannot substitute for closed release-role semantics", (
       schema_version: 1, ...common, candidate_sha256: digest,
       oracle: {
         provider: "github-actions",
-        repository: "Runa-Laboratories/runa-release-authority",
+        repository: "Cuna-Labs/cuna-release-authority",
         workflow: ".github/workflows/release-authority.yml",
         run_id: 123, run_attempt: 1, head_sha: "d".repeat(40),
       },
@@ -123,6 +123,30 @@ test("trusted signatures cannot substitute for closed release-role semantics", (
     const payload = structuredClone(valid[mutation.role]);
     payload[mutation.field] = mutation.value;
     assert.throws(() => validateTrustedRolePayload(mutation.role, payload));
+  }
+
+  const legacyRepositoryControls = structuredClone(valid["repository-controls"]);
+  legacyRepositoryControls.repository = "Runa-Laboratories/runa-lib-ts";
+  assert.equal(validateTrustedRolePayload(
+    "repository-controls", legacyRepositoryControls,
+  ), true);
+  const legacyPublication = structuredClone(valid.publication);
+  legacyPublication.package_name = "@runa_laboratories/sdk";
+  assert.equal(validateTrustedRolePayload("publication", legacyPublication), true);
+  const legacyAcceptance = structuredClone(valid["acceptance-results"]);
+  legacyAcceptance.oracle.repository = "Runa-Laboratories/runa-release-authority";
+  assert.equal(validateTrustedRolePayload("acceptance-results", legacyAcceptance), true);
+
+  for (const [role, mutate] of [
+    ["repository-controls", (value) => { value.repository = "attacker/sdk"; }],
+    ["publication", (value) => { value.package_name = "@attacker/sdk"; }],
+    ["acceptance-results", (value) => {
+      value.oracle.repository = "attacker/release-authority";
+    }],
+  ]) {
+    const payload = structuredClone(valid[role]);
+    mutate(payload);
+    assert.throws(() => validateTrustedRolePayload(role, payload));
   }
 });
 

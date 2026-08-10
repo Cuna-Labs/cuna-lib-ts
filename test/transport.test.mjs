@@ -97,7 +97,7 @@ test("PRD-021/025/028-037 dispatch the canonical legacy session operations", asy
   for (const { target, init } of captures) {
     assert.equal(target.origin, "https://api.runacode.io");
     assert.equal(init.redirect, "manual");
-    assert.equal(init.headers.Accept, "application/json");
+    assert.equal(init.headers.Accept, "application/json, application/problem+json");
     assert.equal(init.headers.Authorization, `Bearer ${API_KEY}`);
     assert.match(init.headers["User-Agent"], /^runa-sdk-typescript\//);
     assert.equal("X-Runa-Request-Id" in init.headers, false);
@@ -208,7 +208,7 @@ test("TC-025-02 selects the exact global fetch when no callable is injected", as
   let calls = 0;
   const selected = async (url, init) => {
     calls += 1;
-    assert.equal(new URL(url).origin, "https://api.runacode.io");
+    assert.equal(new URL(url).origin, "https://api.getcuna.com");
     assert.equal(init.method, "GET");
     return jsonResponse(meFixture());
   };
@@ -261,7 +261,7 @@ test("TC-040-02 rejects hostile redirects with one request and no exposure", asy
 });
 
 test("PRD-025/040 enforce the response cap and invalid UTF-8", async () => {
-  const over = new Uint8Array(8_388_609);
+  const over = new Uint8Array(16_777_217);
   over.fill(0x20);
   for (const response of [
     new Response(over, {
@@ -290,7 +290,7 @@ test("PRD-025/026 overflow remains terminal when stream cancellation never settl
   let cancellations = 0;
   const body = new ReadableStream({
     start(controller) {
-      controller.enqueue(new Uint8Array(8_388_609));
+      controller.enqueue(new Uint8Array(16_777_217));
     },
     cancel() {
       cancellations += 1;
@@ -305,14 +305,10 @@ test("PRD-025/026 overflow remains terminal when stream cancellation never settl
       headers: { "content-type": "application/json" },
     }),
   });
-  let outcome;
-  void runa.me().then(
-    () => { outcome = "resolved"; },
-    (error) => { outcome = error; },
-  );
-  for (let turn = 0; turn < 10 && outcome === undefined; turn += 1) {
-    await new Promise((resolve) => setImmediate(resolve));
-  }
+  const outcome = await Promise.race([
+    runa.me().then(() => "resolved", (error) => error),
+    new Promise((resolve) => setTimeout(() => resolve("timed-out"), 1_000)),
+  ]);
   assert(outcome instanceof ApiError);
   assert.equal(outcome.code, "malformed_response");
   assert.equal(cancellations, 1);

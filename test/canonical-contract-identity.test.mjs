@@ -4,7 +4,9 @@ import { readFile } from "node:fs/promises";
 import { test } from "vitest";
 
 import {
+  CANONICAL_CONTRACT_REPOSITORY,
   loadCanonicalContractIdentity,
+  validateAuthorityContractProvenance,
 } from "../scripts/canonical-contract-identity.mjs";
 
 test("release identity rejects the exact unapproved canonical contract", async () => {
@@ -33,4 +35,42 @@ test("release trust is pinned to one accepted Ed25519 root for every authority r
     createHash("sha256").update(policy.keys[0].public_key_pem).digest("hex"),
     "fe7d7259281d512d4f17ef1a0afed3e9b613105ab1a3304e129130b194aa8000",
   );
+});
+
+test("contract authority accepts only the active Cuna identity and exact signed legacy identity", () => {
+  const identity = {
+    approvedCheckout: "b".repeat(40),
+    canonicalContractSha256: "c".repeat(64),
+    canonicalRef: "a".repeat(40),
+    openapiSha256: "d".repeat(64),
+    projectionSha256: "e".repeat(64),
+  };
+  const provenance = (repository) => ({
+    schema_version: 1,
+    status: "APPROVED",
+    canonical_repository: repository,
+    canonical_ref: identity.canonicalRef,
+    approval_sha: identity.approvedCheckout,
+    approver_identity: `https://github.com/${repository}`,
+    approved_at: "2026-08-09T00:00:00.000Z",
+    canonical_contract_sha256: identity.canonicalContractSha256,
+    projection_sha256: identity.projectionSha256,
+    openapi_sha256: identity.openapiSha256,
+  });
+
+  assert.equal(validateAuthorityContractProvenance(
+    provenance(CANONICAL_CONTRACT_REPOSITORY), identity,
+  ), true);
+  assert.equal(validateAuthorityContractProvenance(
+    provenance("Runa-Laboratories/runa-sdk-contract"), identity,
+  ), true);
+  assert.throws(() => validateAuthorityContractProvenance(
+    provenance("attacker/sdk-contract"), identity,
+  ), /unaccepted contract repository/u);
+  const mismatchedApprover = provenance(CANONICAL_CONTRACT_REPOSITORY);
+  mismatchedApprover.approver_identity =
+    "https://github.com/Runa-Laboratories/runa-sdk-contract";
+  assert.throws(() => validateAuthorityContractProvenance(
+    mismatchedApprover, identity,
+  ));
 });

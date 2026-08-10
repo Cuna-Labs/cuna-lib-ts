@@ -3,8 +3,9 @@ import { test } from "vitest";
 
 import { operationKeys } from "../dist/internal/contract/index.js";
 
-test("private transport bridge exposes exactly the canonical 1.4 SDK operations", () => {
+test("private transport bridge exposes exactly the canonical 1.7 SDK operations", () => {
   assert.deepEqual(operationKeys(), [
+    "agentSessions.agentAuth",
     "agentSessions.create",
     "agentSessions.createTerminalConnection",
     "agentSessions.get",
@@ -12,6 +13,8 @@ test("private transport bridge exposes exactly the canonical 1.4 SDK operations"
     "agentSessions.rename",
     "agentSessions.terminate",
     "capabilities.get",
+    "machineCreates.get",
+    "machineCreates.reconcile",
     "me.get",
     "records.list",
     "sessions.checkpoint",
@@ -25,5 +28,14 @@ test("private transport bridge exposes exactly the canonical 1.4 SDK operations"
     "sessions.resume",
     "sessions.start",
     "sessions.stop",
+    "workspaceBindings.create",
+    "workspaceBindings.get",
+    "workspaces.sync.begin",
+    "workspaces.sync.changes",
+    "workspaces.sync.chunk",
+    "workspaces.sync.chunkDownload",
+    "workspaces.sync.commit",
+    "workspaces.sync.negotiate",
+    "workspaces.sync.reconcile",
   ]);
 });

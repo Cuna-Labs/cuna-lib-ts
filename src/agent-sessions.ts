@@ -6,6 +6,33 @@ import type { SessionAgent } from "./types.js";
 export type AgentSessionAuthMode =
   | "interactive_login"
   | "credential_binding";
+export type AgentSessionAuthState =
+  | "login_required"
+  | "authenticated"
+  | "configured"
+  | "unavailable";
+export type AgentSessionAuthEvidenceClass =
+  | "provider_cli_login_status"
+  | "credential_binding_authority"
+  | "insufficient";
+
+/**
+ * Immutable, short-lived authentication evidence for one exact AgentSession
+ * process generation. Positive evidence is accepted only while its lease is
+ * fresh; `unavailable` deliberately carries an empty freshness interval.
+ */
+export interface AgentSessionAuth {
+  readonly observationId: string;
+  readonly agentSessionId: string;
+  readonly processEpoch: string | null;
+  readonly authMode: AgentSessionAuthMode;
+  readonly agentVersion: string;
+  readonly adapterVersion: "runa.agent-auth.v1";
+  readonly evidenceClass: AgentSessionAuthEvidenceClass;
+  readonly observedAt: string;
+  readonly validUntil: string;
+  readonly state: AgentSessionAuthState;
+}
 export type AgentSessionDesiredState = "running" | "terminated";
 export type AgentSessionRequestState =
   | "launch_pending"
@@ -28,6 +55,10 @@ export type AgentSessionProcessState =
 export interface AgentSession {
   readonly id: string;
   readonly machineId: string;
+  /** Immutable Runa workspace-sync binding identifier. Absent only on legacy sessions. */
+  readonly workspaceBindingId?: string;
+  /** Immutable committed workspace generation. Absent only on legacy sessions. */
+  readonly workspaceGeneration?: number;
   readonly name: string;
   readonly agent: SessionAgent;
   readonly cwd: string;
@@ -37,6 +68,8 @@ export interface AgentSession {
   readonly processState: AgentSessionProcessState;
   readonly processEpoch?: string;
   readonly runtimeObservedAt?: string;
+  /** Authoritative expiry of the current leased runtime observation. */
+  readonly runtimeExpiresAt?: string;
   readonly terminationRequestedAt?: string;
   readonly rowVersion: number;
   readonly createdAt: string;
@@ -58,6 +91,10 @@ export interface AgentSessionCreateOptions {
   readonly idempotencyKey: string;
   readonly agent: SessionAgent;
   readonly cwd: string;
+  /** Canonical owned workspace-sync binding selected for this session. */
+  readonly workspaceBindingId: string;
+  /** Exact committed workspace generation selected for this session. */
+  readonly workspaceGeneration: number;
   readonly name?: string;
   readonly authMode?: AgentSessionAuthMode;
   readonly credentialBindingId?: string;
@@ -107,6 +144,8 @@ export interface AgentSessionsManager {
   list(machineId: string, options?: AgentSessionListOptions): Promise<AgentSessionPage>;
   create(machineId: string, options: AgentSessionCreateOptions): Promise<AgentSession>;
   get(agentSessionId: string): Promise<AgentSession>;
+  /** Reads auth evidence and binds it to the supplied admitted AgentSession. */
+  agentAuth(agentSession: AgentSession): Promise<AgentSessionAuth>;
   rename(agentSessionId: string, name: string): Promise<AgentSession>;
   terminate(agentSessionId: string): Promise<AgentSession>;
   createTerminalConnection(
@@ -126,6 +165,8 @@ const CREATE_FIELDS = new Set([
   "idempotencyKey",
   "agent",
   "cwd",
+  "workspaceBindingId",
+  "workspaceGeneration",
   "name",
   "authMode",
   "credentialBindingId",
@@ -158,9 +199,11 @@ function validateCreate(options: AgentSessionCreateOptions): {
   }
   if (!AGENTS.has(options.agent) || typeof options.cwd !== "string" ||
       length(options.cwd) < 10 || length(options.cwd) > 1_024 || !CWD.test(options.cwd) ||
-      typeof options.idempotencyKey !== "string" || !IDEMPOTENCY_KEY.test(options.idempotencyKey)) {
+      typeof options.idempotencyKey !== "string" || !IDEMPOTENCY_KEY.test(options.idempotencyKey) ||
+      !Number.isSafeInteger(options.workspaceGeneration) || options.workspaceGeneration < 1) {
     throw new TypeError("Invalid AgentSession create options.");
   }
+  assertUuid(options.workspaceBindingId);
   if (options.name !== undefined && !validName(options.name)) {
     throw new TypeError("Invalid AgentSession create options.");
   }
@@ -181,6 +224,8 @@ function validateCreate(options: AgentSessionCreateOptions): {
     body: Object.freeze({
       agent: options.agent,
       cwd: options.cwd,
+      workspace_binding_id: options.workspaceBindingId,
+      workspace_generation: options.workspaceGeneration,
       ...(options.name === undefined ? {} : { name: options.name }),
       ...(options.authMode === undefined ? {} : { auth_mode: options.authMode }),
       ...(options.credentialBindingId === undefined
@@ -235,7 +280,10 @@ class AgentSessionsManagerImplementation implements AgentSessionsManager {
       body: input.body,
       idempotencyKey: input.idempotencyKey,
     })) as AgentSession;
-    if (created.machineId !== machineId || created.agent !== options.agent || created.cwd !== options.cwd) {
+    if (created.machineId !== machineId || created.agent !== options.agent ||
+        created.cwd !== options.cwd ||
+        created.workspaceBindingId !== options.workspaceBindingId ||
+        created.workspaceGeneration !== options.workspaceGeneration) {
       throw new ApiError(201, "malformed_response");
     }
     return created;
@@ -243,6 +291,25 @@ class AgentSessionsManagerImplementation implements AgentSessionsManager {
 
   async get(agentSessionId: string): Promise<AgentSession> {
     return await this.#one("agentSessions.get", agentSessionId);
+  }
+
+  async agentAuth(agentSession: AgentSession): Promise<AgentSessionAuth> {
+    if (agentSession === null || typeof agentSession !== "object") {
+      throw new TypeError("Invalid AgentSession authentication authority.");
+    }
+    assertUuid(agentSession.id);
+    const observation = (await this.#owner.invoke("agentSessions.agentAuth", {
+      id: agentSession.id,
+    })) as AgentSessionAuth;
+    const expectedEpoch = agentSession.processEpoch ?? null;
+    if (
+      observation.agentSessionId !== agentSession.id ||
+      observation.authMode !== agentSession.authMode ||
+      observation.processEpoch !== expectedEpoch
+    ) {
+      throw new ApiError(200, "malformed_response");
+    }
+    return observation;
   }
 
   async rename(agentSessionId: string, name: string): Promise<AgentSession> {

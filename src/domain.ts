@@ -1,3 +1,6 @@
+import { createHash } from "node:crypto";
+import { Buffer } from "node:buffer";
+
 import type {
   Acknowledgement, Capability, CapabilityAvailability,
   CapabilityInteraction, CapabilityMutationClass, CapabilitySnapshot,
@@ -6,6 +9,8 @@ import type {
 } from "./types.js";
 import type {
   AgentSession,
+  AgentSessionAuth,
+  AgentSessionAuthEvidenceClass,
   AgentSessionAuthMode,
   AgentSessionDesiredState,
   AgentSessionPage,
@@ -17,6 +22,22 @@ import type {
   TerminalConnectionGrant,
 } from "./agent-sessions.js";
 import type { Problem, ProblemAction } from "./errors.js";
+import type { MachineCreateRequest } from "./machine-creates.js";
+import type { WorkspaceBinding } from "./workspace-bindings.js";
+import type {
+  WorkspaceSyncCapability,
+  WorkspaceSyncChangeItem,
+  WorkspaceSyncChangePage,
+  WorkspaceSyncChunkReceipt,
+  WorkspaceSyncChunkContent,
+  WorkspaceSyncCommitReceipt,
+  WorkspaceSyncEnvelope,
+  WorkspaceSyncManifestEntry,
+  WorkspaceSyncManifestReceipt,
+  WorkspaceSyncProblem,
+  WorkspaceSyncReconcileReceipt,
+  WorkspaceSyncSession,
+} from "./workspace-sync.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const SLUG = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
@@ -42,6 +63,13 @@ const ETAG = /^[0-9a-f]{64}$/;
 const AGENT_SESSION_AUTH_MODES = new Set<AgentSessionAuthMode>([
   "interactive_login", "credential_binding",
 ]);
+const AGENT_SESSION_AUTH_EVIDENCE = new Set<AgentSessionAuthEvidenceClass>([
+  "provider_cli_login_status", "credential_binding_authority", "insufficient",
+]);
+const AGENT_VERSION = /^[0-9]+\.[0-9]+\.[0-9]+$/u;
+const AGENT_AUTH_ADAPTER = "runa.agent-auth.v1" as const;
+const MAX_AGENT_AUTH_TTL_MS = 30_000;
+const MAX_AGENT_AUTH_FUTURE_SKEW_MS = 5_000;
 const AGENT_SESSION_DESIRED_STATES = new Set<AgentSessionDesiredState>([
   "running", "terminated",
 ]);
@@ -52,7 +80,7 @@ const AGENT_SESSION_PROCESS_STATES = new Set<AgentSessionProcessState>([
   "unknown", "starting", "ready", "running", "exited", "failed", "terminating", "terminated",
 ]);
 const AGENT_SESSION_CWD = /^\/workspace(?:\/.*)?$/u;
-const TERMINAL_CONNECTION_URL = /^wss:\/\/api\.runacode\.io\/v1\/terminal-connections\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/stream$/u;
+const TERMINAL_CONNECTION_URL = /^wss:\/\/api\.(?:getcuna\.com|runacode\.io)\/v1\/terminal-connections\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/stream$/u;
 const TERMINAL_CONNECTION_TOKEN = /^runa_tc_[A-Za-z0-9_-]{43}$/u;
 const TERMINAL_CAPABILITY_NAMES = new Set<TerminalConnectionCapabilityName>([
   "acknowledgement", "heartbeat", "live_resize", "resume", "signals",
@@ -61,9 +89,23 @@ const TERMINAL_CAPABILITY_AVAILABILITIES = new Set<TerminalConnectionCapabilityA
   "supported", "unsupported", "unknown",
 ]);
 const PROBLEM_CODE = /^[a-z][a-z0-9_]{2,63}$/u;
-const PROBLEM_TYPE = /^https:\/\/api\.runacode\.io\/problems\/[a-z][a-z0-9_]{2,63}$/u;
+const PROBLEM_TYPE = /^https:\/\/api\.(?:getcuna\.com|runacode\.io)\/problems\/[a-z][a-z0-9_]{2,63}$/u;
 const PROBLEM_ACTIONS = new Set<ProblemAction>([
   "retry", "sign_in", "open_web", "contact_support", "none",
+]);
+const MACHINE_CREATE_STATES = new Set<MachineCreateRequest["state"]>([
+  "prepared", "in_progress", "unknown", "provider_succeeded", "settled", "terminal_failed",
+]);
+const MACHINE_CREATE_ACTIONS = new Set<MachineCreateRequest["action"]>([
+  "retry_create", "reconcile", "wait", "none",
+]);
+const WORKSPACE_SYNC_CAPABILITIES = new Set<WorkspaceSyncCapability>([
+  "atomic_generation_commit",
+  "bounded_manifest_pages",
+  "content_digest_verification",
+  "explicit_reconciliation",
+  "ordered_generation_changes",
+  "policy_bound_admission",
 ]);
 
 export class DecodeFailure {
@@ -144,6 +186,61 @@ export function decodeSessions(value: unknown): readonly SessionSnapshot[] {
   return Object.freeze(value.map(decodeSession));
 }
 
+export function decodeAgentSessionAuth(
+  value: unknown,
+  nowMs = Date.now(),
+): AgentSessionAuth {
+  const source = object(value);
+  exact(source, [
+    "observation_id", "agent_session_id", "process_epoch", "auth_mode",
+    "agent_version", "adapter_version", "evidence_class", "observed_at",
+    "valid_until", "state",
+  ]);
+  const observationId = uuid(source.observation_id);
+  const agentSessionId = uuid(source.agent_session_id);
+  const processEpoch = source.process_epoch === null ? null : uuid(source.process_epoch);
+  const authMode = enumValue(source.auth_mode, AGENT_SESSION_AUTH_MODES);
+  const agentVersion = string(source.agent_version);
+  const adapterVersion = string(source.adapter_version);
+  const evidenceClass = enumValue(source.evidence_class, AGENT_SESSION_AUTH_EVIDENCE);
+  const observedAt = dateTime(source.observed_at);
+  const validUntil = dateTime(source.valid_until);
+  const state = string(source.state);
+  const observedMs = Date.parse(observedAt);
+  const validUntilMs = Date.parse(validUntil);
+  const unavailable = evidenceClass === "insufficient" && state === "unavailable";
+  const interactive = authMode === "interactive_login" &&
+    evidenceClass === "provider_cli_login_status" &&
+    (state === "login_required" || state === "authenticated");
+  const credential = authMode === "credential_binding" &&
+    evidenceClass === "credential_binding_authority" && state === "configured";
+  if (
+    adapterVersion !== AGENT_AUTH_ADAPTER ||
+    (!unavailable && !interactive && !credential) ||
+    (unavailable && validUntilMs !== observedMs) ||
+    (!unavailable && (
+      processEpoch === null ||
+      !AGENT_VERSION.test(agentVersion) ||
+      validUntilMs <= observedMs ||
+      validUntilMs - observedMs > MAX_AGENT_AUTH_TTL_MS ||
+      observedMs > nowMs + MAX_AGENT_AUTH_FUTURE_SKEW_MS ||
+      validUntilMs <= nowMs
+    ))
+  ) malformed();
+  return Object.freeze({
+    observationId,
+    agentSessionId,
+    processEpoch,
+    authMode,
+    agentVersion,
+    adapterVersion: AGENT_AUTH_ADAPTER,
+    evidenceClass,
+    observedAt,
+    validUntil,
+    state,
+  }) as AgentSessionAuth;
+}
+
 function boundedString(value: unknown, minimum: number, maximum: number): string {
   const result = string(value);
   const size = [...result].length;
@@ -164,7 +261,14 @@ export function decodeAgentSession(value: unknown): AgentSession {
       "id", "machine_id", "name", "agent", "cwd", "auth_mode", "desired_state",
       "request_state", "process_state", "row_version", "created_at", "updated_at",
     ],
-    ["process_epoch", "runtime_observed_at", "termination_requested_at"],
+    [
+      "process_epoch",
+      "workspace_binding_id",
+      "workspace_generation",
+      "runtime_observed_at",
+      "runtime_expires_at",
+      "termination_requested_at",
+    ],
   );
   const name = boundedString(source.name, 1, 80);
   const agent = enumValue(source.agent, AGENTS);
@@ -177,8 +281,20 @@ export function decodeAgentSession(value: unknown): AgentSession {
   const processEpoch = Object.hasOwn(source, "process_epoch")
     ? uuid(source.process_epoch)
     : undefined;
+  const hasWorkspaceBindingId = Object.hasOwn(source, "workspace_binding_id");
+  const hasWorkspaceGeneration = Object.hasOwn(source, "workspace_generation");
+  if (hasWorkspaceBindingId !== hasWorkspaceGeneration) malformed();
+  const workspaceBindingId = hasWorkspaceBindingId
+    ? uuid(source.workspace_binding_id)
+    : undefined;
+  const workspaceGeneration = hasWorkspaceGeneration
+    ? safeInteger(source.workspace_generation, 1)
+    : undefined;
   const runtimeObservedAt = Object.hasOwn(source, "runtime_observed_at")
     ? dateTime(source.runtime_observed_at)
+    : undefined;
+  const runtimeExpiresAt = Object.hasOwn(source, "runtime_expires_at")
+    ? dateTime(source.runtime_expires_at)
     : undefined;
   const terminationRequestedAt = Object.hasOwn(source, "termination_requested_at")
     ? dateTime(source.termination_requested_at)
@@ -186,6 +302,8 @@ export function decodeAgentSession(value: unknown): AgentSession {
   return Object.freeze({
     id: uuid(source.id),
     machineId: uuid(source.machine_id),
+    ...(workspaceBindingId === undefined ? {} : { workspaceBindingId }),
+    ...(workspaceGeneration === undefined ? {} : { workspaceGeneration }),
     name,
     agent,
     cwd,
@@ -195,6 +313,7 @@ export function decodeAgentSession(value: unknown): AgentSession {
     processState,
     ...(processEpoch === undefined ? {} : { processEpoch }),
     ...(runtimeObservedAt === undefined ? {} : { runtimeObservedAt }),
+    ...(runtimeExpiresAt === undefined ? {} : { runtimeExpiresAt }),
     ...(terminationRequestedAt === undefined ? {} : { terminationRequestedAt }),
     rowVersion: safeInteger(source.row_version, 0),
     createdAt: dateTime(source.created_at),
@@ -215,6 +334,309 @@ export function decodeAgentSessionPage(value: unknown): AgentSessionPage {
   });
 }
 
+function sha256(value: unknown): string {
+  const result = string(value);
+  if (!ETAG.test(result)) malformed();
+  return result;
+}
+
+function syncProtocol(value: unknown): 1 | 2 {
+  const result = safeInteger(value, 1);
+  if (result !== 1 && result !== 2) malformed();
+  return result;
+}
+
+function syncCapabilities(value: unknown): readonly WorkspaceSyncCapability[] {
+  if (!Array.isArray(value) || value.length !== WORKSPACE_SYNC_CAPABILITIES.size) malformed();
+  const capabilities = value.map((item) => enumValue(item, WORKSPACE_SYNC_CAPABILITIES));
+  if (new Set(capabilities).size !== WORKSPACE_SYNC_CAPABILITIES.size ||
+      [...WORKSPACE_SYNC_CAPABILITIES].some((item) => !capabilities.includes(item))) malformed();
+  return Object.freeze(capabilities);
+}
+
+function syncManifestEntry(value: unknown): WorkspaceSyncManifestEntry {
+  const source = object(value);
+  exact(source, ["path", "kind", "byte_length", "executable", "chunks", "link_target"]);
+  const path = boundedString(source.path, 1, 4096);
+  const kind = enumValue(source.kind, new Set(["directory", "file", "symlink"] as const));
+  if (typeof source.executable !== "boolean" || !Array.isArray(source.chunks) ||
+      source.chunks.length > 4096 ||
+      (source.link_target !== null && typeof source.link_target !== "string")) malformed();
+  const linkTarget = source.link_target === null
+    ? null
+    : boundedString(source.link_target, 0, 4096);
+  const chunks = source.chunks.map((value) => {
+    const chunk = object(value);
+    exact(chunk, ["digest", "byte_length"]);
+    const byteLength = safeInteger(chunk.byte_length, 0);
+    if (byteLength > 8_388_608) malformed();
+    return Object.freeze({ digest: sha256(chunk.digest), byteLength });
+  });
+  return Object.freeze({
+    path,
+    kind,
+    byteLength: safeInteger(source.byte_length, 0),
+    executable: source.executable,
+    chunks: Object.freeze(chunks),
+    linkTarget,
+  });
+}
+
+function syncSession(value: unknown): WorkspaceSyncSession {
+  const source = object(value);
+  exact(source, [
+    "id", "workspace_id", "machine_id", "base_generation", "exclusion_policy_digest",
+    "selected_protocol", "capabilities", "state", "manifest_entry_count",
+    "manifest_encoded_bytes", "content_bytes", "expires_at", "created_at", "updated_at",
+  ], ["last_page_index", "committed_generation", "committed_manifest_root"]);
+  const selectedProtocol = syncProtocol(source.selected_protocol);
+  const capabilities = syncCapabilities(source.capabilities);
+  const lastPageIndex = Object.hasOwn(source, "last_page_index")
+    ? safeInteger(source.last_page_index, 0)
+    : undefined;
+  const committedGeneration = Object.hasOwn(source, "committed_generation")
+    ? safeInteger(source.committed_generation, 1)
+    : undefined;
+  const committedManifestRoot = Object.hasOwn(source, "committed_manifest_root")
+    ? sha256(source.committed_manifest_root)
+    : undefined;
+  return Object.freeze({
+    id: uuid(source.id),
+    workspaceId: uuid(source.workspace_id),
+    machineId: uuid(source.machine_id),
+    baseGeneration: safeInteger(source.base_generation, 0),
+    exclusionPolicyDigest: sha256(source.exclusion_policy_digest),
+    selectedProtocol,
+    capabilities,
+    state: enumValue(source.state, new Set(["staging", "committed", "conflicted", "expired"] as const)),
+    manifestEntryCount: safeInteger(source.manifest_entry_count, 0),
+    manifestEncodedBytes: safeInteger(source.manifest_encoded_bytes, 0),
+    contentBytes: safeInteger(source.content_bytes, 0),
+    ...(lastPageIndex === undefined ? {} : { lastPageIndex }),
+    ...(committedGeneration === undefined ? {} : { committedGeneration }),
+    ...(committedManifestRoot === undefined ? {} : { committedManifestRoot }),
+    expiresAt: dateTime(source.expires_at),
+    createdAt: dateTime(source.created_at),
+    updatedAt: dateTime(source.updated_at),
+  });
+}
+
+function syncManifestReceipt(value: unknown): WorkspaceSyncManifestReceipt {
+  const source = object(value);
+  exact(source, ["sync", "page_index", "page_digest", "missing_digests"]);
+  if (!Array.isArray(source.missing_digests)) malformed();
+  return Object.freeze({
+    sync: syncSession(source.sync),
+    pageIndex: safeInteger(source.page_index, 0),
+    pageDigest: sha256(source.page_digest),
+    missingDigests: Object.freeze(source.missing_digests.map(sha256)),
+  });
+}
+
+function syncChunkReceipt(value: unknown): WorkspaceSyncChunkReceipt {
+  const source = object(value);
+  exact(source, ["selected_protocol", "digest", "byte_length", "stored"]);
+  const byteLength = safeInteger(source.byte_length, 0);
+  if (byteLength > 8_388_608 || typeof source.stored !== "boolean") malformed();
+  return Object.freeze({
+    selectedProtocol: syncProtocol(source.selected_protocol),
+    digest: sha256(source.digest),
+    byteLength,
+    stored: source.stored,
+  });
+}
+
+function syncChunkContent(value: unknown): WorkspaceSyncChunkContent {
+  const source = object(value);
+  exact(source, [
+    "selected_protocol", "digest", "byte_length", "minimum_reader", "content_base64",
+  ]);
+  const selectedProtocol = syncProtocol(source.selected_protocol);
+  const expectedDigest = sha256(source.digest);
+  const byteLength = safeInteger(source.byte_length, 0);
+  const minimumReader = safeInteger(source.minimum_reader, 1);
+  if (byteLength > 8_388_608 || minimumReader > 2 || minimumReader > selectedProtocol ||
+      typeof source.content_base64 !== "string" ||
+      !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/u
+        .test(source.content_base64)) malformed();
+  const decoded = Buffer.from(source.content_base64, "base64");
+  if (decoded.byteLength !== byteLength ||
+      decoded.toString("base64") !== source.content_base64 ||
+      createHash("sha256").update(decoded).digest("hex") !== expectedDigest) malformed();
+  return Object.freeze({
+    selectedProtocol,
+    digest: expectedDigest,
+    byteLength,
+    minimumReader,
+    bytes: new Uint8Array(decoded),
+  });
+}
+
+function syncCommitReceipt(value: unknown): WorkspaceSyncCommitReceipt {
+  const source = object(value);
+  exact(source, [
+    "selected_protocol", "state", "generation", "manifest_root", "committed_at",
+    "minimum_reader", "minimum_writer",
+  ]);
+  if (source.state !== "committed") malformed();
+  return Object.freeze({
+    selectedProtocol: syncProtocol(source.selected_protocol),
+    state: "committed",
+    generation: safeInteger(source.generation, 1),
+    manifestRoot: sha256(source.manifest_root),
+    committedAt: dateTime(source.committed_at),
+    minimumReader: safeInteger(source.minimum_reader, 1),
+    minimumWriter: safeInteger(source.minimum_writer, 1),
+  });
+}
+
+function syncChangeItem(value: unknown): WorkspaceSyncChangeItem {
+  const source = object(value);
+  exact(source, [
+    "generation", "operation", "path", "entry", "manifest_root",
+    "exclusion_policy_digest", "committed_at", "minimum_reader", "minimum_writer",
+  ]);
+  const operation = enumValue(source.operation, new Set(["revision", "upsert", "delete"] as const));
+  const path = source.path === null ? null : boundedString(source.path, 0, 4096);
+  const entry = source.entry === null ? null : syncManifestEntry(source.entry);
+  if ((operation === "revision" && (path !== null || entry !== null)) ||
+      (operation === "delete" && (path === null || entry !== null)) ||
+      (operation === "upsert" && (path === null || entry === null))) malformed();
+  return Object.freeze({
+    generation: safeInteger(source.generation, 1),
+    operation,
+    path,
+    entry,
+    manifestRoot: sha256(source.manifest_root),
+    exclusionPolicyDigest: sha256(source.exclusion_policy_digest),
+    committedAt: dateTime(source.committed_at),
+    minimumReader: safeInteger(source.minimum_reader, 1),
+    minimumWriter: safeInteger(source.minimum_writer, 1),
+  });
+}
+
+function syncChangePage(value: unknown): WorkspaceSyncChangePage {
+  const source = object(value);
+  exact(source, ["selected_protocol", "items", "next_cursor"]);
+  if (!Array.isArray(source.items) || source.items.length > 1000 ||
+      (source.next_cursor !== null && typeof source.next_cursor !== "string")) malformed();
+  const nextCursor = source.next_cursor === null
+    ? null
+    : boundedString(source.next_cursor, 0, 1024);
+  const items = source.items.map(syncChangeItem);
+  if (items.some((item, index) => index > 0 &&
+      item.generation < items[index - 1]!.generation)) malformed();
+  return Object.freeze({
+    selectedProtocol: syncProtocol(source.selected_protocol),
+    items: Object.freeze(items),
+    nextCursor,
+  });
+}
+
+function syncReconcileReceipt(value: unknown): WorkspaceSyncReconcileReceipt {
+  const source = object(value);
+  exact(source, [
+    "selected_protocol", "status", "active_generation", "active_manifest_root",
+    "exclusion_policy_digest",
+  ]);
+  return Object.freeze({
+    selectedProtocol: syncProtocol(source.selected_protocol),
+    status: enumValue(source.status, new Set(["converged", "reconciliation_required"] as const)),
+    activeGeneration: safeInteger(source.active_generation, 0),
+    activeManifestRoot: sha256(source.active_manifest_root),
+    exclusionPolicyDigest: sha256(source.exclusion_policy_digest),
+  });
+}
+
+type WorkspaceSyncOperation =
+  | "workspaces.sync.begin"
+  | "workspaces.sync.negotiate"
+  | "workspaces.sync.chunk"
+  | "workspaces.sync.chunkDownload"
+  | "workspaces.sync.commit"
+  | "workspaces.sync.changes"
+  | "workspaces.sync.reconcile";
+
+/** Decode one operation-specific closed workspace-sync envelope. */
+export function decodeWorkspaceSyncEnvelope(
+  operation: WorkspaceSyncOperation,
+  value: unknown,
+): WorkspaceSyncEnvelope<unknown> {
+  const source = object(value);
+  exact(source, ["request_id", "selected_protocol", "capabilities", "data"]);
+  const selectedProtocol = syncProtocol(source.selected_protocol);
+  const capabilities = syncCapabilities(source.capabilities);
+  const data = operation === "workspaces.sync.begin"
+    ? syncSession(source.data)
+    : operation === "workspaces.sync.negotiate"
+      ? syncManifestReceipt(source.data)
+      : operation === "workspaces.sync.chunk"
+        ? syncChunkReceipt(source.data)
+        : operation === "workspaces.sync.chunkDownload"
+          ? syncChunkContent(source.data)
+        : operation === "workspaces.sync.commit"
+          ? syncCommitReceipt(source.data)
+          : operation === "workspaces.sync.changes"
+            ? syncChangePage(source.data)
+            : syncReconcileReceipt(source.data);
+  const nestedProtocol = "selectedProtocol" in data ? data.selectedProtocol
+    : "sync" in data ? data.sync.selectedProtocol : undefined;
+  if (nestedProtocol !== undefined && nestedProtocol !== selectedProtocol) malformed();
+  if ("capabilities" in data &&
+      (data.capabilities.length !== capabilities.length ||
+        data.capabilities.some((capability, index) => capability !== capabilities[index]))) malformed();
+  return Object.freeze({
+    requestId: uuid(source.request_id),
+    selectedProtocol,
+    capabilities,
+    data,
+  });
+}
+
+/** Decode one exact canonical WorkspaceBinding projection. */
+export function decodeWorkspaceBinding(value: unknown): WorkspaceBinding {
+  const source = object(value);
+  exact(source, [
+    "binding_id", "workspace_id", "project_id", "local_instance_id", "machine_id",
+    "remote_root", "exclusion_policy_digest", "active_generation", "active_manifest_root",
+    "binding_epoch", "minimum_reader", "minimum_writer", "created_at", "updated_at",
+  ]);
+  const projectId = uuid(source.project_id);
+  const remoteRoot = string(source.remote_root);
+  if (remoteRoot !== `/workspace/projects/${projectId}`) malformed();
+  return Object.freeze({
+    bindingId: uuid(source.binding_id),
+    workspaceId: uuid(source.workspace_id),
+    projectId,
+    localInstanceId: uuid(source.local_instance_id),
+    machineId: uuid(source.machine_id),
+    remoteRoot,
+    exclusionPolicyDigest: sha256(source.exclusion_policy_digest),
+    activeGeneration: safeInteger(source.active_generation, 0),
+    activeManifestRoot: sha256(source.active_manifest_root),
+    bindingEpoch: safeInteger(source.binding_epoch, 1),
+    minimumReader: safeInteger(source.minimum_reader, 1),
+    minimumWriter: safeInteger(source.minimum_writer, 1),
+    createdAt: dateTime(source.created_at),
+    updatedAt: dateTime(source.updated_at),
+  });
+}
+
+/** Decode one closed machine-create recovery observation. */
+export function decodeMachineCreateRequest(value: unknown): MachineCreateRequest {
+  const source = object(value);
+  exact(source, ["id", "machine_id", "state", "retryable", "action", "updated_at"]);
+  if (typeof source.retryable !== "boolean") malformed();
+  return Object.freeze({
+    id: uuid(source.id),
+    machineId: uuid(source.machine_id),
+    state: enumValue(source.state, MACHINE_CREATE_STATES),
+    retryable: source.retryable,
+    action: enumValue(source.action, MACHINE_CREATE_ACTIONS),
+    updatedAt: dateTime(source.updated_at),
+  });
+}
+
 export function decodeTerminalConnectionGrant(value: unknown): TerminalConnectionGrant {
   const source = object(value);
   exact(source, [
@@ -224,9 +646,11 @@ export function decodeTerminalConnectionGrant(value: unknown): TerminalConnectio
   const terminalSessionId = uuid(source.terminal_session_id);
   const connectUrl = string(source.connect_url);
   const connectToken = string(source.connect_token);
-  const expectedConnectUrl =
-    `wss://api.runacode.io/v1/terminal-connections/${terminalSessionId}/stream`;
-  if (!TERMINAL_CONNECTION_URL.test(connectUrl) || connectUrl !== expectedConnectUrl ||
+  const expectedConnectUrls = new Set([
+    `wss://api.getcuna.com/v1/terminal-connections/${terminalSessionId}/stream`,
+    `wss://api.runacode.io/v1/terminal-connections/${terminalSessionId}/stream`,
+  ]);
+  if (!TERMINAL_CONNECTION_URL.test(connectUrl) || !expectedConnectUrls.has(connectUrl) ||
       !TERMINAL_CONNECTION_TOKEN.test(connectToken) ||
       connectUrl.includes(connectToken) || source.protocol !== "runa.terminal.v1" ||
       !Array.isArray(source.capabilities) || source.capabilities.length !== 5) malformed();
@@ -283,6 +707,46 @@ export function decodeProblem(value: unknown, expectedStatus: number): Problem {
     retryable: source.retryable,
     ...(detail === undefined ? {} : { detail }),
     ...(action === undefined ? {} : { action }),
+  });
+}
+
+export function decodeWorkspaceSyncProblem(
+  value: unknown,
+  expectedStatus: number,
+): WorkspaceSyncProblem {
+  const source = object(value);
+  exact(source, [
+    "type", "title", "status", "code", "request_id", "retryable", "action",
+    "selected_protocol", "capabilities", "detail",
+  ]);
+  const status = safeInteger(source.status, 400);
+  const code = string(source.code);
+  const type = string(source.type);
+  if (status > 599 || status !== expectedStatus ||
+      !/^workspace_sync_[a-z0-9_]{2,48}$/u.test(code) ||
+      (type !== `https://api.getcuna.com/problems/${code}` &&
+        type !== `https://api.runacode.io/problems/${code}`) ||
+      typeof source.retryable !== "boolean" ||
+      (source.action !== "retry" && source.action !== "none") ||
+      (source.selected_protocol !== null &&
+        source.selected_protocol !== 1 && source.selected_protocol !== 2)) malformed();
+  const capabilities = source.selected_protocol === null
+    ? (() => {
+        if (!Array.isArray(source.capabilities) || source.capabilities.length !== 0) malformed();
+        return Object.freeze([]) as readonly WorkspaceSyncCapability[];
+      })()
+    : syncCapabilities(source.capabilities);
+  return Object.freeze({
+    type,
+    title: boundedString(source.title, 1, 120),
+    status,
+    code: code as `workspace_sync_${string}`,
+    requestId: uuid(source.request_id),
+    retryable: source.retryable,
+    action: source.action,
+    selectedProtocol: source.selected_protocol,
+    capabilities,
+    detail: boundedString(source.detail, 1, 500),
   });
 }
 export function decodeExec(value: unknown): ExecResult {
@@ -407,12 +871,13 @@ export function decodeMe(value: unknown): Me {
   const email = string(source.email);
   const workspace = object(source.workspace);
   if (workspace.assigned === true) {
-    exact(workspace, ["assigned", "usage"]);
+    exact(workspace, ["assigned", "id", "usage"]);
     const usage = object(workspace.usage);
     if (["est_spend_usd", "est_remaining_usd", "note"].some((key) => !Object.hasOwn(usage, key))) malformed();
     return Object.freeze({
       id, email, workspace: Object.freeze({
         assigned: true as const,
+        id: uuid(workspace.id),
         usage: Object.freeze({
           estimatedSpendUsd: number(usage.est_spend_usd),
           estimatedRemainingUsd: number(usage.est_remaining_usd),

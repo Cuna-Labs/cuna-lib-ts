@@ -292,7 +292,7 @@ interface SessionsManager
 Creates one session and returns its client-owned handle.
 
 ```ts
-create(name: string, options?: SessionCreateOptions): Promise<Session>
+create(name: string, options: SessionCreateOptions): Promise<Session>
 ```
 
 #### list
@@ -442,6 +442,14 @@ interface SessionCreateOptions
 ```
 
 ### Public members
+
+#### idempotencyKey
+
+Optional caller-stable key used to make one create request retry-safe.
+
+```ts
+idempotencyKey?: string
+```
 
 #### agent
 

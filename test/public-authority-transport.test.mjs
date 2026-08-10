@@ -84,7 +84,7 @@ function signedAssets() {
       ...common, administrators_enforced: true, branch: "main", commit_sha: headSha,
       deletions_allowed: false, dismiss_stale_reviews: true,
       force_pushes_allowed: false, pull_request_required: true,
-      repository: "Runa-Laboratories/runa-lib-ts", required_approving_reviews: 0,
+      repository: "Cuna-Labs/cuna-lib-ts", required_approving_reviews: 0,
       required_status_checks: ["release-admission", "ts-quality-gates"],
     },
     cross_language: {
@@ -101,12 +101,12 @@ function signedAssets() {
         sdist: { filename: "runa_sdk-0.1.0.tar.gz", sha256: pythonSdistSha },
       },
       typescript_artifact: {
-        filename: "runa_laboratories-sdk-0.1.0.tgz", sha256: candidateSha,
+        filename: "cuna_labs-sdk-0.1.0.tgz", sha256: candidateSha,
       },
     },
     publication_readiness: {
       ...common, candidate_sha256: candidateSha, dist_tag: "latest",
-      oidc_trusted_publisher: true, package_name: "@runa_laboratories/sdk",
+      oidc_trusted_publisher: true, package_name: "@cuna_labs/sdk",
       provenance_attestation_required: true, registry: "https://registry.npmjs.org",
       registry_retrieval_required: true, version: "0.1.0",
     },
@@ -365,6 +365,38 @@ test("tampered SHA, detached signature, and legacy embedded envelopes are reject
   }, fixture.trust, "approval", Date.parse("2026-08-02T12:10:00.000Z"), {
     requiredSchemaVersion: 2,
   }), undefined);
+});
+
+test("legacy authority repository remains verifiable through an exact allowlist", () => {
+  const fixture = signedAssets();
+  const assets = new Map(fixture.assets);
+  const detached = JSON.parse(assets.get("release-authority-bundle.json.sig"));
+  const { signature: _signature, ...statement } = detached;
+  statement.authority_repository = "Runa-Laboratories/runa-release-authority";
+  const legacyDetached = {
+    ...statement,
+    signature: sign(null, jcsBytes(statement), fixture.privateKey).toString("base64"),
+  };
+  assets.set("release-authority-bundle.json.sig",
+    Buffer.from(`${JSON.stringify(legacyDetached, null, 2)}\n`));
+  const legacyRun = {
+    ...validRun(),
+    repository: {
+      full_name: "Runa-Laboratories/runa-release-authority",
+      private: false,
+    },
+  };
+  assert.deepEqual(verifyAuthorityAssets(
+    assets, fixture.trust, Date.parse("2026-08-02T12:10:00.000Z"), legacyRun,
+  ).bundle, fixture.bundle);
+
+  const attackerRun = {
+    ...legacyRun,
+    repository: { full_name: "attacker/release-authority", private: false },
+  };
+  assert.throws(() => verifyAuthorityAssets(
+    assets, fixture.trust, Date.parse("2026-08-02T12:10:00.000Z"), attackerRun,
+  ), /not accepted/u);
 });
 
 test("detached v2 authenticates raw bytes and rejects duplicate JSON keys", () => {

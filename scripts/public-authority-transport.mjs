@@ -10,8 +10,12 @@ import {
   validateTrustedRolePayload,
 } from "./release-authority-schema.mjs";
 
-export const AUTHORITY_REPOSITORY = "Runa-Laboratories/runa-release-authority";
+export const AUTHORITY_REPOSITORY = "Cuna-Labs/cuna-release-authority";
 export const AUTHORITY_WORKFLOW = ".github/workflows/release-authority.yml";
+const ACCEPTED_AUTHORITY_REPOSITORIES = new Set([
+  AUTHORITY_REPOSITORY,
+  "Runa-Laboratories/runa-release-authority",
+]);
 const API_ROOT = "https://api.github.com";
 const ASSET_NAMES = Object.freeze([
   "release-authority-bundle.json",
@@ -53,7 +57,7 @@ const ROLE_FIELDS = Object.freeze([
 ]);
 const apiHeaders = Object.freeze({
   accept: "application/vnd.github+json",
-  "user-agent": "runa-lib-ts-public-authority-transport",
+  "user-agent": "cuna-lib-ts-public-authority-transport",
   "x-github-api-version": "2022-11-28",
 });
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -214,7 +218,10 @@ export function verifyAuthorityAssets(assets, trustPolicy, now = Date.now(), aut
   const detached = parseProducerJson(signatureBytes, "Detached authority signature");
   assert.equal(authorityRun !== null && typeof authorityRun === "object", true,
     "Expected authority run identity is absent.");
-  assert.equal(detached.authority_repository, AUTHORITY_REPOSITORY);
+  const runRepository = authorityRun.repository?.full_name ?? authorityRun.repository;
+  assert.equal(ACCEPTED_AUTHORITY_REPOSITORIES.has(runRepository), true,
+    "Authority run repository is not accepted.");
+  assert.equal(detached.authority_repository, runRepository);
   assert.equal(detached.authority_workflow, AUTHORITY_WORKFLOW);
   assert.equal(detached.authority_run_id, authorityRun.id ?? authorityRun.run_id);
   assert.equal(detached.authority_run_attempt, authorityRun.run_attempt);

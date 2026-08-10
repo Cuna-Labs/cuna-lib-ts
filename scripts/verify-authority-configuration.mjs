@@ -7,7 +7,7 @@ assert.equal(policy.releaseAuthority?.status, "configured",
   "Release authority is intentionally unconfigured; an accepted governance change is required before tagging.");
 const authority = policy.releaseAuthority.authority;
 assert.deepEqual(authority, {
-  repository: "Runa-Laboratories/runa-release-authority",
+  repository: "Cuna-Labs/cuna-release-authority",
   workflow: ".github/workflows/release-authority.yml",
   artifact: "release-authority-bundle",
   branch: "main",

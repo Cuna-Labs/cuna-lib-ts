@@ -107,7 +107,7 @@ message: "The Runa API request failed." | "The Runa API returned an invalid resp
 Validated closed Problem metadata when the operation returned a conforming Problem body.
 
 ```ts
-problem: Problem | undefined
+problem: ApiProblem | undefined
 ```
 
 #### constructor

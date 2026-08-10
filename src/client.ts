@@ -1,4 +1,5 @@
 import { resolveConfig, type EffectiveConfig } from "./config.js";
+import { randomBytes } from "node:crypto";
 import { assertUuid } from "./domain.js";
 import { ApiError } from "./errors.js";
 import {
@@ -17,6 +18,18 @@ import {
 } from "./internal/performance-seam.js";
 import { createDefaultTransport } from "./internal/test-seams.js";
 import { Session, constructSession } from "./session.js";
+import {
+  constructWorkspaceSyncManager,
+  type WorkspaceSyncManager,
+} from "./workspace-sync.js";
+import {
+  constructWorkspaceBindingsManager,
+  type WorkspaceBindingsManager,
+} from "./workspace-bindings.js";
+import {
+  constructMachineCreatesManager,
+  type MachineCreatesManager,
+} from "./machine-creates.js";
 import type {
   CapabilityScope,
   CapabilitySnapshot,
@@ -49,7 +62,7 @@ export interface SessionsManager {
    */
   create(
     name: string,
-    options?: SessionCreateOptions,
+    options: SessionCreateOptions,
   ): Promise<Session>;
   /**
    * Lists the sessions available to the caller.
@@ -187,7 +200,7 @@ function createBody(
   const source = options as SessionCreateOptions &
     globalThis.Record<string, unknown>;
   if (Object.keys(source).some((key) =>
-    !["agent", "vcpus", "memoryMiB", "allowedHosts", "outboundPolicy", "runtimePort"].includes(key)
+    !["idempotencyKey", "agent", "vcpus", "memoryMiB", "allowedHosts", "outboundPolicy", "runtimePort"].includes(key)
   )) {
     throw new TypeError("Invalid session create options.");
   }
@@ -267,11 +280,20 @@ class SessionsManagerImplementation implements SessionsManager {
 
   async create(
     name: string,
-    options?: SessionCreateOptions,
+    options: SessionCreateOptions = {},
   ): Promise<Session> {
+    if (
+      options.idempotencyKey !== undefined &&
+        (typeof options.idempotencyKey !== "string" ||
+          !/^[\x21-\x7e]{8,128}$/.test(options.idempotencyKey))
+    ) {
+      throw new TypeError("The Runa idempotency key is invalid.");
+    }
     const body = createBody(name, options);
     const snapshot = (await this.#owner.invoke("sessions.create", {
       body,
+      idempotencyKey: options.idempotencyKey ??
+        `runa_sdk_${randomBytes(18).toString("base64url")}`,
     })) as SessionSnapshot;
     return constructSession(this.#owner, snapshot);
   }
@@ -295,6 +317,7 @@ class SessionsManagerImplementation implements SessionsManager {
     }
     return constructSession(this.#owner, snapshot);
   }
+
 }
 
 class RecordsManagerImplementation implements RecordsManager {
@@ -354,6 +377,9 @@ export class Runa {
   #agentSessions: AgentSessionsManager | undefined;
   #capabilities: CapabilitiesManager | undefined;
   #sessions: SessionsManager | undefined;
+  #workspaceBindings: WorkspaceBindingsManager | undefined;
+  #workspaceSync: WorkspaceSyncManager | undefined;
+  #machineCreates: MachineCreatesManager | undefined;
   #records: RecordsManager | undefined;
 
   /**
@@ -376,6 +402,24 @@ export class Runa {
   get sessions(): SessionsManager {
     this.#sessions ??= new SessionsManagerImplementation(this.#context);
     return this.#sessions;
+  }
+
+  /** Stable manager for canonical public workspace bindings. */
+  get workspaceBindings(): WorkspaceBindingsManager {
+    this.#workspaceBindings ??= constructWorkspaceBindingsManager(this.#context);
+    return this.#workspaceBindings;
+  }
+
+  /** Explicit bounded workspace synchronization protocol operations. */
+  get workspaceSync(): WorkspaceSyncManager {
+    this.#workspaceSync ??= constructWorkspaceSyncManager(this.#context);
+    return this.#workspaceSync;
+  }
+
+  /** Read and reconcile non-secret machine-create request state. */
+  get machineCreates(): MachineCreatesManager {
+    this.#machineCreates ??= constructMachineCreatesManager(this.#context);
+    return this.#machineCreates;
   }
 
   /** Stable manager for multiple agent processes owned by one machine. */

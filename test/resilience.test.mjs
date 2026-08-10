@@ -84,7 +84,12 @@ test("TC-026-02 never retries a response or write", async () => {
       }),
       runtime,
     );
-    await assert.rejects(transport.execute(operation, operation === "sessions.create" ? { body: { name: "x" } } : {}));
+    await assert.rejects(transport.execute(
+      operation,
+      operation === "sessions.create"
+        ? { body: { name: "x" }, idempotencyKey: "retry-test-key" }
+        : {},
+    ));
     assert.equal(calls, 1);
   }
 });
@@ -228,7 +233,10 @@ test("PRD-008 deadline remains authoritative while streaming a response", async 
     runtime,
   );
   await assert.rejects(
-    transport.execute("sessions.create", { body: { name: "worker" } }),
+    transport.execute("sessions.create", {
+      body: { name: "worker" },
+      idempotencyKey: "deadline-test-key",
+    }),
     (error) => error instanceof DOMException && error.name === "TimeoutError",
   );
   assert.equal(dispatches, 1);

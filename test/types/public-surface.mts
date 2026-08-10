@@ -1,5 +1,7 @@
 import { stderrText, stdoutText } from "../../src/index.js";
 import type {
+  AgentSession,
+  AgentSessionCreateOptions,
   AssignedWorkspace,
   CapabilitySnapshot,
   Problem,
@@ -7,6 +9,11 @@ import type {
   TerminalConnectionCreateOptions,
   TerminalConnectionGrant,
   Workspace,
+  WorkspaceBinding,
+  WorkspaceBindingCreateRequest,
+  WorkspaceSyncBeginRequest,
+  WorkspaceSyncChangeItem,
+  WorkspaceSyncProblem,
 } from "../../src/index.js";
 
 type Equal<Left, Right> =
@@ -51,8 +58,67 @@ type ProblemIsClosed = Assert<
     | "action"
   >
 >;
+type WorkspaceBindingIsClosed = Assert<
+  Equal<
+    keyof WorkspaceBinding,
+    | "bindingId"
+    | "workspaceId"
+    | "projectId"
+    | "localInstanceId"
+    | "machineId"
+    | "remoteRoot"
+    | "exclusionPolicyDigest"
+    | "activeGeneration"
+    | "activeManifestRoot"
+    | "bindingEpoch"
+    | "minimumReader"
+    | "minimumWriter"
+    | "createdAt"
+    | "updatedAt"
+  >
+>;
+type WorkspaceBindingCreateRequestIsClosed = Assert<
+  Equal<
+    keyof WorkspaceBindingCreateRequest,
+    | "workspaceId"
+    | "projectId"
+    | "localInstanceId"
+    | "machineId"
+    | "exclusionPolicyDigest"
+    | "excludedPrefixes"
+  >
+>;
+type WorkspaceSyncBeginSeparatesAuthorities = Assert<
+  Equal<keyof WorkspaceSyncBeginRequest,
+    | "workspaceBindingId"
+    | "machineId"
+    | "baseGeneration"
+    | "exclusionPolicyDigest"
+    | "protocol"
+    | "minimumReader"
+    | "minimumWriter"
+  >
+>;
+type WorkspaceSyncChangeItemIsTyped = Assert<
+  Equal<WorkspaceSyncChangeItem["operation"], "revision" | "upsert" | "delete">
+>;
+type WorkspaceSyncProblemIsSpecialized = Assert<
+  Equal<WorkspaceSyncProblem["selectedProtocol"], 1 | 2 | null>
+>;
 type TerminalConnectionCapabilityIsClosed = Assert<
   Equal<keyof TerminalConnectionCapability, "name" | "availability">
+>;
+type AgentSessionBindingNameIsUnambiguous = Assert<
+  Equal<
+    Extract<keyof AgentSession, "workspaceBindingId" | "workspaceId">,
+    "workspaceBindingId"
+  >
+>;
+type AgentSessionCreateBindingNameIsUnambiguous = Assert<
+  Equal<
+    Extract<keyof AgentSessionCreateOptions, "workspaceBindingId" | "workspaceId">,
+    "workspaceBindingId"
+  >
 >;
 type TerminalConnectionCreateOptionsIsClosed = Assert<
   Equal<
@@ -74,8 +140,15 @@ type TerminalConnectionGrantIsClosed = Assert<
 >;
 
 export type {
+  AgentSessionBindingNameIsUnambiguous,
+  AgentSessionCreateBindingNameIsUnambiguous,
   CapabilitySnapshotIsClosed,
   ProblemIsClosed,
+  WorkspaceBindingCreateRequestIsClosed,
+  WorkspaceBindingIsClosed,
+  WorkspaceSyncBeginSeparatesAuthorities,
+  WorkspaceSyncChangeItemIsTyped,
+  WorkspaceSyncProblemIsSpecialized,
   AssignedDiscriminantIsLiteral,
   StderrHelperContract,
   StdoutHelperContract,

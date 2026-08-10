@@ -4,8 +4,11 @@ import { TextDecoder } from "node:util";
 import type { EffectiveConfig } from "../config.js";
 import {
   decodeAcknowledgement,
+  decodeAgentSessionAuth,
   decodeAgentSession,
   decodeAgentSessionPage,
+  decodeWorkspaceBinding,
+  decodeMachineCreateRequest,
   decodeProblem,
   decodeTerminalConnectionGrant,
   decodeCapabilitySnapshot,
@@ -15,6 +18,8 @@ import {
   decodeRecords,
   decodeSession,
   decodeSessions,
+  decodeWorkspaceSyncEnvelope,
+  decodeWorkspaceSyncProblem,
   DecodeFailure,
 } from "../domain.js";
 import { ApiError, ConfigError, apiErrorWithProblem } from "../errors.js";
@@ -27,7 +32,7 @@ import type {
   Record,
   SessionSnapshot,
 } from "../types.js";
-import type { AgentSession, AgentSessionPage } from "../agent-sessions.js";
+import type { AgentSession, AgentSessionAuth, AgentSessionPage } from "../agent-sessions.js";
 import type { TerminalConnectionGrant } from "../agent-sessions.js";
 import {
   operationDescriptor,
@@ -36,16 +41,24 @@ import {
 import { OperationObserver } from "./observer.js";
 import { sanitizeWire } from "./sanitize.js";
 import { SDK_VERSION } from "../version.js";
+import type { MachineCreateRequest } from "../machine-creates.js";
+import type { WorkspaceBinding } from "../workspace-bindings.js";
+import type { WorkspaceSyncEnvelope } from "../workspace-sync.js";
 
-const MAX_RESPONSE_BYTES = 8_388_608;
+const MAX_RESPONSE_BYTES = 16_777_216;
 const READS = new Set<OperationKey>([
   "agentSessions.list",
   "agentSessions.get",
+  "agentSessions.agentAuth",
   "capabilities.get",
   "me.get",
   "sessions.list",
   "sessions.get",
   "records.list",
+  "workspaces.sync.changes",
+  "workspaces.sync.chunkDownload",
+  "machineCreates.get",
+  "workspaceBindings.get",
 ]);
 
 export interface DispatchInput {
@@ -55,11 +68,15 @@ export interface DispatchInput {
   readonly timeoutSecs?: number;
   readonly signal?: AbortSignal;
   readonly idempotencyKey?: string;
+  readonly bindingId?: string;
+  readonly digest?: string;
+  readonly bytes?: Uint8Array;
 }
 
 export type DispatchResult =
   | Acknowledgement
   | AgentSession
+  | AgentSessionAuth
   | AgentSessionPage
   | TerminalConnectionGrant
   | CapabilitySnapshot
@@ -68,7 +85,10 @@ export type DispatchResult =
   | OpenSessionResult
   | readonly Record[]
   | SessionSnapshot
-  | readonly SessionSnapshot[];
+  | readonly SessionSnapshot[]
+  | WorkspaceSyncEnvelope<unknown>
+  | MachineCreateRequest
+  | WorkspaceBinding;
 
 export interface CancelableTimer {
   cancel(): void;
@@ -84,9 +104,9 @@ export interface TransportRuntime {
 
 interface PreparedRequest {
   readonly url: string;
-  readonly method: "GET" | "POST" | "PATCH" | "DELETE";
+  readonly method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   readonly headers: Readonly<globalThis.Record<string, string>>;
-  readonly body?: string;
+  readonly body?: BodyInit;
 }
 
 function safeTransportFailure(): TypeError {
@@ -97,12 +117,27 @@ function timeoutFailure(): DOMException {
   return new DOMException("The Runa request timed out.", "TimeoutError");
 }
 
-function renderPath(template: string, id?: string): string {
+function renderPath(
+  template: string,
+  id?: string,
+  digest?: string,
+  bindingId?: string,
+): string {
   if (template.includes(":id")) {
     if (id === undefined) throw new TypeError("Invalid session ID.");
-    return template.replace(":id", id);
+    template = template.replace(":id", id);
   }
-  if (id !== undefined) throw new TypeError("Invalid session ID.");
+  else if (id !== undefined) throw new TypeError("Invalid session ID.");
+  if (template.includes(":digest")) {
+    if (digest === undefined || !/^[0-9a-f]{64}$/.test(digest)) throw new TypeError("Invalid workspace sync digest.");
+    template = template.replace(":digest", digest);
+  }
+  else if (digest !== undefined) throw new TypeError("Invalid workspace sync digest.");
+  if (template.includes(":binding_id")) {
+    if (bindingId === undefined) throw new TypeError("Invalid workspace binding ID.");
+    return template.replace(":binding_id", bindingId);
+  }
+  if (bindingId !== undefined) throw new TypeError("Invalid workspace binding ID.");
   return template;
 }
 
@@ -112,7 +147,12 @@ function prepare(
   input: DispatchInput,
 ): PreparedRequest {
   const descriptor = operationDescriptor(operationKey);
-  const path = renderPath(descriptor.pathTemplate, input.id);
+  const path = renderPath(
+    descriptor.pathTemplate,
+    input.id,
+    input.digest,
+    input.bindingId,
+  );
   const target = new URL(path, `${config.baseUrl}/`);
   if (input.query !== undefined) {
     for (const [key, value] of Object.entries(input.query)) {
@@ -123,8 +163,12 @@ function prepare(
   if (target.origin !== config.baseUrl || target.href !== expectedHref) {
     throw new ConfigError();
   }
-  let body: string | undefined;
-  if (descriptor.hasRequestBody) {
+  let body: BodyInit | undefined;
+  const binaryBody = operationKey === "workspaces.sync.chunk";
+  if (binaryBody) {
+    if (!(input.bytes instanceof Uint8Array) || input.body !== undefined) throw new TypeError("The Runa request body is invalid.");
+    body = input.bytes.slice().buffer;
+  } else if (descriptor.hasRequestBody) {
     try {
       body = JSON.stringify(input.body);
     } catch {
@@ -137,7 +181,14 @@ function prepare(
     throw new TypeError("The Runa request body is invalid.");
   }
   const needsIdempotencyKey = operationKey === "agentSessions.create" ||
-    operationKey === "agentSessions.createTerminalConnection";
+    operationKey === "agentSessions.createTerminalConnection" ||
+    operationKey === "sessions.create" ||
+    operationKey === "workspaceBindings.create" ||
+    operationKey === "workspaces.sync.begin" ||
+    operationKey === "workspaces.sync.negotiate" ||
+    operationKey === "workspaces.sync.chunk" ||
+    operationKey === "workspaces.sync.commit" ||
+    operationKey === "workspaces.sync.reconcile";
   if (needsIdempotencyKey !== (input.idempotencyKey !== undefined)) {
     throw new TypeError("The Runa idempotency key is invalid.");
   }
@@ -145,7 +196,7 @@ function prepare(
     url: target.href,
     method: descriptor.method,
     headers: Object.freeze({
-      Accept: "application/json",
+      Accept: "application/json, application/problem+json",
       Authorization: `Bearer ${config.apiKey}`,
       "User-Agent": `runa-sdk-typescript/${SDK_VERSION}`,
       ...(input.idempotencyKey === undefined
@@ -153,7 +204,9 @@ function prepare(
         : { "Idempotency-Key": input.idempotencyKey }),
       ...(body === undefined
         ? {}
-        : { "Content-Type": "application/json; charset=utf-8" }),
+        : binaryBody
+          ? { "Content-Type": "application/octet-stream", "Content-Length": String(input.bytes!.byteLength) }
+          : { "Content-Type": "application/json; charset=utf-8" }),
     }),
     ...(body === undefined ? {} : { body }),
   });
@@ -253,12 +306,23 @@ async function disposition(
       throw new ApiError(response.status, "malformed_response");
     }
     if (descriptor.errorKind === "problem") {
-      throw await problemFailure(response, signal);
+      throw await problemFailure(
+        response,
+        signal,
+        descriptor.responseKind === "workspace-sync",
+      );
     }
     cancelResponseBody(response);
     throw new ApiError(response.status, "api_error");
   }
   if (signal.aborted) throw cancellationFailure();
+  if (
+    operationKey === "agentSessions.agentAuth" &&
+    response.headers.get("cache-control")?.trim().toLowerCase() !== "no-store"
+  ) {
+    cancelResponseBody(response);
+    throw new ApiError(response.status, "malformed_response");
+  }
   const contentType = response.headers.get("content-type");
   if (
     contentType === null ||
@@ -281,6 +345,8 @@ async function disposition(
     switch (descriptor.responseKind) {
       case "acknowledgement":
         return decodeAcknowledgement(value);
+      case "agent-auth":
+        return decodeAgentSessionAuth(value);
       case "agent-session":
         return decodeAgentSession(value);
       case "agent-session-page":
@@ -307,6 +373,21 @@ async function disposition(
         return decodeSession(value);
       case "sessions":
         return decodeSessions(value);
+      case "workspace-binding":
+        return decodeWorkspaceBinding(value);
+      case "workspace-sync":
+        return decodeWorkspaceSyncEnvelope(
+          operationKey as
+            | "workspaces.sync.begin"
+            | "workspaces.sync.negotiate"
+            | "workspaces.sync.chunk"
+            | "workspaces.sync.commit"
+            | "workspaces.sync.changes"
+            | "workspaces.sync.reconcile",
+          value,
+        );
+      case "machine-create":
+        return decodeMachineCreateRequest(value);
     }
   } catch (error) {
     if (error instanceof DecodeFailure) {
@@ -319,9 +400,11 @@ async function disposition(
 async function problemFailure(
   response: Response,
   signal: AbortSignal,
+  workspaceSync: boolean,
 ): Promise<ApiError> {
   const contentType = response.headers.get("content-type");
-  if (contentType?.split(";", 1)[0]?.trim().toLowerCase() !== "application/json") {
+  const mediaType = contentType?.split(";", 1)[0]?.trim().toLowerCase() ?? "";
+  if (!["application/json", "application/problem+json"].includes(mediaType)) {
     cancelResponseBody(response);
     return new ApiError(response.status);
   }
@@ -332,7 +415,9 @@ async function problemFailure(
     const value = sanitizeWire(JSON.parse(text));
     return apiErrorWithProblem(
       response.status,
-      decodeProblem(value, response.status),
+      workspaceSync && mediaType === "application/problem+json"
+        ? decodeWorkspaceSyncProblem(value, response.status)
+        : decodeProblem(value, response.status),
     );
   } catch (error) {
     if (signal.aborted) throw cancellationFailure();

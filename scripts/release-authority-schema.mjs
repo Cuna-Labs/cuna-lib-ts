@@ -7,7 +7,19 @@ const SHA256 = /^[a-f0-9]{64}$/u;
 const COMMIT = /^[a-f0-9]{40}$/u;
 const VERSION = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/u;
 const TEST_ID = /^TC-\d{3}-\d{2}$/u;
-const AUTHORITY_REPOSITORY = "Runa-Laboratories/runa-release-authority";
+const ACTIVE_AUTHORITY_REPOSITORY = "Cuna-Labs/cuna-release-authority";
+const ACCEPTED_AUTHORITY_REPOSITORIES = new Set([
+  ACTIVE_AUTHORITY_REPOSITORY,
+  "Runa-Laboratories/runa-release-authority",
+]);
+const ACCEPTED_SDK_REPOSITORIES = new Set([
+  "Cuna-Labs/cuna-lib-ts",
+  "Runa-Laboratories/runa-lib-ts",
+]);
+const ACCEPTED_PACKAGE_NAMES = new Set([
+  "@cuna_labs/sdk",
+  "@runa_laboratories/sdk",
+]);
 const AUTHORITY_WORKFLOW = ".github/workflows/release-authority.yml";
 
 const sha256 = (value, field) => assert.match(value, SHA256, `Invalid ${field}.`);
@@ -29,7 +41,7 @@ const artifact = (value, kind) => {
   exact(value, ["filename", "sha256"], `${kind} artifact`);
   assert.match(value.filename, kind === "wheel" ? /^[A-Za-z0-9_.-]+\.whl$/u :
     kind === "sdist" ? /^[A-Za-z0-9_.-]+\.tar\.gz$/u :
-      /^runa_laboratories-sdk-[0-9A-Za-z.-]+\.tgz$/u);
+      /^(?:cuna_labs|runa_laboratories)-sdk-[0-9A-Za-z.-]+\.tgz$/u);
   sha256(value.sha256, `${kind}.sha256`);
 };
 
@@ -67,7 +79,8 @@ export function validateTrustedRolePayload(role, payload) {
       "pull_request_required", "repository", "required_approving_reviews",
       "required_status_checks", "status",
     ], "repository controls");
-    assert.equal(payload.repository, "Runa-Laboratories/runa-lib-ts");
+    assert.equal(ACCEPTED_SDK_REPOSITORIES.has(payload.repository), true,
+      "Repository controls reference an unaccepted SDK repository.");
     assert.equal(payload.branch, "main");
     assert.match(payload.commit_sha, COMMIT);
     assert.equal(payload.pull_request_required, true);
@@ -122,7 +135,8 @@ export function validateTrustedRolePayload(role, payload) {
       "registry", "registry_retrieval_required", "status", "version",
     ], "publication readiness");
     sha256(payload.candidate_sha256, "candidate_sha256");
-    assert.equal(payload.package_name, "@runa_laboratories/sdk");
+    assert.equal(ACCEPTED_PACKAGE_NAMES.has(payload.package_name), true,
+      "Publication readiness references an unaccepted package.");
     assert.match(payload.version, VERSION);
     assert.equal(payload.registry, "https://registry.npmjs.org");
     assert.match(payload.dist_tag, /^(?:latest|next|beta|rc)$/u);
@@ -178,7 +192,8 @@ export function validateTrustedRolePayload(role, payload) {
       "head_sha", "provider", "repository", "run_attempt", "run_id", "workflow",
     ], "acceptance oracle");
     assert.equal(payload.oracle.provider, "github-actions");
-    assert.equal(payload.oracle.repository, AUTHORITY_REPOSITORY);
+    assert.equal(ACCEPTED_AUTHORITY_REPOSITORIES.has(payload.oracle.repository), true,
+      "Acceptance oracle references an unaccepted authority repository.");
     assert.equal(payload.oracle.workflow, AUTHORITY_WORKFLOW);
     assert.match(payload.oracle.head_sha, COMMIT);
     assert(Number.isSafeInteger(payload.oracle.run_id) && payload.oracle.run_id > 0);
