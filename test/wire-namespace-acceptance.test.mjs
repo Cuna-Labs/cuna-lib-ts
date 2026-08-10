@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
+import path from "node:path";
 import { test, vi } from "vitest";
 
 import { ApiError, ConfigError, Runa } from "../dist/index.js";
 import { resolveConfig } from "../dist/config.js";
 import {
   WIRE_BRANDS,
+  brandedApiHostPattern,
+  brandedApiOrigins,
   brandedCredentialPrefixes,
   brandedEnvNames,
+  brandedReservedPaths,
 } from "../dist/internal/wire-namespaces.js";
 import { API_KEY, SESSION_ID, jsonResponse, sessionFixture } from "./helpers.mjs";
 
@@ -244,6 +248,358 @@ test("session runtime URLs outside a single-label runtime zone are still rejecte
   for (const url of rejected) {
     await assert.rejects(sessionUrl(url), malformed, url);
   }
+});
+
+/*
+ * The API host was the half of this concept that derived from nothing.
+ *
+ * The runtime zone above has had an authority since `brandedZonePattern`; the
+ * API host in the very same file did not, so `getcuna.com|runacode.io` was
+ * written out by hand five times — the terminal `connect_url` pattern, the
+ * problem `type` pattern, the two expected `wss://` origins, the workspace-sync
+ * problem `type`, and the two accepted base URLs one module over. Half of one
+ * namespace governed by an append-only list and half copied by hand.
+ *
+ * Both spellings must keep being accepted, and the direction is not symmetric.
+ * `api.runacode.io` is serving production traffic right now, so a narrowing
+ * here is an outage rather than a cleanup; `api.getcuna.com` is what the
+ * service is moving to. Every case below therefore states all three directions
+ * — new accepted, old accepted, foreign rejected — and spells its hosts by
+ * hand. A case list drawn from `brandedApiOrigins` would narrow along with the
+ * derivation and go green on single-brand code, which is exactly how the
+ * equivalent test in `libs/python` passed a reverted fix.
+ */
+
+const CANONICAL_API_ORIGIN = "https://api.getcuna.com";
+const LEGACY_API_ORIGIN = "https://api.runacode.io";
+const CANONICAL_STREAM_ORIGIN = "wss://api.getcuna.com";
+const LEGACY_STREAM_ORIGIN = "wss://api.runacode.io";
+const STREAM_PATH = `/v1/terminal-connections/${TERMINAL_SESSION_ID}/stream`;
+const OTHER_TERMINAL_SESSION_ID = "66666666-6666-4666-8666-666666666666";
+const WORKSPACE_ID = "77777777-7777-4777-8777-777777777777";
+const BINDING_ID = "88888888-8888-4888-8888-888888888888";
+const REQUEST_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+const POLICY_DIGEST = "a".repeat(64);
+const SYNC_CAPABILITIES = [
+  "atomic_generation_commit",
+  "bounded_manifest_pages",
+  "content_digest_verification",
+  "explicit_reconciliation",
+  "ordered_generation_changes",
+  "policy_bound_admission",
+];
+
+/**
+ * A rejected Problem is not an exception here: the transport drops metadata it
+ * cannot decode and reports `api_error` with no `problem`. So `problem.type`
+ * present means accepted and `problem === undefined` means rejected, which is
+ * a sharper oracle than "it threw".
+ */
+async function problemFor(type) {
+  const runa = clientFor(async () => jsonResponse({
+    type,
+    title: "Attachment conflict",
+    status: 409,
+    code: "attachment_conflict",
+    request_id: REQUEST_ID,
+    retryable: false,
+  }, 409));
+  try {
+    await runa.agentSessions.get(AGENT_SESSION_ID);
+  } catch (error) {
+    if (error instanceof ApiError) return error.problem;
+    throw error;
+  } finally {
+    await runa.close();
+  }
+  throw new Error(`a 409 Problem response resolved: ${type}`);
+}
+
+/** The same question for the second problem decoder, which compares whole strings. */
+async function syncProblemFor(type) {
+  const runa = clientFor(async () => jsonResponse({
+    type,
+    title: "Workspace sync protocol mismatch",
+    status: 426,
+    code: "workspace_sync_protocol_mismatch",
+    request_id: REQUEST_ID,
+    retryable: false,
+    action: "none",
+    selected_protocol: 2,
+    capabilities: SYNC_CAPABILITIES,
+    detail: "The requested protocol range is not supported.",
+  }, 426, { "content-type": "application/problem+json" }));
+  try {
+    await runa.workspaceSync.begin(WORKSPACE_ID, {
+      workspaceBindingId: BINDING_ID,
+      machineId: MACHINE_ID,
+      baseGeneration: 4,
+      exclusionPolicyDigest: POLICY_DIGEST,
+      protocol: { minimum: 1, maximum: 2 },
+      minimumReader: 1,
+      minimumWriter: 2,
+    }, "workspace-begin-host-probe");
+  } catch (error) {
+    if (error instanceof ApiError) return error.problem;
+    throw error;
+  } finally {
+    await runa.close();
+  }
+  throw new Error(`a 426 workspace-sync Problem response resolved: ${type}`);
+}
+
+/*
+ * S-3's literal oracle for the API host, spelled by hand.
+ *
+ * Position 0 and position 1 are asserted as exact strings because a mutation
+ * that merely reverses the authority's order would reverse a derived
+ * expectation with it and still pass. Length is deliberately NOT asserted: an
+ * accepted host ranks nothing the way an environment-variable name does, so a
+ * further spelling must be able to widen this surface without a test edit.
+ */
+test("the accepted API origins are the authority's hosts, canonical first", () => {
+  const https = brandedApiOrigins("https");
+  assert.equal(https[0], "https://api.getcuna.com");
+  assert.equal(https[1], "https://api.runacode.io");
+  const wss = brandedApiOrigins("wss");
+  assert.equal(wss[0], "wss://api.getcuna.com");
+  assert.equal(wss[1], "wss://api.runacode.io");
+});
+
+test("the accepted reserved capability paths are the authority's spellings, canonical first", () => {
+  const paths = brandedReservedPaths("auth");
+  assert.equal(paths[0], "/__cuna/auth");
+  assert.equal(paths[1], "/__runa/auth");
+});
+
+test("the API-host pattern admits both hosts and nothing adjacent to them", () => {
+  const pattern = brandedApiHostPattern("/probe");
+  assert.equal(pattern.test("https://api.getcuna.com/probe"), true);
+  assert.equal(pattern.test("https://api.runacode.io/probe"), true);
+  const rejected = [
+    // An unescaped `.` in the alternation would accept this one.
+    "https://apixgetcuna.com/probe",
+    "https://api.getnuna.com/probe",
+    "https://api.runacode.cloud/probe",
+    "https://evil.api.getcuna.com/probe",
+    "https://api.getcuna.com.evil.invalid/probe",
+    "http://api.getcuna.com/probe",
+    "https://api.getcuna.com/probe/more",
+  ];
+  for (const candidate of rejected) {
+    assert.equal(pattern.test(candidate), false, `${candidate} was accepted`);
+  }
+  const stream = brandedApiHostPattern("/probe", "wss");
+  assert.equal(stream.test("wss://api.getcuna.com/probe"), true);
+  assert.equal(stream.test("wss://api.runacode.io/probe"), true);
+  assert.equal(stream.test("https://api.runacode.io/probe"), false);
+});
+
+test("terminal grants are accepted on both branded API hosts", async () => {
+  for (const origin of [CANONICAL_STREAM_ORIGIN, LEGACY_STREAM_ORIGIN]) {
+    const connect_url = `${origin}${STREAM_PATH}`;
+    const grant = await grantFor({ connect_url });
+    assert.equal(grant.connectUrl, connect_url, `${origin} was rejected`);
+  }
+});
+
+test("terminal grants on a host outside the authority are still rejected", async () => {
+  const rejected = [
+    `wss://apixgetcuna.com${STREAM_PATH}`,
+    `wss://api.getnuna.com${STREAM_PATH}`,
+    `wss://api.runacode.cloud${STREAM_PATH}`,
+    `wss://evil.api.getcuna.com${STREAM_PATH}`,
+    `https://api.getcuna.com${STREAM_PATH}`,
+    // Right host, wrong session: the equality check binds the URL to the id
+    // the grant itself declared, which the pattern alone cannot.
+    `wss://api.getcuna.com/v1/terminal-connections/${OTHER_TERMINAL_SESSION_ID}/stream`,
+  ];
+  for (const connect_url of rejected) {
+    await assert.rejects(grantFor({ connect_url }), malformed, connect_url);
+  }
+});
+
+test("Problem types are accepted on both branded API hosts", async () => {
+  for (const origin of [CANONICAL_API_ORIGIN, LEGACY_API_ORIGIN]) {
+    const type = `${origin}/problems/attachment_conflict`;
+    const problem = await problemFor(type);
+    assert.equal(problem?.type, type, `${origin} was rejected`);
+  }
+});
+
+test("Problem types on a host outside the authority are still discarded", async () => {
+  const rejected = [
+    "https://apixgetcuna.com/problems/attachment_conflict",
+    "https://api.getnuna.com/problems/attachment_conflict",
+    "https://api.runacode.cloud/problems/attachment_conflict",
+    "https://evil.api.getcuna.com/problems/attachment_conflict",
+    "http://api.getcuna.com/problems/attachment_conflict",
+  ];
+  for (const type of rejected) {
+    assert.equal(await problemFor(type), undefined, `${type} was accepted`);
+  }
+});
+
+test("workspace-sync Problem types are accepted on both branded API hosts", async () => {
+  for (const origin of [CANONICAL_API_ORIGIN, LEGACY_API_ORIGIN]) {
+    const type = `${origin}/problems/workspace_sync_protocol_mismatch`;
+    const problem = await syncProblemFor(type);
+    assert.equal(problem?.type, type, `${origin} was rejected`);
+  }
+});
+
+test("workspace-sync Problem types on a host outside the authority are still discarded", async () => {
+  const rejected = [
+    "https://apixgetcuna.com/problems/workspace_sync_protocol_mismatch",
+    "https://api.getnuna.com/problems/workspace_sync_protocol_mismatch",
+    "https://api.runacode.cloud/problems/workspace_sync_protocol_mismatch",
+    // Right host, wrong code: the type must name the code the body declared.
+    `${CANONICAL_API_ORIGIN}/problems/workspace_sync_authority_unavailable`,
+  ];
+  for (const type of rejected) {
+    assert.equal(await syncProblemFor(type), undefined, `${type} was accepted`);
+  }
+});
+
+test("both branded API origins are accepted as a base URL, with or without a trailing slash", () => {
+  for (const origin of [CANONICAL_API_ORIGIN, LEGACY_API_ORIGIN]) {
+    for (const value of [origin, `${origin}/`]) {
+      const resolved = withEnv(
+        { ...CLEARED },
+        () => resolveConfig({ apiKey: CANONICAL_KEY, baseUrl: value }),
+      );
+      assert.equal(resolved.baseUrl, origin, `${value} was rejected`);
+    }
+  }
+});
+
+test("a base URL on a host outside the authority is still rejected", () => {
+  const rejected = [
+    "https://apixgetcuna.com",
+    "https://api.getnuna.com",
+    "https://api.runacode.cloud",
+    "https://evil.api.getcuna.com",
+    "http://api.getcuna.com",
+    `${CANONICAL_API_ORIGIN}//`,
+  ];
+  for (const baseUrl of rejected) {
+    assert.throws(
+      () => withEnv({ ...CLEARED }, () => resolveConfig({ apiKey: CANONICAL_KEY, baseUrl })),
+      ConfigError,
+      `${baseUrl} was accepted`,
+    );
+  }
+});
+
+/*
+ * Open capability URLs carry a branded PATH as well as a branded zone, and it
+ * was compared twice inside one function: once as raw text by the pattern and
+ * once as `parsed.pathname` after the URL is re-parsed. The double check stays
+ * — the parse asserts things no pattern over the raw text can, such as the
+ * absence of credentials, a port or a fragment — but both halves now read one
+ * derived accept set, so they cannot disagree about which paths are a
+ * capability, and both widened together.
+ */
+test("open capability URLs are accepted in both reserved-path spellings", async () => {
+  for (const reserved of ["/__cuna/auth", "/__runa/auth"]) {
+    const url = `https://synthetic-session.cunacode.cloud${reserved}?t=synthetic`;
+    assert.equal(await openedUrl(url), url, `${reserved} was rejected`);
+  }
+});
+
+test("open capability URLs on an unknown reserved path are still rejected", async () => {
+  const rejected = [
+    "https://synthetic-session.cunacode.cloud/__nuna/auth?t=synthetic",
+    "https://synthetic-session.cunacode.cloud/_cuna/auth?t=synthetic",
+    "https://synthetic-session.cunacode.cloud/__cuna/authorize?t=synthetic",
+    "https://synthetic-session.cunacode.cloud/__cuna/auth/more?t=synthetic",
+    "https://synthetic-session.cunacode.cloud/__cuna/auth#t=synthetic",
+  ];
+  for (const url of rejected) {
+    await assert.rejects(openedUrl(url), malformed, url);
+  }
+});
+
+/*
+ * S-4(a)'s detector, and the only kind that can see that mutation.
+ *
+ * Reverting any call site to its hand-written alternation preserves behaviour
+ * exactly today — a copy agrees with the authority right up until the authority
+ * grows — so no behavioural assertion above can fire on it. Absence of the
+ * spelling is the one property a copy cannot satisfy.
+ *
+ * This is an ABSENCE detector, which is why it survives the trap that killed
+ * the `CUNA_BASE_URL` occurrence count: a correct implementation scores zero
+ * and a defective one scores more, so abstracting the source correctly cannot
+ * make it read like a fix. The allowlist is exact rather than a skip rule, so
+ * a new file that spells a host has to be argued for here.
+ */
+const API_HOST_AUTHORITY = "src/internal/wire-namespaces.ts";
+const API_HOST_PROSE = "src/types.ts";
+
+/*
+ * The labels, not the whole hosts, and the source is read with backslashes
+ * removed. Measured: the first version of this detector searched for
+ * `getcuna.com`, applied the S-4(a) mutation — the terminal-connection pattern
+ * reverted to its hand-written alternation — and stayed GREEN, because a regex
+ * spells the host `getcuna\.com` and the dot is not there to find. A detector
+ * that a correct revert walks straight past is decorative, which is the whole
+ * complaint this commit is about, reappearing one layer up.
+ */
+const API_HOST_SPELLINGS = ["getcuna", "runacode"];
+const unescaped = (source) => source.toLowerCase().replaceAll("\\", "");
+
+/**
+ * Hand-written modules only. `src/internal/contract/generated/` is a projection
+ * of the canonical OpenAPI artifact and is regenerated, never edited, so a
+ * spelling there is the contract's to change and not this package's.
+ */
+const GENERATED = "src/internal/contract/generated";
+
+async function sourceFiles(directory) {
+  const found = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const target = path.join(directory, entry.name).replaceAll("\\", "/");
+    if (target === GENERATED) continue;
+    if (entry.isDirectory()) found.push(...await sourceFiles(target));
+    else if (entry.name.endsWith(".ts")) found.push(target);
+  }
+  return found;
+}
+
+test("no module outside the API-host authority spells an API host", async () => {
+  const files = await sourceFiles("src");
+  assert.ok(files.length > 10, "src was not walked");
+  assert.ok(files.includes("src/domain.ts"), "src/domain.ts was not read");
+  assert.ok(files.includes("src/config.ts"), "src/config.ts was not read");
+  const offenders = [];
+  for (const file of files) {
+    if (file === API_HOST_AUTHORITY || file === API_HOST_PROSE) continue;
+    const source = unescaped(await readFile(file, "utf8"));
+    for (const host of API_HOST_SPELLINGS) {
+      if (source.includes(host)) offenders.push(`${file} spells ${host}`);
+    }
+  }
+  assert.deepEqual(offenders, []);
+  // Negative control: the two allowed files really do spell them, so a misread
+  // or renamed tree cannot pass this vacuously.
+  const authority = unescaped(await readFile(API_HOST_AUTHORITY, "utf8"));
+  for (const host of API_HOST_SPELLINGS) {
+    assert.equal(authority.includes(host), true, `${API_HOST_AUTHORITY} was not read`);
+  }
+});
+
+test("no module outside the wire-namespace authority spells a reserved capability path", async () => {
+  const files = await sourceFiles("src");
+  const offenders = [];
+  for (const file of files) {
+    if (file === API_HOST_AUTHORITY) continue;
+    const source = unescaped(await readFile(file, "utf8"));
+    for (const brand of WIRE_BRANDS) {
+      if (source.includes(`__${brand}/`)) offenders.push(`${file} spells __${brand}/`);
+    }
+  }
+  assert.deepEqual(offenders, []);
 });
 
 /*

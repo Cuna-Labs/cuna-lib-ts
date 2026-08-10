@@ -152,6 +152,141 @@ export function brandedZonePattern(pathAndQuery = ""): RegExp {
 }
 
 /**
+ * The API host each brand spelling serves, KEYED BY BRAND rather than listed.
+ *
+ * The runtime zone above derives from the brand by string transform —
+ * `cuna` → `cunacode.cloud` — and the API host is the one branded identity that
+ * does not: `cuna` serves `api.getcuna.com` and `runa` serves
+ * `api.runacode.io`, and no transform relates the two. The mapping therefore
+ * has to be written down somewhere, and this is the only place it may be.
+ *
+ * `Record<WireBrand, string>` is what makes writing it down safe, and it is the
+ * reason this is a record and not the obvious array. An array stays
+ * type-correct when `WIRE_BRANDS` grows and silently omits the new host — a
+ * narrowing relative to the authority, arriving with no diagnostic, which is
+ * the exact failure this module exists to forbid. A record indexed by
+ * `WireBrand` cannot: appending a spelling to the authority is a COMPILE ERROR
+ * here until the host that spelling serves is supplied.
+ *
+ * Private on purpose. Every consumer takes a projection below, so no call site
+ * can pick one brand's host out of the mapping and compare against it alone.
+ */
+const API_HOSTS = Object.freeze({
+  cuna: "api.getcuna.com",
+  runa: "api.runacode.io",
+} as const satisfies Readonly<Record<WireBrand, string>>);
+
+/** One accepted API host, e.g. `api.getcuna.com`. */
+export type BrandedApiHost = (typeof API_HOSTS)[WireBrand];
+
+/** One accepted API origin under one scheme, e.g. `wss://api.runacode.io`. */
+export type BrandedApiOrigin<Scheme extends string> =
+  `${Scheme}://${BrandedApiHost}`;
+
+/**
+ * One value per element of a tuple, preserving its length.
+ *
+ * `Tuple` must stay a type PARAMETER: only then is the mapped type homomorphic
+ * and only then does it produce a tuple. Written directly over
+ * `keyof typeof WIRE_BRANDS` it maps `map`, `some` and every other array member
+ * as well, and the result is unusable.
+ */
+type PerElement<Tuple extends readonly unknown[], Value> = {
+  readonly [Index in keyof Tuple]: Value;
+};
+
+/**
+ * Every accepted API origin, one per brand, in the authority's order.
+ *
+ * A TUPLE whose length tracks `WIRE_BRANDS`, so callers that need the canonical
+ * origin index it at `[0]` without a non-null assertion under
+ * `noUncheckedIndexedAccess`, and keep compiling when a third spelling lands.
+ */
+export type BrandedApiOrigins<Scheme extends string> =
+  PerElement<typeof WIRE_BRANDS, BrandedApiOrigin<Scheme>>;
+
+/** Escapes a host literal for embedding in a regular expression. */
+function regexLiteral(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+}
+
+/** `(?:api\.getcuna\.com|api\.runacode\.io)` — the API-host alternation. */
+export const API_HOST_ALTERNATION = `(?:${
+  WIRE_BRANDS.map((brand) => regexLiteral(API_HOSTS[brand])).join("|")
+})`;
+
+/**
+ * Every accepted API origin under one scheme, canonical first.
+ *
+ * The projection for accepting surfaces that compare a whole URL by equality
+ * rather than by shape — a terminal `connect_url` bound to a decoded session
+ * id, a problem `type` bound to a decoded code — where no pattern can express
+ * the binding. `brandedApiHostPattern` is the same authority projected as a
+ * shape check; the two cannot disagree about the host because neither spells
+ * one.
+ *
+ * The `as` is confined to this one line: `readonly [...].map()` widens a tuple
+ * to an array, and the mapped return type is what restores the length the
+ * authority guarantees.
+ */
+export function brandedApiOrigins<Scheme extends string>(
+  scheme: Scheme,
+): BrandedApiOrigins<Scheme> {
+  return WIRE_BRANDS.map(
+    (brand): BrandedApiOrigin<Scheme> => `${scheme}://${API_HOSTS[brand]}`,
+  ) as unknown as BrandedApiOrigins<Scheme>;
+}
+
+/**
+ * An API-host URL pattern in every brand spelling, anchored end to end.
+ *
+ * The counterpart of `brandedZonePattern` for the half of the same concept that
+ * derived from nothing. The runtime zone had an authority and the API host did
+ * not, so `api.getcuna.com|api.runacode.io` was written out by hand at every
+ * accepting site — the terminal `connect_url`, the problem `type`, and the
+ * expected `wss://` origins — each an independent copy of a spelling the
+ * service mints. Every copy rejects a valid response on the same day, and a
+ * rejected terminal grant is a single-use 60-second capability destroyed rather
+ * than retried.
+ *
+ * `scheme` is a parameter because one host carries two: `https` for the REST
+ * surface and `wss` for the terminal stream. Splitting it into two functions
+ * would put the host in two derivations again for no gain.
+ */
+export function brandedApiHostPattern(
+  pathAndQuery = "",
+  scheme: "https" | "wss" = "https",
+): RegExp {
+  return new RegExp(`^${scheme}://${API_HOST_ALTERNATION}${pathAndQuery}$`, "u");
+}
+
+/**
+ * `(?:/__cuna|/__runa)` — the reserved-path label of a runtime capability URL,
+ * leading separator included so it composes the same way `brandedReservedPaths`
+ * spells a whole path.
+ *
+ * `/__runa/auth` is minted by the edge and accepted here, and it was accepted
+ * in two independent places at once: once inside the capability-URL pattern and
+ * once as a bare pathname string after the URL is re-parsed. Two copies of one
+ * spelling, compared by nothing, in the same function.
+ */
+export const RESERVED_PATH_ALTERNATION =
+  `(?:${WIRE_BRANDS.map((brand) => `/__${brand}`).join("|")})`;
+
+/** One reserved runtime path in one brand spelling, e.g. `/__cuna/auth`. */
+export type BrandedReservedPath<Suffix extends string> =
+  `/__${WireBrand}/${Suffix}`;
+
+/** Every brand spelling of one reserved runtime path, canonical first. */
+export function brandedReservedPaths<Suffix extends string>(
+  suffix: Suffix,
+): readonly BrandedReservedPath<Suffix>[] {
+  return WIRE_BRANDS.map(
+    (brand): BrandedReservedPath<Suffix> => `/__${brand}/${suffix}`,
+  );
+}
+
+/**
  * The terminal-stream protocol this client sends when it requests a grant.
  *
  * One value, not a set: the service owns the minted spelling and this constant

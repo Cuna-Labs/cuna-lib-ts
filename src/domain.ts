@@ -26,8 +26,12 @@ import type { Problem, ProblemAction } from "./errors.js";
 import type { MachineCreateRequest } from "./machine-creates.js";
 import type { WorkspaceBinding } from "./workspace-bindings.js";
 import {
+  RESERVED_PATH_ALTERNATION,
+  brandedApiHostPattern,
+  brandedApiOrigins,
   brandedCredentialPattern,
   brandedProtocols,
+  brandedReservedPaths,
   brandedZonePattern,
 } from "./internal/wire-namespaces.js";
 import type { BrandedProtocol, Covers } from "./internal/wire-namespaces.js";
@@ -46,10 +50,32 @@ import type {
   WorkspaceSyncSession,
 } from "./workspace-sync.js";
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+/**
+ * The UUID grammar, spelled once. It is asserted standalone on every decoded
+ * identifier and again as a segment inside the terminal `connect_url`, which
+ * used to be two independent copies of the same twelve-group pattern.
+ */
+const UUID_BODY = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+const UUID = new RegExp(`^${UUID_BODY}$`);
 const SLUG = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 const RUNTIME_URL = brandedZonePattern();
-const OPEN_URL = brandedZonePattern("/__runa/auth\\?t=[^&#]+");
+/**
+ * The capability URL is validated twice — as raw text here, and again as a
+ * parsed URL in `decodeOpen`. That is defence in depth and it stays, because
+ * the two checks assert different properties: this pattern constrains the
+ * bytes the service sent, and the parse constrains what a client would
+ * actually dial (no credentials, no port, no fragment, exactly one query
+ * member), which no pattern over the raw text can express.
+ *
+ * What did NOT stay is the second copy of the path. Both checks now read the
+ * one derived accept set, so the pre-parse and post-parse halves cannot
+ * disagree about which paths are a capability, and both widen together when the
+ * edge flips the reserved label.
+ */
+const OPEN_PATHS = brandedReservedPaths("auth");
+const OPEN_URL = brandedZonePattern(
+  `${RESERVED_PATH_ALTERNATION}/auth\\?t=[^&#]+`,
+);
 const RFC3339 = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:Z|([+-])(\d{2}):(\d{2}))$/;
 const STATUSES = new Set<SessionStatus>(["creating", "running", "paused", "suspended", "stopped", "deleted", "error"]);
 const AGENTS = new Set<SessionAgent>(["claude-code", "codex", "openclaw"]);
@@ -90,7 +116,11 @@ const AGENT_SESSION_PROCESS_STATES = new Set<AgentSessionProcessState>([
   "unknown", "starting", "ready", "running", "exited", "failed", "terminating", "terminated",
 ]);
 const AGENT_SESSION_CWD = /^\/workspace(?:\/.*)?$/u;
-const TERMINAL_CONNECTION_URL = /^wss:\/\/api\.(?:getcuna\.com|runacode\.io)\/v1\/terminal-connections\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/stream$/u;
+const TERMINAL_CONNECTION_PATH = "/v1/terminal-connections/";
+const TERMINAL_CONNECTION_URL = brandedApiHostPattern(
+  `${TERMINAL_CONNECTION_PATH}${UUID_BODY}/stream`,
+  "wss",
+);
 const TERMINAL_CONNECTION_TOKEN = brandedCredentialPattern("tc", "[A-Za-z0-9_-]{43}");
 const TERMINAL_PROTOCOLS: ReadonlySet<TerminalConnectionProtocol> =
   brandedProtocols("terminal.v1");
@@ -103,7 +133,18 @@ const TERMINAL_CAPABILITY_AVAILABILITIES = new Set<TerminalConnectionCapabilityA
   "supported", "unsupported", "unknown",
 ]);
 const PROBLEM_CODE = /^[a-z][a-z0-9_]{2,63}$/u;
-const PROBLEM_TYPE = /^https:\/\/api\.(?:getcuna\.com|runacode\.io)\/problems\/[a-z][a-z0-9_]{2,63}$/u;
+/**
+ * The problem-type namespace, reached by two decoders with two different code
+ * grammars. `decodeProblem` accepts any code and can check the shape; the
+ * workspace-sync decoder must bind the type to the code it already decoded, so
+ * it compares whole strings and no pattern can express that. They stay two
+ * checks — but of the same derived origins and the same path, so a hand-written
+ * host cannot survive in either.
+ */
+const PROBLEM_PATH = "/problems/";
+const PROBLEM_TYPE = brandedApiHostPattern(`${PROBLEM_PATH}[a-z][a-z0-9_]{2,63}`);
+const problemTypesFor = (code: string): readonly string[] =>
+  brandedApiOrigins("https").map((origin) => `${origin}${PROBLEM_PATH}${code}`);
 const PROBLEM_ACTIONS = new Set<ProblemAction>([
   "retry", "sign_in", "open_web", "contact_support", "none",
 ]);
@@ -725,10 +766,16 @@ export function decodeTerminalConnectionGrant(value: unknown): TerminalConnectio
   const terminalSessionId = uuid(source.terminal_session_id);
   const connectUrl = string(source.connect_url);
   const connectToken = string(source.connect_token);
-  const expectedConnectUrls = new Set([
-    `wss://api.getcuna.com/v1/terminal-connections/${terminalSessionId}/stream`,
-    `wss://api.runacode.io/v1/terminal-connections/${terminalSessionId}/stream`,
-  ]);
+  // Subsumes `TERMINAL_CONNECTION_URL` today — it binds the URL to the session
+  // id the grant just declared, which the pattern cannot. Both are kept as
+  // defence in depth and both now read one host authority, so the shape check
+  // and the equality check can no longer disagree about which hosts exist.
+  const expectedConnectUrls = new Set<string>(
+    brandedApiOrigins("wss").map(
+      (origin) =>
+        `${origin}${TERMINAL_CONNECTION_PATH}${terminalSessionId}/stream`,
+    ),
+  );
   const protocol = enumValue(source.protocol, TERMINAL_PROTOCOLS);
   if (!TERMINAL_CONNECTION_URL.test(connectUrl) || !expectedConnectUrls.has(connectUrl) ||
       !TERMINAL_CONNECTION_TOKEN.test(connectToken) ||
@@ -807,8 +854,7 @@ export function decodeWorkspaceSyncProblem(
   const type = string(source.type);
   if (status > 599 || status !== expectedStatus ||
       !/^workspace_sync_[a-z0-9_]{2,48}$/u.test(code) ||
-      (type !== `https://api.getcuna.com/problems/${code}` &&
-        type !== `https://api.runacode.io/problems/${code}`) ||
+      !problemTypesFor(code).includes(type) ||
       typeof source.retryable !== "boolean" ||
       (source.action !== "retry" && source.action !== "none") ||
       (source.selected_protocol !== null &&
@@ -856,7 +902,8 @@ export function decodeOpen(value: unknown): OpenSessionResult {
   try {
     const parsed = new URL(url);
     if (parsed.protocol !== "https:" || parsed.username !== "" || parsed.password !== "" || parsed.port !== "" ||
-        parsed.hash !== "" || parsed.pathname !== "/__runa/auth" || [...parsed.searchParams.keys()].length !== 1 ||
+        parsed.hash !== "" || !OPEN_PATHS.includes(parsed.pathname as (typeof OPEN_PATHS)[number]) ||
+        [...parsed.searchParams.keys()].length !== 1 ||
         parsed.searchParams.get("t") === null || parsed.searchParams.get("t") === "") malformed();
   } catch (error) {
     if (error instanceof DecodeFailure) throw error;

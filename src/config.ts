@@ -3,6 +3,7 @@ import { TextDecoder } from "node:util";
 
 import { ConfigError } from "./errors.js";
 import {
+  brandedApiOrigins,
   brandedCredentialPrefixes,
   brandedEnvNames,
   type BrandedEnvName,
@@ -14,8 +15,24 @@ import type {
   TraceSink,
 } from "./types.js";
 
-export const DEFAULT_BASE_URL = "https://api.getcuna.com";
-export const LEGACY_BASE_URL = "https://api.runacode.io";
+/**
+ * Every API origin a caller may point this client at, canonical first.
+ *
+ * This is the endpoint half of the defect the credential prefixes below
+ * describe, and it sat in the same file. The variable NAMES derived from the
+ * brand authority; the two ORIGINS those variables are allowed to carry were
+ * written out by hand right here, and `normalizeBaseUrl` compared against them
+ * one at a time. A brand appended to the authority would have grown the names
+ * and left the values behind — an endpoint variable the SDK reads and then
+ * refuses, reported as `ConfigError`, "configuration is invalid", for an
+ * origin that is fine.
+ *
+ * Accepting is not emitting: the list is the accept set, and `DEFAULT_BASE_URL`
+ * is the single origin this client dials when nobody said otherwise.
+ */
+export const ACCEPTED_BASE_URLS = brandedApiOrigins("https");
+export const DEFAULT_BASE_URL = ACCEPTED_BASE_URLS[0];
+export const LEGACY_BASE_URL = ACCEPTED_BASE_URLS[1];
 
 interface ConfigFileShape {
   readonly api_key?: string;
@@ -188,8 +205,9 @@ function validApiKey(value: unknown): value is string {
 
 function normalizeBaseUrl(value: unknown): string {
   if (typeof value !== "string") fail();
-  if (![DEFAULT_BASE_URL, `${DEFAULT_BASE_URL}/`, LEGACY_BASE_URL, `${LEGACY_BASE_URL}/`]
-    .includes(value)) fail();
+  if (!ACCEPTED_BASE_URLS.some(
+    (origin) => value === origin || value === `${origin}/`,
+  )) fail();
   let parsed: URL;
   try {
     parsed = new URL(value);
@@ -204,7 +222,7 @@ function normalizeBaseUrl(value: unknown): string {
     (parsed.pathname !== "" && parsed.pathname !== "/") ||
     parsed.search !== "" ||
     parsed.hash !== "" ||
-    (parsed.origin !== DEFAULT_BASE_URL && parsed.origin !== LEGACY_BASE_URL)
+    !ACCEPTED_BASE_URLS.some((origin) => parsed.origin === origin)
   ) {
     fail();
   }
