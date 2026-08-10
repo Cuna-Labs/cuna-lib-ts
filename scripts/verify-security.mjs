@@ -20,12 +20,37 @@ async function walk(directory) {
   }
 }
 await walk(".");
-const credentialPrefix = ["runa", "sk"].join("_") + "_";
+// Every brand and every credential family the product has ever minted. This is
+// a denylist, so it may only ever GROW: a name removed from it silently starts
+// admitting material that is blocked today.
+//
+// It was `runa_sk_` alone, which is the one prefix production no longer mints.
+// A committed `cuna_sk_` key — the CURRENT mint, and what `config.ts` accepts
+// first — passed this gate without a word. The families mirror the CLI's single
+// namespace authority (`runa-cli/src/core/namespace.ts`): sk secret key, at
+// access token, rt refresh token, ct continuation, tc terminal connect, se/sc
+// session credentials, cb browser callback nonce.
+const credentialBrands = ["cuna", "runa"];
+const credentialFamilies = ["sk", "at", "rt", "ct", "tc", "se", "sc", "cb"];
+const credentialOpening =
+  `(?:${credentialBrands.join("|")})_(?:${credentialFamilies.join("|")})_`;
 const secretPatterns = [
-  new RegExp(`${credentialPrefix}[A-Za-z0-9_-]{16,}`, "g"),
+  new RegExp(`${credentialOpening}[A-Za-z0-9_-]{16,}`, "g"),
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/g,
   /Authorization\s*[:=]\s*Bearer\s+\S+/gi
 ];
+
+/**
+ * A capability URL that carries a credential in its own query is a secret
+ * wearing a URL's clothes: it survives every "URLs are safe to log" habit.
+ * `domain.ts` refuses a terminal grant whose `connect_url` contains its
+ * `connect_token`; this is the same rule applied to committed bytes.
+ */
+function containedCredential(text) {
+  const urls = text.match(/https?:\/\/[^\s"'`<>)\]]+|wss?:\/\/[^\s"'`<>)\]]+/g) ?? [];
+  const opening = new RegExp(`${credentialOpening}[A-Za-z0-9_-]{16,}`);
+  return urls.some((url) => opening.test(url) || /[?&](?:token|secret|key|t)=[^&\s]{16,}/i.test(url));
+}
 const failures = [];
 for (const file of files) {
   const bytes = await readFile(file);
@@ -35,6 +60,7 @@ for (const file of files) {
   if (secretPatterns.some((pattern) => (pattern.lastIndex = 0, pattern.test(text)))) {
     failures.push({ category: "credential-material", path: file });
   }
+  if (containedCredential(text)) failures.push({ category: "capability-url", path: file });
 }
 if (failures.length > 0) {
   console.error(JSON.stringify({ status: "FAIL", failures }, null, 2));

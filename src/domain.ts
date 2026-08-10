@@ -112,6 +112,45 @@ export class DecodeFailure {
   readonly kind = "decode_failure";
 }
 function malformed(): never { throw new DecodeFailure(); }
+
+/** The value substituted for a credential when a result is serialized. */
+export const REDACTED = "[redacted]";
+
+/**
+ * Freeze a result whose named fields are live capabilities, and attach a
+ * non-enumerable `toJSON` that redacts them.
+ *
+ * A plain frozen object hands its secret to `JSON.stringify` verbatim, and
+ * `JSON.stringify` is what every structured logger, crash reporter, and
+ * outbound request body calls. The type system cannot object: the field is a
+ * `string` like any other. Redacting at the serialization boundary is the only
+ * place the guard survives being passed to code that never heard of this SDK.
+ *
+ * `toJSON` is non-enumerable, so the object's own key set, spreads, and
+ * `deepStrictEqual` comparisons are unchanged, and the caller still reads the
+ * real value off the property.
+ */
+function redactOnSerialize<T extends object>(
+  value: T,
+  secretKeys: readonly (keyof T & string)[],
+): T {
+  Object.defineProperty(value, "toJSON", {
+    value(this: T): globalThis.Record<string, unknown> {
+      const safe: globalThis.Record<string, unknown> = Object.fromEntries(
+        Object.entries(this),
+      );
+      for (const key of secretKeys) {
+        if (Object.hasOwn(safe, key)) safe[key] = REDACTED;
+      }
+      return safe;
+    },
+    enumerable: false,
+    writable: false,
+    configurable: false,
+  });
+  return Object.freeze(value);
+}
+
 function object(value: unknown): globalThis.Record<string, unknown> {
   if (value === null || typeof value !== "object" || Array.isArray(value)) malformed();
   return value as globalThis.Record<string, unknown>;
@@ -668,15 +707,18 @@ export function decodeTerminalConnectionGrant(value: unknown): TerminalConnectio
   const names = capabilities.map((capability) => capability.name);
   if (new Set(names).size !== TERMINAL_CAPABILITY_NAMES.size ||
       [...TERMINAL_CAPABILITY_NAMES].some((name) => !names.includes(name))) malformed();
-  return Object.freeze({
+  // `connectUrl` is the non-secret half and is checked above never to contain
+  // the token; `connectToken` is the one-use credential and must not be the
+  // default output of `JSON.stringify`.
+  return redactOnSerialize({
     terminalSessionId,
     resumeHandle: uuid(source.resume_handle),
     connectUrl,
     connectToken,
-    protocol: "runa.terminal.v1",
+    protocol: "runa.terminal.v1" as const,
     capabilities: Object.freeze(capabilities),
     expiresAt: dateTime(source.expires_at),
-  });
+  }, ["connectToken"]);
 }
 
 export function decodeProblem(value: unknown, expectedStatus: number): Problem {
@@ -779,7 +821,10 @@ export function decodeOpen(value: unknown): OpenSessionResult {
     if (error instanceof DecodeFailure) throw error;
     malformed();
   }
-  return Object.freeze({ url });
+  // The `t` query member IS the capability: this URL opens the session for
+  // whoever holds it. Its own doc comment says never log or persist it, so it
+  // must not be the default output of `JSON.stringify`.
+  return redactOnSerialize({ url }, ["url"]);
 }
 function enumValue<T extends string>(value: unknown, allowed: ReadonlySet<T>): T {
   const candidate = string(value);
