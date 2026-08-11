@@ -128,7 +128,7 @@ jobs:
           CUNA_COMPAT_SIGNING_KEY_ID: ${{ vars.CUNA_COMPAT_SIGNING_KEY_ID }}
           CUNA_COMPAT_SIGNING_KEY_PEM: ${{ secrets.CUNA_COMPAT_SIGNING_KEY_PEM }}
       - id: attest
-        uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6
         with:
           subject-path: release-artifacts/*.tgz
       - name: Verify controlled-build provenance through GitHub verifier
