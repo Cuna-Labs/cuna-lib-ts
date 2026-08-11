@@ -51,46 +51,51 @@
     },
     {
       "id": "TS-REL-010",
+      "gate": "local-performance",
+      "reason": "Local performance evidence is not bound to the candidate archive."
+    },
+    {
+      "id": "TS-REL-011",
       "gate": "compatibility-matrix",
       "reason": "Missing or invalid evidence: evidence/compatibility-matrix.json"
     },
     {
-      "id": "TS-REL-011",
+      "id": "TS-REL-012",
       "gate": "repository-controls",
       "reason": "Missing or invalid evidence: evidence/repository-controls.json"
     },
     {
-      "id": "TS-REL-012",
+      "id": "TS-REL-013",
       "gate": "cross-language",
       "reason": "Missing or invalid evidence: evidence/cross-language.json"
     },
     {
-      "id": "TS-REL-013",
+      "id": "TS-REL-014",
       "gate": "publication-readiness",
       "reason": "Missing or invalid evidence: evidence/publication-readiness.json"
     },
     {
-      "id": "TS-REL-014",
+      "id": "TS-REL-015",
       "gate": "runtime-closure",
       "reason": "Runtime closure is not bound to the candidate."
     },
     {
-      "id": "TS-REL-015",
+      "id": "TS-REL-016",
       "gate": "ci-candidate-manifest",
       "reason": "CI manifest is not bound to the candidate."
     },
     {
-      "id": "TS-REL-016",
+      "id": "TS-REL-017",
       "gate": "sbom",
       "reason": "CycloneDX identity or candidate binding is invalid."
     },
     {
-      "id": "TS-REL-017",
+      "id": "TS-REL-018",
       "gate": "sbom-validation",
       "reason": "Evidence signature, role, status, or freshness is invalid."
     },
     {
-      "id": "TS-REL-018",
+      "id": "TS-REL-019",
       "gate": "external-release-interfaces",
       "reason": "Evidence signature, role, status, or freshness is invalid."
     }

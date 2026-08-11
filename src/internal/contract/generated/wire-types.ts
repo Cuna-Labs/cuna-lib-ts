@@ -1,4 +1,4 @@
-// @generated {"contract_id":"runa-sdk-contract","generator_path":"tools/runa-contract-generator.mjs","generator_sha256":"879fbef4d654c1f7769e1724c065133d6744bbda6b913d5bd3cd5b8104ce31e4","generator_version":"0.2.0","projection_path":"runa-sdk.projection.json","projection_sha256":"693dec9fd0d00fb541b4238e47d8f6bbd5211e4f18dcd133ae60b58462b44089","projection_version":"1.7.0","snapshot_path":"runa-sdk-contract.snapshot.json","snapshot_sha256":"6dec7457e26b733b2a29b63b4effa39ec362957e227e67fba16fff17ed1c785c","snapshot_version":"1.7.0"}
+// @generated {"contract_id":"runa-sdk-contract","generator_path":"tools/runa-contract-generator.mjs","generator_sha256":"879fbef4d654c1f7769e1724c065133d6744bbda6b913d5bd3cd5b8104ce31e4","generator_version":"0.2.0","projection_path":"runa-sdk.projection.json","projection_sha256":"145dc0f4ff47d3721d37f475c1c859e6797d1dd08c74736de414a80d69150cbe","projection_version":"1.7.0","snapshot_path":"runa-sdk-contract.snapshot.json","snapshot_sha256":"e7416b1e20843e0a96290428419e1e137d8189e30b7c82c62b011978516126bd","snapshot_version":"1.7.0"}
 export type GeneratedWireValue = null | boolean | number | string | GeneratedWireValue[] | { readonly [key: string]: GeneratedWireValue };
 export const GENERATED_WIRE_SCHEMAS = {
   "AgentAuth": {
@@ -759,7 +759,18 @@ export const GENERATED_WIRE_SCHEMAS = {
     "additionalProperties": false,
     "properties": {
       "url": {
-        "pattern": "^https://[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.cunacode\\.cloud/__runa/auth\\?t=[^&#]+$",
+        "description": "Single-use handoff URL. Cuna producers emit only cunacode.cloud; the exact runacode.cloud predecessor remains response-compatible during the 1.7 expand phase.",
+        "oneOf": [
+          {
+            "pattern": "^https://[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.cunacode\\.cloud/__runa/auth\\?t=[^&#]+$",
+            "title": "Canonical Cuna handoff URL"
+          },
+          {
+            "deprecated": true,
+            "pattern": "^https://[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.runacode\\.cloud/__runa/auth\\?t=[^&#]+$",
+            "title": "Deprecated legacy handoff URL"
+          }
+        ],
         "type": "string"
       }
     },
@@ -878,7 +889,18 @@ export const GENERATED_WIRE_SCHEMAS = {
     "type": "object"
   },
   "RuntimeUrl": {
-    "pattern": "^https://[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.cunacode\\.cloud$",
+    "description": "Cuna producers emit only cunacode.cloud. Consumers temporarily accept the exact runacode.cloud predecessor during the 1.7 expand phase.",
+    "oneOf": [
+      {
+        "pattern": "^https://[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.cunacode\\.cloud$",
+        "title": "Canonical Cuna runtime URL"
+      },
+      {
+        "deprecated": true,
+        "pattern": "^https://[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.runacode\\.cloud$",
+        "title": "Deprecated legacy runtime URL"
+      }
+    ],
     "type": "string"
   },
   "SdkCreateSession": {

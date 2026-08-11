@@ -3,8 +3,8 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { test } from "vitest";
 
-const OPENAPI_SHA256 = "66ba7497ec55b60236a0ccd036aab593523ef3819036009518465fcf474ef0aa";
-const PROJECTION_SHA256 = "693dec9fd0d00fb541b4238e47d8f6bbd5211e4f18dcd133ae60b58462b44089";
+const OPENAPI_SHA256 = "eb99020842228ad4727e18335c8985b0e5175d1450b1d317e5f6567db6192cc9";
+const PROJECTION_SHA256 = "145dc0f4ff47d3721d37f475c1c859e6797d1dd08c74736de414a80d69150cbe";
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
 test("TypeScript workspace authority is frozen to the exact OpenAPI 1.7 artifacts", async () => {
