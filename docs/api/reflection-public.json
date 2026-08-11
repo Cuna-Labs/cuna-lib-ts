@@ -60,7 +60,7 @@
         "optional": false,
         "readonly": true,
         "signatures": [
-          "message: \"The Runa API request failed.\" | \"The Runa API returned an invalid response.\""
+          "message: \"The Cuna API request failed.\" | \"The Cuna API returned an invalid response.\""
         ]
       },
       {
@@ -212,7 +212,7 @@
         "optional": false,
         "readonly": true,
         "signatures": [
-          "message: \"Runa SDK configuration is invalid.\""
+          "message: \"Cuna SDK configuration is invalid.\""
         ]
       },
       {
@@ -238,21 +238,220 @@
   {
     "name": "Cuna",
     "kind": "runtime",
-    "declarationKind": "reference",
+    "declarationKind": "class",
     "page": "Core.md",
     "source": "dist/index.d.ts",
-    "signature": "alias Cuna",
-    "members": [],
+    "signature": "class Cuna",
+    "members": [
+      {
+        "name": "constructor",
+        "kind": "constructor",
+        "optional": false,
+        "readonly": false,
+        "signatures": [
+          "constructor(config?: CunaConfig): Cuna"
+        ]
+      },
+      {
+        "name": "sessions",
+        "kind": "accessor",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "sessions: SessionsManager"
+        ]
+      },
+      {
+        "name": "workspaceBindings",
+        "kind": "accessor",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "workspaceBindings: WorkspaceBindingsManager"
+        ]
+      },
+      {
+        "name": "workspaceSync",
+        "kind": "accessor",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "workspaceSync: WorkspaceSyncManager"
+        ]
+      },
+      {
+        "name": "machineCreates",
+        "kind": "accessor",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "machineCreates: MachineCreatesManager"
+        ]
+      },
+      {
+        "name": "agentSessions",
+        "kind": "accessor",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "agentSessions: AgentSessionsManager"
+        ]
+      },
+      {
+        "name": "capabilities",
+        "kind": "accessor",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "capabilities: CapabilitiesManager"
+        ]
+      },
+      {
+        "name": "records",
+        "kind": "accessor",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "records: RecordsManager"
+        ]
+      },
+      {
+        "name": "me",
+        "kind": "method",
+        "optional": false,
+        "readonly": false,
+        "signatures": [
+          "me(): Promise<Me>"
+        ]
+      },
+      {
+        "name": "close",
+        "kind": "method",
+        "optional": false,
+        "readonly": false,
+        "signatures": [
+          "close(): Promise<void>"
+        ]
+      }
+    ],
+    "operations": [
+      {
+        "operationKey": "Cuna#constructor",
+        "name": "constructor",
+        "signature": "constructor(config?: CunaConfig): Cuna",
+        "parameters": [
+          "config"
+        ],
+        "returns": "Cuna"
+      },
+      {
+        "operationKey": "Cuna#me",
+        "name": "me",
+        "signature": "me(): Promise<Me>",
+        "parameters": [],
+        "returns": "Promise<Me>"
+      },
+      {
+        "operationKey": "Cuna#close",
+        "name": "close",
+        "signature": "close(): Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>"
+      }
+    ]
+  },
+  {
+    "name": "CunaConfig",
+    "kind": "type",
+    "declarationKind": "interface",
+    "page": "Core.md",
+    "source": "dist/index.d.ts",
+    "signature": "interface CunaConfig",
+    "members": [
+      {
+        "name": "apiKey",
+        "kind": "property",
+        "optional": true,
+        "readonly": true,
+        "signatures": [
+          "apiKey?: string"
+        ]
+      },
+      {
+        "name": "baseUrl",
+        "kind": "property",
+        "optional": true,
+        "readonly": true,
+        "signatures": [
+          "baseUrl?: string"
+        ]
+      },
+      {
+        "name": "configFile",
+        "kind": "property",
+        "optional": true,
+        "readonly": true,
+        "signatures": [
+          "configFile?: string | null"
+        ]
+      },
+      {
+        "name": "fetch",
+        "kind": "property",
+        "optional": true,
+        "readonly": true,
+        "signatures": [
+          "fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response> | (input: string | Request | URL, init?: RequestInit) => Promise<Response>"
+        ]
+      },
+      {
+        "name": "diagnostics",
+        "kind": "property",
+        "optional": true,
+        "readonly": true,
+        "signatures": [
+          "diagnostics?: DiagnosticSink"
+        ]
+      },
+      {
+        "name": "tracing",
+        "kind": "property",
+        "optional": true,
+        "readonly": true,
+        "signatures": [
+          "tracing?: TraceSink"
+        ]
+      }
+    ],
     "operations": []
   },
   {
     "name": "CunaError",
     "kind": "runtime",
-    "declarationKind": "reference",
+    "declarationKind": "class",
     "page": "Shared.md",
     "source": "dist/index.d.ts",
-    "signature": "alias CunaError",
-    "members": [],
+    "signature": "class CunaError",
+    "members": [
+      {
+        "name": "name",
+        "kind": "property",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "name: \"ConfigError\" | \"ApiError\" | \"CommandError\""
+        ]
+      },
+      {
+        "name": "code",
+        "kind": "property",
+        "optional": false,
+        "readonly": true,
+        "signatures": [
+          "code: \"config_error\" | \"api_error\" | \"malformed_response\" | \"command_error\""
+        ]
+      }
+    ],
     "operations": []
   },
   {
@@ -588,225 +787,6 @@
     ]
   },
   {
-    "name": "Runa",
-    "kind": "runtime",
-    "declarationKind": "class",
-    "page": "Core.md",
-    "source": "dist/index.d.ts",
-    "signature": "class Runa",
-    "members": [
-      {
-        "name": "constructor",
-        "kind": "constructor",
-        "optional": false,
-        "readonly": false,
-        "signatures": [
-          "constructor(config?: RunaConfig): Runa"
-        ]
-      },
-      {
-        "name": "sessions",
-        "kind": "accessor",
-        "optional": false,
-        "readonly": true,
-        "signatures": [
-          "sessions: SessionsManager"
-        ]
-      },
-      {
-        "name": "workspaceBindings",
-        "kind": "accessor",
-        "optional": false,
-        "readonly": true,
-        "signatures": [
-          "workspaceBindings: WorkspaceBindingsManager"
-        ]
-      },
-      {
-        "name": "workspaceSync",
-        "kind": "accessor",
-        "optional": false,
-        "readonly": true,
-        "signatures": [
-          "workspaceSync: WorkspaceSyncManager"
-        ]
-      },
-      {
-        "name": "machineCreates",
-        "kind": "accessor",
-        "optional": false,
-        "readonly": true,
-        "signatures": [
-          "machineCreates: MachineCreatesManager"
-        ]
-      },
-      {
-        "name": "agentSessions",
-        "kind": "accessor",
-        "optional": false,
-        "readonly": true,
-        "signatures": [
-          "agentSessions: AgentSessionsManager"
-        ]
-      },
-      {
-        "name": "capabilities",
-        "kind": "accessor",
-        "optional": false,
-        "readonly": true,
-        "signatures": [
-          "capabilities: CapabilitiesManager"
-        ]
-      },
-      {
-        "name": "records",
-        "kind": "accessor",
-        "optional": false,
-        "readonly": true,
-        "signatures": [
-          "records: RecordsManager"
-        ]
-      },
-      {
-        "name": "me",
-        "kind": "method",
-        "optional": false,
-        "readonly": false,
-        "signatures": [
-          "me(): Promise<Me>"
-        ]
-      },
-      {
-        "name": "close",
-        "kind": "method",
-        "optional": false,
-        "readonly": false,
-        "signatures": [
-          "close(): Promise<void>"
-        ]
-      }
-    ],
-    "operations": [
-      {
-        "operationKey": "Runa#constructor",
-        "name": "constructor",
-        "signature": "constructor(config?: RunaConfig): Runa",
-        "parameters": [
-          "config"
-        ],
-        "returns": "Runa"
-      },
-      {
-        "operationKey": "Runa#me",
-        "name": "me",
-        "signature": "me(): Promise<Me>",
-        "parameters": [],
-        "returns": "Promise<Me>"
-      },
-      {
-        "operationKey": "Runa#close",
-        "name": "close",
-        "signature": "close(): Promise<void>",
-        "parameters": [],
-        "returns": "Promise<void>"
-      }
-    ]
-  },
-  {
-    "name": "RunaConfig",
-    "kind": "type",
-    "declarationKind": "interface",
-    "page": "Core.md",
-    "source": "dist/index.d.ts",
-    "signature": "interface RunaConfig",
-    "members": [
-      {
-        "name": "apiKey",
-        "kind": "property",
-        "optional": true,
-        "readonly": true,
-        "signatures": [
-          "apiKey?: string"
-        ]
-      },
-      {
-        "name": "baseUrl",
-        "kind": "property",
-        "optional": true,
-        "readonly": true,
-        "signatures": [
-          "baseUrl?: string"
-        ]
-      },
-      {
-        "name": "configFile",
-        "kind": "property",
-        "optional": true,
-        "readonly": true,
-        "signatures": [
-          "configFile?: string | null"
-        ]
-      },
-      {
-        "name": "fetch",
-        "kind": "property",
-        "optional": true,
-        "readonly": true,
-        "signatures": [
-          "fetch?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response> | (input: string | Request | URL, init?: RequestInit) => Promise<Response>"
-        ]
-      },
-      {
-        "name": "diagnostics",
-        "kind": "property",
-        "optional": true,
-        "readonly": true,
-        "signatures": [
-          "diagnostics?: DiagnosticSink"
-        ]
-      },
-      {
-        "name": "tracing",
-        "kind": "property",
-        "optional": true,
-        "readonly": true,
-        "signatures": [
-          "tracing?: TraceSink"
-        ]
-      }
-    ],
-    "operations": []
-  },
-  {
-    "name": "RunaError",
-    "kind": "runtime",
-    "declarationKind": "class",
-    "page": "Shared.md",
-    "source": "dist/index.d.ts",
-    "signature": "class RunaError",
-    "members": [
-      {
-        "name": "name",
-        "kind": "property",
-        "optional": false,
-        "readonly": true,
-        "signatures": [
-          "name: \"ConfigError\" | \"ApiError\" | \"CommandError\""
-        ]
-      },
-      {
-        "name": "code",
-        "kind": "property",
-        "optional": false,
-        "readonly": true,
-        "signatures": [
-          "code: \"config_error\" | \"api_error\" | \"malformed_response\" | \"command_error\""
-        ]
-      }
-    ],
-    "operations": []
-  },
-  {
     "name": "Session",
     "kind": "runtime",
     "declarationKind": "class",
@@ -1083,7 +1063,7 @@
         "optional": false,
         "readonly": false,
         "signatures": [
-          "create(name: string, options: SessionCreateOptions): Promise<Session>"
+          "create(name: string, options?: SessionCreateOptions): Promise<Session>"
         ]
       },
       {
@@ -1109,7 +1089,7 @@
       {
         "operationKey": "SessionsManager#create",
         "name": "create",
-        "signature": "create(name: string, options: SessionCreateOptions): Promise<Session>",
+        "signature": "create(name: string, options?: SessionCreateOptions): Promise<Session>",
         "parameters": [
           "name",
           "options"

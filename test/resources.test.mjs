@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "vitest";
 
-import { ApiError, Runa } from "../dist/index.js";
+import { ApiError, Cuna } from "../dist/index.js";
 import {
   API_KEY,
   RECORD_ID,
@@ -20,12 +20,12 @@ test("PRD-027 managers are lazy, stable and client-owned", async () => {
     calls += 1;
     return jsonResponse([]);
   };
-  const first = new Runa({
+  const first = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch,
   });
-  const second = new Runa({
+  const second = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch,
@@ -54,7 +54,7 @@ test("PRD-029/031/032 preserve collection order and snapshot identity rules", as
     }
     return jsonResponse(sessionFixture({ status: "paused" }));
   };
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch,
@@ -81,7 +81,7 @@ test("PRD-029/031/032 preserve collection order and snapshot identity rules", as
 
 test("PRD-031 preserves snapshot on refresh failure", async () => {
   let call = 0;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async () => {
@@ -118,7 +118,7 @@ test("PRD-033/034/035 keep exec/checkpoint/open cache-neutral", async () => {
     if (path.endsWith("/open")) return jsonResponse({ url: openUrl() });
     return jsonResponse(sessionFixture());
   };
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch,
@@ -134,7 +134,7 @@ test("PRD-033/034/035 keep exec/checkpoint/open cache-neutral", async () => {
 
 test("PRD-035 rejects hostile open capability without retaining it", async () => {
   const invalid = `https://${upstreamName()}.example.invalid/__runa/auth?t=value`;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async (url) =>
@@ -156,7 +156,7 @@ test("PRD-035 rejects hostile open capability without retaining it", async () =>
 
 test("PRD-036/037 return plain fresh values and both workspace variants", async () => {
   let assigned = true;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async (url) => {
@@ -191,7 +191,7 @@ test("PRD-013/022 fail closed on protected wire content without truncation", asy
     { ...sessionFixture(), [["runtime", "id"].join("_")]: protectedValue },
   ];
   let index = 0;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async () => jsonResponse(responses[index++]),
@@ -215,7 +215,7 @@ test("PRD-013/022 fail closed on protected wire content without truncation", asy
 test("PRD-027 close waits for admitted work and blocks later work", async () => {
   let resolveFetch;
   let calls = 0;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async () => {
@@ -241,14 +241,14 @@ test("PRD-027 close waits for admitted work and blocks later work", async () => 
   assert.equal(closed, true);
   await assert.rejects(runa.me(), {
     name: "TypeError",
-    message: "The Runa client is closed.",
+    message: "The Cuna client is closed.",
   });
   assert.equal(calls, 1);
 });
 
 test("TC-036-06 returns fresh ordered record arrays without caching or merging", async () => {
   let call = 0;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => {
       call += 1;

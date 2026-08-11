@@ -5,11 +5,11 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { computeTestEvidenceBinding } from "./test-evidence-binding.mjs";
 
-const resultsFile = ".runa-tmp/vitest-results.json";
+const resultsFile = ".sdk-tmp/vitest-results.json";
 const oracleFile = "evidence/vitest-oracle.json";
 const receiptFile = "evidence/vitest-acceptance.json";
 await mkdir("evidence", { recursive: true });
-await mkdir(".runa-tmp", { recursive: true });
+await mkdir(".sdk-tmp", { recursive: true });
 
 const run = spawnSync(process.execPath, [
   "node_modules/vitest/vitest.mjs",

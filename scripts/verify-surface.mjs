@@ -3,7 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 
 const module = await import("../dist/index.js");
 assert.deepEqual(Object.keys(module).sort(), [
-  "ApiError", "CommandError", "ConfigError", "Cuna", "CunaError", "Runa", "RunaError", "Session",
+  "ApiError", "CommandError", "ConfigError", "Cuna", "CunaError", "Session",
   "stderrText", "stdoutText"
 ]);
 const manifest = JSON.parse(await readFile("docs/reference-manifest.json", "utf8"));

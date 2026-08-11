@@ -3,7 +3,7 @@
 Choose one policy when creating a session:
 
 ```ts
-await runa.sessions.create("restricted", {
+await cuna.sessions.create("restricted", {
   outboundPolicy: {
     mode: "allowlist",
     hosts: ["api.example.com", "*.assets.example.com"],
@@ -17,7 +17,7 @@ exact domains or leading wildcards such as `*.example.com`; ports, paths, URLs,
 IP addresses, duplicates, and more than 128 rules are rejected.
 
 Empty lists are meaningful: an empty deny list permits all work destinations,
-and an empty allow list permits none. Runa maintains required platform
+and an empty allow list permits none. Cuna maintains required platform
 connectivity internally without exposing its control domains or provider fields.
 
 `allowedHosts` is the legacy allow-list option. It remains supported for

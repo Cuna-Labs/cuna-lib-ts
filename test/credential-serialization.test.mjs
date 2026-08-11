@@ -4,7 +4,7 @@ import { Writable } from "node:stream";
 import { format, inspect } from "node:util";
 import { test } from "vitest";
 
-import { Runa } from "../dist/index.js";
+import { Cuna } from "../dist/index.js";
 import { API_KEY, SESSION_ID, jsonResponse, openUrl, sessionFixture } from "./helpers.mjs";
 
 /*
@@ -78,7 +78,7 @@ function agentSessionFixture() {
 }
 
 test("SEC-5 OpenSessionResult never serializes its capability URL", async () => {
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async (url) =>
@@ -109,7 +109,7 @@ test("SEC-5 OpenSessionResult never serializes its capability URL", async () => 
 });
 
 test("SEC-5 TerminalConnectionGrant never serializes its connect token", async () => {
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async (url) =>
@@ -164,7 +164,7 @@ function consoleOutput(value) {
 }
 
 test("SEC-5 OpenSessionResult never renders its capability URL to a console", async () => {
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async (url) =>
@@ -192,7 +192,7 @@ test("SEC-5 OpenSessionResult never renders its capability URL to a console", as
 });
 
 test("SEC-5 TerminalConnectionGrant never renders its connect token to a console", async () => {
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async (url) =>

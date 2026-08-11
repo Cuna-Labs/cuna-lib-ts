@@ -35,7 +35,7 @@ import type {
   CapabilitySnapshot,
   Me,
   Record,
-  RunaConfig,
+  CunaConfig,
   SessionAgent,
   SessionCreateOptions,
   SessionSnapshot,
@@ -43,7 +43,7 @@ import type {
 
 /**
  * Client-owned entry point for creating, listing, and retrieving sessions.
- * @runa-contract sessionsmanager-summary PRD-027#R-027-01
+ * @cuna-contract sessionsmanager-summary PRD-027#R-027-01
  */
 export interface SessionsManager {
   /**
@@ -53,26 +53,26 @@ export interface SessionsManager {
    * @returns A client-owned handle for the created session.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#sessions-create
-   * @runa-contract sessionsmanager-create-description PRD-028#R-028-01
-   * @runa-contract sessionsmanager-create-param-name PRD-028#R-028-01
-   * @runa-contract sessionsmanager-create-param-options PRD-028#R-028-01
-   * @runa-contract sessionsmanager-create-returns PRD-028#R-028-01
-   * @runa-contract sessionsmanager-create-throws-api PRD-024#R-024-03
-   * @runa-contract sessionsmanager-create-example PRD-028#R-028-01
+   * @cuna-contract sessionsmanager-create-description PRD-028#R-028-01
+   * @cuna-contract sessionsmanager-create-param-name PRD-028#R-028-01
+   * @cuna-contract sessionsmanager-create-param-options PRD-028#R-028-01
+   * @cuna-contract sessionsmanager-create-returns PRD-028#R-028-01
+   * @cuna-contract sessionsmanager-create-throws-api PRD-024#R-024-03
+   * @cuna-contract sessionsmanager-create-example PRD-028#R-028-01
    */
   create(
     name: string,
-    options: SessionCreateOptions,
+    options?: SessionCreateOptions,
   ): Promise<Session>;
   /**
    * Lists the sessions available to the caller.
    * @returns A fresh readonly ordered collection of client-owned session handles.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#sessions-list
-   * @runa-contract sessionsmanager-list-description PRD-029#R-029-01
-   * @runa-contract sessionsmanager-list-returns PRD-029#R-029-01
-   * @runa-contract sessionsmanager-list-throws-api PRD-024#R-024-03
-   * @runa-contract sessionsmanager-list-example PRD-029#R-029-01
+   * @cuna-contract sessionsmanager-list-description PRD-029#R-029-01
+   * @cuna-contract sessionsmanager-list-returns PRD-029#R-029-01
+   * @cuna-contract sessionsmanager-list-throws-api PRD-024#R-024-03
+   * @cuna-contract sessionsmanager-list-example PRD-029#R-029-01
    */
   list(): Promise<readonly Session[]>;
   /**
@@ -81,18 +81,18 @@ export interface SessionsManager {
    * @returns A client-owned handle for the requested session.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#sessions-get
-   * @runa-contract sessionsmanager-get-description PRD-030#R-030-01
-   * @runa-contract sessionsmanager-get-param-id PRD-030#R-030-01
-   * @runa-contract sessionsmanager-get-returns PRD-030#R-030-01
-   * @runa-contract sessionsmanager-get-throws-api PRD-024#R-024-03
-   * @runa-contract sessionsmanager-get-example PRD-030#R-030-01
+   * @cuna-contract sessionsmanager-get-description PRD-030#R-030-01
+   * @cuna-contract sessionsmanager-get-param-id PRD-030#R-030-01
+   * @cuna-contract sessionsmanager-get-returns PRD-030#R-030-01
+   * @cuna-contract sessionsmanager-get-throws-api PRD-024#R-024-03
+   * @cuna-contract sessionsmanager-get-example PRD-030#R-030-01
    */
   get(id: string): Promise<Session>;
 }
 
 /**
  * Client-owned entry point for listing records.
- * @runa-contract recordsmanager-summary PRD-027#R-027-01
+ * @cuna-contract recordsmanager-summary PRD-027#R-027-01
  */
 export interface RecordsManager {
   /**
@@ -100,10 +100,10 @@ export interface RecordsManager {
    * @returns A fresh readonly ordered collection of records.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#records-list
-   * @runa-contract recordsmanager-list-description PRD-037#R-037-01
-   * @runa-contract recordsmanager-list-returns PRD-037#R-037-01
-   * @runa-contract recordsmanager-list-throws-api PRD-024#R-024-03
-   * @runa-contract recordsmanager-list-example PRD-037#R-037-01
+   * @cuna-contract recordsmanager-list-description PRD-037#R-037-01
+   * @cuna-contract recordsmanager-list-returns PRD-037#R-037-01
+   * @cuna-contract recordsmanager-list-throws-api PRD-024#R-024-03
+   * @cuna-contract recordsmanager-list-example PRD-037#R-037-01
    */
   list(): Promise<readonly Record[]>;
 }
@@ -135,7 +135,7 @@ class ClientContext implements ClientPort {
     input: DispatchInput = {},
   ): Promise<DispatchResult> {
     if (this.#state !== "open") {
-      throw new TypeError("The Runa client is closed.");
+      throw new TypeError("The Cuna client is closed.");
     }
     this.#active += 1;
     try {
@@ -287,13 +287,13 @@ class SessionsManagerImplementation implements SessionsManager {
         (typeof options.idempotencyKey !== "string" ||
           !/^[\x21-\x7e]{8,128}$/.test(options.idempotencyKey))
     ) {
-      throw new TypeError("The Runa idempotency key is invalid.");
+      throw new TypeError("The Cuna idempotency key is invalid.");
     }
     const body = createBody(name, options);
     const snapshot = (await this.#owner.invoke("sessions.create", {
       body,
       idempotencyKey: options.idempotencyKey ??
-        `runa_sdk_${randomBytes(18).toString("base64url")}`,
+        `cuna_sdk_${randomBytes(18).toString("base64url")}`,
     })) as SessionSnapshot;
     return constructSession(this.#owner, snapshot);
   }
@@ -369,10 +369,10 @@ class CapabilitiesManagerImplementation implements CapabilitiesManager {
 }
 
 /**
- * Constructible Runa client that owns managers, transport lifecycle, and cleanup.
- * @runa-contract runa-summary PRD-023#R-023-01
+ * Constructible Cuna client that owns managers, transport lifecycle, and cleanup.
+ * @cuna-contract cuna-summary PRD-023#R-023-01
  */
-export class Runa {
+export class Cuna {
   readonly #context: ClientContext;
   #agentSessions: AgentSessionsManager | undefined;
   #capabilities: CapabilitiesManager | undefined;
@@ -383,18 +383,18 @@ export class Runa {
   #records: RecordsManager | undefined;
 
   /**
-   * Constructs one configured Runa client.
+   * Constructs one configured Cuna client.
    * @param config Optional client configuration resolved under the documented precedence rules.
-   * @returns A configured Runa client.
+   * @returns A configured Cuna client.
    * @throws ConfigError when selected client configuration is invalid.
-   * @example docs/reference/examples/workflows.ts#runa-constructor
-   * @runa-contract runa-constructor-description PRD-023#R-023-01
-   * @runa-contract runa-constructor-param-config PRD-023#R-023-01
-   * @runa-contract runa-constructor-returns PRD-023#R-023-01
-   * @runa-contract runa-constructor-throws-config PRD-023#R-023-06
-   * @runa-contract runa-constructor-example PRD-023#R-023-01
+   * @example docs/reference/examples/workflows.ts#cuna-constructor
+   * @cuna-contract cuna-constructor-description PRD-023#R-023-01
+   * @cuna-contract cuna-constructor-param-config PRD-023#R-023-01
+   * @cuna-contract cuna-constructor-returns PRD-023#R-023-01
+   * @cuna-contract cuna-constructor-throws-config PRD-023#R-023-06
+   * @cuna-contract cuna-constructor-example PRD-023#R-023-01
    */
-  constructor(config?: RunaConfig) {
+  constructor(config?: CunaConfig) {
     this.#context = new ClientContext(resolveConfig(config));
   }
 
@@ -444,11 +444,11 @@ export class Runa {
    * Reads the caller profile and workspace state.
    * @returns The caller profile and workspace state.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
-   * @example docs/reference/examples/workflows.ts#runa-me
-   * @runa-contract runa-me-description PRD-036#R-036-01
-   * @runa-contract runa-me-returns PRD-036#R-036-01
-   * @runa-contract runa-me-throws-api PRD-024#R-024-03
-   * @runa-contract runa-me-example PRD-036#R-036-01
+   * @example docs/reference/examples/workflows.ts#cuna-me
+   * @cuna-contract cuna-me-description PRD-036#R-036-01
+   * @cuna-contract cuna-me-returns PRD-036#R-036-01
+   * @cuna-contract cuna-me-throws-api PRD-024#R-024-03
+   * @cuna-contract cuna-me-example PRD-036#R-036-01
    */
   async me(): Promise<Me> {
     return (await this.#context.invoke("me.get")) as Me;
@@ -457,10 +457,10 @@ export class Runa {
   /**
    * Closes this client after already admitted work completes.
    * @returns A promise that resolves after client-owned cleanup completes.
-   * @example docs/reference/examples/workflows.ts#runa-close
-   * @runa-contract runa-close-description PRD-027#R-027-10
-   * @runa-contract runa-close-returns PRD-027#R-027-10
-   * @runa-contract runa-close-example PRD-027#R-027-10
+   * @example docs/reference/examples/workflows.ts#cuna-close
+   * @cuna-contract cuna-close-description PRD-027#R-027-10
+   * @cuna-contract cuna-close-returns PRD-027#R-027-10
+   * @cuna-contract cuna-close-example PRD-027#R-027-10
    */
   close(): Promise<void> {
     return this.#context.close();

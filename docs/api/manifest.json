@@ -10,36 +10,23 @@
       "kind": "runtime",
       "page": "Core.md",
       "anchor": "cuna",
-      "signature": "alias Cuna",
-      "documentation": "complete",
-      "examples": [],
-      "contractRefs": [
-        "PRD-023#R-023-01"
-      ],
-      "status": "PASS"
-    },
-    {
-      "name": "Runa",
-      "kind": "runtime",
-      "page": "Core.md",
-      "anchor": "runa",
-      "signature": "class Runa",
+      "signature": "class Cuna",
       "documentation": "complete",
       "examples": [
         {
-          "operationKey": "Runa#constructor",
+          "operationKey": "Cuna#constructor",
           "sourcePath": "docs/reference/examples/workflows.ts",
-          "testId": "TC-048-EXAMPLE-RUNA_CONSTRUCTOR"
+          "testId": "TC-048-EXAMPLE-CUNA_CONSTRUCTOR"
         },
         {
-          "operationKey": "Runa#me",
+          "operationKey": "Cuna#me",
           "sourcePath": "docs/reference/examples/workflows.ts",
-          "testId": "TC-048-EXAMPLE-RUNA_ME"
+          "testId": "TC-048-EXAMPLE-CUNA_ME"
         },
         {
-          "operationKey": "Runa#close",
+          "operationKey": "Cuna#close",
           "sourcePath": "docs/reference/examples/workflows.ts",
-          "testId": "TC-048-EXAMPLE-RUNA_CLOSE"
+          "testId": "TC-048-EXAMPLE-CUNA_CLOSE"
         }
       ],
       "contractRefs": [
@@ -52,11 +39,11 @@
       "status": "PASS"
     },
     {
-      "name": "RunaConfig",
+      "name": "CunaConfig",
       "kind": "type",
       "page": "Core.md",
-      "anchor": "runaconfig",
-      "signature": "interface RunaConfig",
+      "anchor": "cunaconfig",
+      "signature": "interface CunaConfig",
       "documentation": "complete",
       "examples": [],
       "contractRefs": [
@@ -438,20 +425,7 @@
       "kind": "runtime",
       "page": "Shared.md",
       "anchor": "cunaerror",
-      "signature": "alias CunaError",
-      "documentation": "complete",
-      "examples": [],
-      "contractRefs": [
-        "PRD-024#R-024-01"
-      ],
-      "status": "PASS"
-    },
-    {
-      "name": "RunaError",
-      "kind": "runtime",
-      "page": "Shared.md",
-      "anchor": "runaerror",
-      "signature": "class RunaError",
+      "signature": "class CunaError",
       "documentation": "complete",
       "examples": [],
       "contractRefs": [
@@ -509,16 +483,8 @@
       ]
     },
     {
-      "claimId": "runa-summary",
-      "subjectKey": "Runa",
-      "fragment": "summary",
-      "contractRefs": [
-        "PRD-023#R-023-01"
-      ]
-    },
-    {
-      "claimId": "runaconfig-summary",
-      "subjectKey": "RunaConfig",
+      "claimId": "cunaconfig-summary",
+      "subjectKey": "CunaConfig",
       "fragment": "summary",
       "contractRefs": [
         "PRD-023#R-023-01"
@@ -709,14 +675,6 @@
       ]
     },
     {
-      "claimId": "runaerror-summary",
-      "subjectKey": "RunaError",
-      "fragment": "summary",
-      "contractRefs": [
-        "PRD-024#R-024-01"
-      ]
-    },
-    {
       "claimId": "opaquewirevalue-summary",
       "subjectKey": "OpaqueWireValue",
       "fragment": "summary",
@@ -741,72 +699,72 @@
       ]
     },
     {
-      "claimId": "runa-constructor-description",
-      "subjectKey": "Runa#constructor",
+      "claimId": "cuna-constructor-description",
+      "subjectKey": "Cuna#constructor",
       "fragment": "description",
       "contractRefs": [
         "PRD-023#R-023-01"
       ]
     },
     {
-      "claimId": "runa-constructor-returns",
-      "subjectKey": "Runa#constructor",
+      "claimId": "cuna-constructor-returns",
+      "subjectKey": "Cuna#constructor",
       "fragment": "returns",
       "contractRefs": [
         "PRD-023#R-023-01"
       ]
     },
     {
-      "claimId": "runa-constructor-example",
-      "subjectKey": "Runa#constructor",
+      "claimId": "cuna-constructor-example",
+      "subjectKey": "Cuna#constructor",
       "fragment": "example",
       "contractRefs": [
         "PRD-023#R-023-01"
       ]
     },
     {
-      "claimId": "runa-me-description",
-      "subjectKey": "Runa#me",
+      "claimId": "cuna-me-description",
+      "subjectKey": "Cuna#me",
       "fragment": "description",
       "contractRefs": [
         "PRD-036#R-036-01"
       ]
     },
     {
-      "claimId": "runa-me-returns",
-      "subjectKey": "Runa#me",
+      "claimId": "cuna-me-returns",
+      "subjectKey": "Cuna#me",
       "fragment": "returns",
       "contractRefs": [
         "PRD-036#R-036-01"
       ]
     },
     {
-      "claimId": "runa-me-example",
-      "subjectKey": "Runa#me",
+      "claimId": "cuna-me-example",
+      "subjectKey": "Cuna#me",
       "fragment": "example",
       "contractRefs": [
         "PRD-036#R-036-01"
       ]
     },
     {
-      "claimId": "runa-close-description",
-      "subjectKey": "Runa#close",
+      "claimId": "cuna-close-description",
+      "subjectKey": "Cuna#close",
       "fragment": "description",
       "contractRefs": [
         "PRD-027#R-027-10"
       ]
     },
     {
-      "claimId": "runa-close-returns",
-      "subjectKey": "Runa#close",
+      "claimId": "cuna-close-returns",
+      "subjectKey": "Cuna#close",
       "fragment": "returns",
       "contractRefs": [
         "PRD-027#R-027-10"
       ]
     },
     {
-      "claimId": "runa-close-example",
-      "subjectKey": "Runa#close",
+      "claimId": "cuna-close-example",
+      "subjectKey": "Cuna#close",
       "fragment": "example",
       "contractRefs": [
         "PRD-027#R-027-10"
@@ -1189,8 +1147,8 @@
       ]
     },
     {
-      "claimId": "runa-constructor-param-config",
-      "subjectKey": "Runa#constructor",
+      "claimId": "cuna-constructor-param-config",
+      "subjectKey": "Cuna#constructor",
       "fragment": "param.config",
       "contractRefs": [
         "PRD-023#R-023-01"
@@ -1277,16 +1235,16 @@
       ]
     },
     {
-      "claimId": "runa-constructor-throws-config",
-      "subjectKey": "Runa#constructor",
+      "claimId": "cuna-constructor-throws-config",
+      "subjectKey": "Cuna#constructor",
       "fragment": "throws.ConfigError",
       "contractRefs": [
         "PRD-023#R-023-06"
       ]
     },
     {
-      "claimId": "runa-me-throws-api",
-      "subjectKey": "Runa#me",
+      "claimId": "cuna-me-throws-api",
+      "subjectKey": "Cuna#me",
       "fragment": "throws.ApiError",
       "contractRefs": [
         "PRD-024#R-024-03"
@@ -1399,12 +1357,12 @@
   ],
   "errorMatrix": [
     {
-      "operationKey": "Runa#constructor",
+      "operationKey": "Cuna#constructor",
       "disposition": "accepted",
       "cases": [
         {
           "errorType": "ConfigError",
-          "conditionClaimId": "runa-constructor-throws-config",
+          "conditionClaimId": "cuna-constructor-throws-config",
           "contractRefs": [
             "PRD-023#R-023-06"
           ]
@@ -1412,12 +1370,12 @@
       ]
     },
     {
-      "operationKey": "Runa#me",
+      "operationKey": "Cuna#me",
       "disposition": "accepted",
       "cases": [
         {
           "errorType": "ApiError",
-          "conditionClaimId": "runa-me-throws-api",
+          "conditionClaimId": "cuna-me-throws-api",
           "contractRefs": [
             "PRD-024#R-024-03"
           ]
@@ -1425,7 +1383,7 @@
       ]
     },
     {
-      "operationKey": "Runa#close",
+      "operationKey": "Cuna#close",
       "disposition": "none",
       "cases": [],
       "contractRefs": [

@@ -31,7 +31,7 @@ import { WIRE_BRANDS } from "../dist/internal/wire-namespaces.js";
 export const ignoredDirectories = Object.freeze([
   ".codex-work",
   ".git",
-  ".runa-tmp",
+  ".sdk-tmp",
   "coverage",
   "node_modules",
 ]);

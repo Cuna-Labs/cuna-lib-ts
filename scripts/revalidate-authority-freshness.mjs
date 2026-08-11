@@ -6,7 +6,7 @@ import {
   verifyAuthorityAssets,
 } from "./public-authority-transport.mjs";
 
-const input = process.env.RUNA_AUTHORITY_INPUT_DIR ?? "authority-preflight";
+const input = process.env.CUNA_AUTHORITY_INPUT_DIR ?? "authority-preflight";
 const trustPolicy = JSON.parse(await readFile("governance/release-trust.json", "utf8"));
 const authorityRun = JSON.parse(await readFile("evidence/authority-run.json", "utf8"));
 const assets = new Map(await Promise.all([
@@ -22,10 +22,10 @@ assert.equal(validateAuthorityContinuity({
   runId: authorityRun.run_id,
   runAttempt: authorityRun.run_attempt,
 }, {
-  bundleSha256: process.env.RUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256,
-  headSha: process.env.RUNA_EXPECTED_AUTHORITY_HEAD_SHA,
-  runId: process.env.RUNA_EXPECTED_AUTHORITY_RUN_ID,
-  runAttempt: process.env.RUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT,
+  bundleSha256: process.env.CUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256,
+  headSha: process.env.CUNA_EXPECTED_AUTHORITY_HEAD_SHA,
+  runId: process.env.CUNA_EXPECTED_AUTHORITY_RUN_ID,
+  runAttempt: process.env.CUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT,
 }), true);
 
 console.log(`release authority freshness: PASS (${verified.detached.bundle_sha256})`);

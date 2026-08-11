@@ -292,7 +292,7 @@ interface SessionsManager
 Creates one session and returns its client-owned handle.
 
 ```ts
-create(name: string, options: SessionCreateOptions): Promise<Session>
+create(name: string, options?: SessionCreateOptions): Promise<Session>
 ```
 
 #### list
@@ -327,7 +327,7 @@ Invokes the accepted public `create` operation owned by `SessionsManager`.
 **Example**
 
 ```ts
-const created = await runa.sessions.create("worker", { agent: "codex" });
+const created = await cuna.sessions.create("worker", { agent: "codex" });
 if (created.snapshot.status === "creating") await created.refresh();
 ```
 
@@ -346,7 +346,7 @@ Invokes the accepted public `list` operation owned by `SessionsManager`.
 **Example**
 
 ```ts
-await runa.sessions.list();
+await cuna.sessions.list();
 ```
 
 Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-SESSIONS_LIST`
@@ -366,7 +366,7 @@ Invokes the accepted public `get` operation owned by `SessionsManager`.
 **Example**
 
 ```ts
-await runa.sessions.get(sessionId);
+await cuna.sessions.get(sessionId);
 ```
 
 Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-SESSIONS_GET`

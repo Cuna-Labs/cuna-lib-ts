@@ -12,12 +12,12 @@ const argument = (name) => {
 const artifact = path.resolve(argument("--artifact") ?? "");
 const runs = Number(argument("--runs"));
 assert.equal(runs, 20, "R-050-21: startup profile requires exactly 20 runs");
-const workspace = await mkdtemp(path.join(tmpdir(), "runa-ts050-startup-"));
+const workspace = await mkdtemp(path.join(tmpdir(), "cuna-ts050-startup-"));
 const cache = path.join(workspace, "cache");
 try {
   await mkdir(cache);
   await writeFile(path.join(workspace, "package.json"), `${JSON.stringify({
-    name: "runa-ts050-startup",
+    name: "cuna-ts050-startup",
     version: "0.0.0",
     private: true,
     type: "module",
@@ -35,7 +35,7 @@ try {
     "const m=await import('@cuna_labs/sdk');",
     "const i=performance.now()-s;",
     "const c=performance.now();",
-    "const x=new m.Runa({apiKey:['runa','sk','synthetic'].join('_')});",
+    "const x=new m.Cuna({apiKey:['cuna','sk','synthetic'].join('_')});",
     "const cm=performance.now()-c;",
     "await x.close();",
     "console.log(JSON.stringify({import_ms:i,construction_ms:cm}));",

@@ -11,7 +11,7 @@ import {
 } from "./internal/wire-namespaces.js";
 import type {
   DiagnosticSink,
-  RunaConfig,
+  CunaConfig,
   TraceSink,
 } from "./types.js";
 
@@ -253,7 +253,7 @@ function validateTracing(value: unknown): TraceSink | undefined {
   return value as TraceSink;
 }
 
-export function resolveConfig(config: RunaConfig = {}): EffectiveConfig {
+export function resolveConfig(config: CunaConfig = {}): EffectiveConfig {
   if (
     config === null ||
     typeof config !== "object" ||
@@ -261,7 +261,7 @@ export function resolveConfig(config: RunaConfig = {}): EffectiveConfig {
   ) {
     fail();
   }
-  const unsafe = config as RunaConfig &
+  const unsafe = config as CunaConfig &
     globalThis.Record<string, unknown>;
   let file: ConfigFileShape = Object.freeze({});
   if (unsafe.configFile !== undefined && unsafe.configFile !== null) {

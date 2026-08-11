@@ -8,11 +8,11 @@ import {
 } from "./release-tag-policy.mjs";
 
 const packageJson = JSON.parse(await readFile("package.json", "utf8"));
-const refName = process.env.RUNA_RELEASE_TAG ?? process.env.GITHUB_REF_NAME;
-const refType = process.env.RUNA_RELEASE_TAG === undefined
+const refName = process.env.CUNA_RELEASE_TAG ?? process.env.GITHUB_REF_NAME;
+const refType = process.env.CUNA_RELEASE_TAG === undefined
   ? process.env.GITHUB_REF_TYPE
   : "tag";
-const workflowCommit = process.env.RUNA_RELEASE_COMMIT ?? process.env.GITHUB_SHA;
+const workflowCommit = process.env.CUNA_RELEASE_COMMIT ?? process.env.GITHUB_SHA;
 assert.equal(typeof refName, "string", "R-053-02: missing GitHub tag name");
 assert.equal(typeof refType, "string", "R-053-02: missing GitHub ref type");
 assert.match(workflowCommit ?? "", /^[a-f0-9]{40}$/,

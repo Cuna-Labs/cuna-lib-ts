@@ -3,7 +3,7 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { test, vi } from "vitest";
 
-import { ApiError, ConfigError, Runa } from "../dist/index.js";
+import { ApiError, ConfigError, Cuna } from "../dist/index.js";
 import { resolveConfig } from "../dist/config.js";
 import {
   WIRE_BRANDS,
@@ -97,7 +97,7 @@ function authFixture(overrides = {}) {
 }
 
 function clientFor(route) {
-  return new Runa({ apiKey: API_KEY, baseUrl: "https://api.runacode.io", fetch: route });
+  return new Cuna({ apiKey: API_KEY, baseUrl: "https://api.runacode.io", fetch: route });
 }
 
 async function grantFor(overrides, record = []) {

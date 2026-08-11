@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "vitest";
 
-import { ApiError, Runa } from "../dist/index.js";
+import { ApiError, Cuna } from "../dist/index.js";
 import { API_KEY, jsonResponse } from "./helpers.mjs";
 
 const WORKSPACE_ID = "77777777-7777-4777-8777-777777777777";
@@ -196,7 +196,7 @@ const identity = {
 
 test("OpenAPI 1.7 WorkspaceBinding and sync methods preserve exact public authority", async () => {
   const calls = [];
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (url, init) => {
       calls.push({ url: String(url), init });
@@ -309,7 +309,7 @@ test("OpenAPI 1.7 WorkspaceBinding and sync methods preserve exact public author
 
 test("workspace authority inputs fail closed before I/O", async () => {
   let calls = 0;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => {
       calls += 1;
@@ -411,7 +411,7 @@ const malformedCases = [
 
 for (const [name, response, invoke] of malformedCases) {
   test(`OpenAPI 1.7 decoder rejects ${name}`, async () => {
-    const runa = new Runa({ apiKey: API_KEY, fetch: async () => jsonResponse(response()) });
+    const runa = new Cuna({ apiKey: API_KEY, fetch: async () => jsonResponse(response()) });
     await assert.rejects(
       invoke(runa),
       (error) => error instanceof ApiError && error.code === "malformed_response",
@@ -430,7 +430,7 @@ test("WorkspaceBinding and sync Problem responses remain typed and safe", async 
     retryable: false,
     action: "none",
   };
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => jsonResponse(problem, 409, { "content-type": "application/problem+json" }),
   });
@@ -456,7 +456,7 @@ test("specialized WorkspaceSyncProblem preserves negotiated public recovery meta
     capabilities: CAPABILITIES,
     detail: "The requested protocol range is not supported.",
   };
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => jsonResponse(problem, 426, { "content-type": "application/problem+json" }),
   });
@@ -489,9 +489,9 @@ test("specialized WorkspaceSyncProblem rejects inconsistent protocol capability 
     action: "retry",
     selected_protocol: null,
     capabilities: CAPABILITIES,
-    detail: "Runa could not confirm the workspace sync operation.",
+    detail: "Cuna could not confirm the workspace sync operation.",
   };
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => jsonResponse(malformed, 503, { "content-type": "application/problem+json" }),
   });
@@ -512,7 +512,7 @@ test("workspace sync accepts the contract's generic application/json Problem fal
     retryable: false,
     action: "none",
   };
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => jsonResponse(problem, 404),
   });
@@ -534,7 +534,7 @@ for (const [name, value] of [
   ["invalid timestamp", machineCreate({ updated_at: "not-a-date" })],
 ]) {
   test(`machine-create recovery rejects ${name}`, async () => {
-    const runa = new Runa({ apiKey: API_KEY, fetch: async () => jsonResponse(value) });
+    const runa = new Cuna({ apiKey: API_KEY, fetch: async () => jsonResponse(value) });
     await assert.rejects(
       runa.machineCreates.get(REQUEST_ID),
       (error) => error instanceof ApiError && error.code === "malformed_response",
@@ -544,7 +544,7 @@ for (const [name, value] of [
 }
 
 test("the SDK surface contains no CLI runtime, PTY, watcher, login, companion, or automatic-sync behavior", async () => {
-  const runa = new Runa({ apiKey: API_KEY, fetch: async () => jsonResponse(binding()) });
+  const runa = new Cuna({ apiKey: API_KEY, fetch: async () => jsonResponse(binding()) });
   for (const forbidden of [
     "tui", "pty", "watchFiles", "login", "companion", "automaticSync", "syncAutomatically",
   ]) assert.equal(forbidden in runa, false);

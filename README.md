@@ -32,16 +32,14 @@ try {
 }
 ```
 
-`Cuna` and `CunaConfig` are aliases over the stable `Runa` and `RunaConfig`
-surface, which remains exported for existing source compatibility. The
+`Cuna` and `CunaConfig` are the canonical public client and configuration
+surface. The unpublished legacy client aliases are intentionally absent. The
 `CUNA_API_KEY` and `cuna_sk_*` are canonical. The legacy `RUNA_API_KEY`,
 `runa_sk_*` key prefix, and wire protocol names are intentionally retained.
 A present invalid canonical variable never falls back to its legacy alias.
 New clients default to `api.getcuna.com`, while
-`api.runacode.io` remains accepted as a legacy-compatible origin. Existing consumers of
-`@runa_laboratories/sdk` require a thin compatibility publication at that old
-scope before it can be deprecated; this repository does not publish it
-automatically.
+`api.runacode.io` remains accepted as a legacy-compatible origin. This package
+does not expose unpublished legacy client symbols.
 
 Configuration precedence is constructor options, environment variables, the
 optional configuration file, then the default API endpoint. A present but
@@ -66,16 +64,16 @@ included. Exporting both with the same value is silent. A present but invalid
 
 ## Resources
 
-- `runa.sessions.create(name, options)`, `list()`, and `get(id)`
+- `cuna.sessions.create(name, options)`, `list()`, and `get(id)`
 - `Session` lifecycle methods, `exec()`, `checkpoint()`, and `open()`
-- `runa.records.list()`
-- `runa.me()`
-- `runa.agentSessions.list(machineId)`, `create(machineId, options)`, `get(id)`, `agentAuth(agentSession)`, `rename(id, name)`, `terminate(id)`, and `createTerminalConnection(id, options)`
-- `runa.workspaceSync.downloadChunk(syncId, digest)` returns verified remote workspace bytes
+- `cuna.records.list()`
+- `cuna.me()`
+- `cuna.agentSessions.list(machineId)`, `create(machineId, options)`, `get(id)`, `agentAuth(agentSession)`, `rename(id, name)`, `terminate(id)`, and `createTerminalConnection(id, options)`
+- `cuna.workspaceSync.downloadChunk(syncId, digest)` returns verified remote workspace bytes
 
 `Session.open()` returns a short-lived sensitive value. Use it only for the
 immediate handoff and do not print, persist, cache, or fetch it automatically.
-`runa.agentSessions.agentAuth(agentSession)` returns immutable, secret-free,
+`cuna.agentSessions.agentAuth(agentSession)` returns immutable, secret-free,
 short-lived evidence for the exact AgentSession process generation. The SDK
 rejects stale, cacheable, contradictory, extra-field, sibling-session, and
 process-epoch-mismatched responses. There is intentionally no machine-level

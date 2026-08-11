@@ -5,7 +5,7 @@ import path from "node:path";
 import { loadPrdCatalog } from "./prd-catalog.mjs";
 
 const prdCatalog = await loadPrdCatalog();
-const workspaceRoot = process.env.RUNA_PRD_ROOT ?? path.resolve("../../prds/libs");
+const workspaceRoot = process.env.CUNA_PRD_ROOT ?? path.resolve("../../prds/libs");
 let workspaceAvailable = true;
 try {
   await access(workspaceRoot);

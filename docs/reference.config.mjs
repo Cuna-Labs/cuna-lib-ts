@@ -1,19 +1,17 @@
 const pages = Object.freeze({
-  "Core.md": ["Cuna", "Runa", "RunaConfig"],
+  "Core.md": ["Cuna", "CunaConfig"],
   "Sessions.md": ["Session", "SessionsManager", "SessionAgent", "OutboundPolicyMode", "OutboundPolicy", "SessionCreateOptions", "SessionSnapshot", "SessionStatus", "ExecOptions", "ExecResult", "Acknowledgement", "OpenSessionResult"],
   "Account-and-records.md": ["Me", "Workspace", "AssignedWorkspace", "UnassignedWorkspace", "EstimatedUsage", "RecordsManager", "Record"],
-  "Shared.md": ["ConfigError", "ApiError", "CommandError", "CunaError", "RunaError", "OpaqueWireValue", "stdoutText", "stderrText"],
+  "Shared.md": ["ConfigError", "ApiError", "CommandError", "CunaError", "OpaqueWireValue", "stdoutText", "stderrText"],
 });
 
 const summaries = Object.freeze({
-  Runa: "Constructible Runa client that owns managers, transport lifecycle, and cleanup.",
-  Cuna: "Canonical Cuna client alias with the same lifecycle and managers as Runa.",
-  RunaConfig: "Configuration accepted while constructing a Runa client.",
+  Cuna: "Constructible Cuna client that owns managers, transport lifecycle, and cleanup.",
+  CunaConfig: "Configuration accepted while constructing a Cuna client.",
   ConfigError: "Safe public error raised when selected client configuration is invalid.",
   ApiError: "Safe public error for an API failure or malformed successful response.",
   CommandError: "Reserved non-constructible public command-error type.",
-  RunaError: "Base class for normalized public Runa SDK errors.",
-  CunaError: "Canonical Cuna alias for the normalized public SDK error base class.",
+  CunaError: "Base class for normalized public Cuna SDK errors.",
   Session: "Client-owned session handle with an immutable current snapshot and bounded operations.",
   SessionsManager: "Client-owned entry point for creating, listing, and retrieving sessions.",
   SessionAgent: "Accepted agent identifier for a session.",
@@ -39,13 +37,11 @@ const summaries = Object.freeze({
 });
 
 const entryContracts = Object.freeze({
-  Runa: "PRD-023#R-023-01",
   Cuna: "PRD-023#R-023-01",
-  RunaConfig: "PRD-023#R-023-01",
+  CunaConfig: "PRD-023#R-023-01",
   ConfigError: "PRD-024#R-024-01",
   ApiError: "PRD-024#R-024-01",
   CommandError: "PRD-024#R-024-01",
-  RunaError: "PRD-024#R-024-01",
   CunaError: "PRD-024#R-024-01",
   Session: "PRD-031#R-031-01",
   SessionsManager: "PRD-027#R-027-01",
@@ -72,9 +68,9 @@ const entryContracts = Object.freeze({
 });
 
 const operationDefinitions = [
-  ["Runa#constructor", "PRD-023#R-023-01", "runa-constructor", true],
-  ["Runa#me", "PRD-036#R-036-01", "runa-me", true],
-  ["Runa#close", "PRD-027#R-027-10", "runa-close", true],
+  ["Cuna#constructor", "PRD-023#R-023-01", "cuna-constructor", true],
+  ["Cuna#me", "PRD-036#R-036-01", "cuna-me", true],
+  ["Cuna#close", "PRD-027#R-027-10", "cuna-close", true],
   ["RecordsManager#list", "PRD-037#R-037-01", "records-list", true],
   ["SessionsManager#create", "PRD-028#R-028-01", "sessions-create", true],
   ["SessionsManager#list", "PRD-029#R-029-01", "sessions-list", true],
@@ -121,13 +117,13 @@ export const examples = Object.freeze(Object.fromEntries(
 
 export const errorMatrix = Object.freeze(operationDefinitions.map(
   ([operationKey, contractRef]) => {
-    if (operationKey === "Runa#constructor") {
+    if (operationKey === "Cuna#constructor") {
       return Object.freeze({
         operationKey,
         disposition: "accepted",
         cases: [Object.freeze({
           errorType: "ConfigError",
-          conditionClaimId: "runa-constructor-throws-config",
+          conditionClaimId: "cuna-constructor-throws-config",
           contractRefs: ["PRD-023#R-023-06"],
         })],
       });
@@ -135,7 +131,7 @@ export const errorMatrix = Object.freeze(operationDefinitions.map(
     if (operationKey.includes("#constructor") ||
         operationKey.startsWith("stdoutText#") ||
         operationKey.startsWith("stderrText#") ||
-        operationKey === "Runa#close") {
+        operationKey === "Cuna#close") {
       return Object.freeze({
         operationKey,
         disposition: "none",
@@ -188,7 +184,7 @@ export const claimRegistry = Object.freeze([
     return claims;
   }),
   ...[
-    ["Runa#constructor", "config", "PRD-023#R-023-01"],
+    ["Cuna#constructor", "config", "PRD-023#R-023-01"],
     ["SessionsManager#create", "name", "PRD-028#R-028-01"],
     ["SessionsManager#create", "options", "PRD-028#R-028-01"],
     ["SessionsManager#get", "id", "PRD-030#R-030-01"],

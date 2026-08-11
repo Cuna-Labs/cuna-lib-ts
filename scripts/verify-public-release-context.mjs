@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const policy = JSON.parse(await readFile(".runa/release-policy.json", "utf8"));
+const policy = JSON.parse(await readFile(".cuna/release-policy.json", "utf8"));
 const packageJson = JSON.parse(await readFile("package.json", "utf8"));
 assert.equal(packageJson.publishConfig?.access, "public");
 assert.equal(policy.packageMetadata.packageAccess, "public");

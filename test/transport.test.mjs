@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "vitest";
 
-import { ApiError, Runa } from "../dist/index.js";
+import { ApiError, Cuna } from "../dist/index.js";
 import {
   API_KEY,
   RECORD_ID,
@@ -46,7 +46,7 @@ function operationFetch(captures) {
 
 test("PRD-021/025/028-037 dispatch the canonical legacy session operations", async () => {
   const captures = [];
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: operationFetch(captures),
@@ -100,7 +100,7 @@ test("PRD-021/025/028-037 dispatch the canonical legacy session operations", asy
     assert.equal(init.headers.Accept, "application/json, application/problem+json");
     assert.equal(init.headers.Authorization, `Bearer ${API_KEY}`);
     assert.match(init.headers["User-Agent"], /^runa-sdk-typescript\//);
-    assert.equal("X-Runa-Request-Id" in init.headers, false);
+    assert.equal("X-Cuna-Request-Id" in init.headers, false);
     assert.equal(
       init.body === undefined,
       init.headers["Content-Type"] === undefined,
@@ -131,7 +131,7 @@ test("PRD-021/025/028-037 dispatch the canonical legacy session operations", asy
 
 test("SDK create never serializes console-only background", async () => {
   const bodies = [];
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (_url, init) => {
       bodies.push(JSON.parse(init.body));
@@ -178,7 +178,7 @@ test("PRD-024/025 map exact status, media, redirect and errors", async () => {
     },
   ];
   for (const scenario of scenarios) {
-    const runa = new Runa({
+    const runa = new Cuna({
       apiKey: API_KEY,
       baseUrl: "https://api.runacode.io",
       fetch: async () => scenario.response,
@@ -201,7 +201,7 @@ test("TC-025-02 selects the exact global fetch when no callable is injected", as
     injectedCalls += 1;
     return jsonResponse(meFixture());
   };
-  const injectedClient = new Runa({ apiKey: API_KEY, fetch: injected });
+  const injectedClient = new Cuna({ apiKey: API_KEY, fetch: injected });
   await injectedClient.me();
   assert.equal(injectedCalls, 1);
   await injectedClient.close();
@@ -214,7 +214,7 @@ test("TC-025-02 selects the exact global fetch when no callable is injected", as
   };
   globalThis.fetch = selected;
   try {
-    const runa = new Runa({ apiKey: API_KEY });
+    const runa = new Cuna({ apiKey: API_KEY });
     assert.equal((await runa.me()).email, "sdk@example.invalid");
     assert.equal(calls, 1);
     await runa.close();
@@ -241,7 +241,7 @@ test("TC-040-02 rejects hostile redirects with one request and no exposure", asy
         return new Promise(() => {});
       },
     });
-    const runa = new Runa({
+    const runa = new Cuna({
       apiKey: API_KEY,
       baseUrl: "https://api.runacode.io",
       fetch: async () => {
@@ -273,7 +273,7 @@ test("PRD-025/040 enforce the response cap and invalid UTF-8", async () => {
       headers: { "content-type": "application/json" },
     }),
   ]) {
-    const runa = new Runa({
+    const runa = new Cuna({
       apiKey: API_KEY,
       baseUrl: "https://api.runacode.io",
       fetch: async () => response,
@@ -297,7 +297,7 @@ test("PRD-025/026 overflow remains terminal when stream cancellation never settl
       return new Promise(() => {});
     },
   });
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async () => new Response(body, {
@@ -317,7 +317,7 @@ test("PRD-025/026 overflow remains terminal when stream cancellation never settl
 
 test("TC-025-07 rejects local invalid values before I/O", async () => {
   let dispatches = 0;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async () => {
@@ -370,7 +370,7 @@ test("PRD-028 snapshots caller-owned create arrays before dispatch", async () =>
     });
     return jsonResponse(sessionFixture(), 201);
   };
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch,
@@ -390,7 +390,7 @@ test("PRD-028 snapshots caller-owned create arrays before dispatch", async () =>
 
 test("serializes explicit outbound allow and deny policies without provider fields", async () => {
   const bodies = [];
-  const runa = new Runa({ apiKey: API_KEY, fetch: async (_url, init) => {
+  const runa = new Cuna({ apiKey: API_KEY, fetch: async (_url, init) => {
     bodies.push(JSON.parse(init.body));
     return jsonResponse(sessionFixture(), 201);
   } });
@@ -407,7 +407,7 @@ test("serializes explicit outbound allow and deny policies without provider fiel
 
 test("TC-033-05 accepts only integer timeoutSecs from 1 through 600", async () => {
   let dispatches = 0;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (url) => {
       dispatches += 1;

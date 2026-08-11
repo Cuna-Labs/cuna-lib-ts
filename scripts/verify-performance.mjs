@@ -58,13 +58,13 @@ const startupResult = spawnSync(process.execPath, [
 assert.equal(startupResult.status, 0, "R-050-09: startup measurement failed");
 const startup = JSON.parse(startupResult.stdout);
 
-const workspace = await mkdtemp(path.join(tmpdir(), "runa-ts050-profile-"));
+const workspace = await mkdtemp(path.join(tmpdir(), "cuna-ts050-profile-"));
 const cache = path.join(workspace, "cache");
 let releasePrivateFactory;
 try {
   await mkdir(cache);
   await writeFile(path.join(workspace, "package.json"), `${JSON.stringify({
-    name: "runa-ts050-profile",
+    name: "cuna-ts050-profile",
     version: "0.0.0",
     private: true,
     type: "module",
@@ -91,7 +91,7 @@ try {
   releasePrivateFactory = seam.installPrivateTransportFactory(
     () => new OverheadBoundaryTransport(),
   );
-  const key = ["runa", "sk", "synthetic"].join("_");
+  const key = ["cuna", "sk", "synthetic"].join("_");
   const requestSamples = [];
   const allocationSamples = [];
   for (
@@ -99,7 +99,7 @@ try {
     warmup < catalog.profile.request_warmup_invocations;
     warmup += 1
   ) {
-    const client = new sdk.Runa({
+    const client = new sdk.Cuna({
       apiKey: key,
       baseUrl: "https://api.getcuna.com",
     });
@@ -107,7 +107,7 @@ try {
     await client.close();
   }
   for (let sample = 0; sample < 20; sample += 1) {
-    const client = new sdk.Runa({
+    const client = new sdk.Cuna({
       apiKey: key,
       baseUrl: "https://api.getcuna.com",
     });
@@ -147,7 +147,7 @@ try {
     return transport;
   });
 
-  const reuseClient = new sdk.Runa({
+  const reuseClient = new sdk.Cuna({
     apiKey: key,
     baseUrl: "https://api.getcuna.com",
   });
@@ -162,11 +162,11 @@ try {
   assert.equal(reuseTransport.closeCalls, 1);
   assert.equal(reuseTransport.closed, true);
 
-  const firstOriginClient = new sdk.Runa({
+  const firstOriginClient = new sdk.Cuna({
     apiKey: key,
     baseUrl: "https://api.getcuna.com",
   });
-  const secondOriginClient = new sdk.Runa({
+  const secondOriginClient = new sdk.Cuna({
     apiKey: key,
     baseUrl: "https://api.getcuna.com",
   });
@@ -180,7 +180,7 @@ try {
   await secondOriginClient.close();
 
   let injectedCalls = 0;
-  const injectedClient = new sdk.Runa({
+  const injectedClient = new sdk.Cuna({
     apiKey: key,
     baseUrl: "https://api.getcuna.com",
     fetch: async () => {
@@ -209,7 +209,7 @@ try {
     const heapBefore = process.memoryUsage().heapUsed;
     const batchStart = observedTransports.length;
     for (let cycle = 0; cycle < 100; cycle += 1) {
-      const client = new sdk.Runa({
+      const client = new sdk.Cuna({
         apiKey: key,
         baseUrl: "https://api.getcuna.com",
       });

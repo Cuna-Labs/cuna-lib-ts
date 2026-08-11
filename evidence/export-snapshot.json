@@ -7,8 +7,6 @@
     "ConfigError",
     "Cuna",
     "CunaError",
-    "Runa",
-    "RunaError",
     "Session",
     "stderrText",
     "stdoutText"
@@ -16,6 +14,7 @@
   "type_exports": [
     "Acknowledgement",
     "AssignedWorkspace",
+    "CunaConfig",
     "EstimatedUsage",
     "ExecOptions",
     "ExecResult",
@@ -26,7 +25,6 @@
     "OutboundPolicyMode",
     "Record",
     "RecordsManager",
-    "RunaConfig",
     "SessionAgent",
     "SessionCreateOptions",
     "SessionSnapshot",

@@ -82,14 +82,14 @@ export const EXPECTED_RELEASE_POLICY = Object.freeze({
   },
   sbom: {
     format: "CycloneDX 1.6 JSON",
-    schemaPath: ".runa/schemas/cyclonedx-1.6.schema.json",
+    schemaPath: ".cuna/schemas/cyclonedx-1.6.schema.json",
     verifier: "cyclonedx-cli@0.32.0 validate --input-format json --input-version v1_6",
   },
   sourceControl: {
     branchProtection: {
       directPushes: false, dismissStaleApprovals: true,
-      requireCodeOwnerReviews: true, requiredApprovingReviews: 0,
-      requiredStatusChecks: ["ts-quality-gates", "release-admission"],
+      requireCodeOwnerReviews: false, requiredApprovingReviews: 0,
+      requiredStatusChecks: ["ts-quality-gates", "release-admission", "CodeQL"],
     },
     provider: "github", releaseBranch: "main",
     repository: "Cuna-Labs/cuna-lib-ts",
@@ -128,7 +128,7 @@ export async function createReleaseManifestCore({
   const compatibilityCatalog = JSON.parse((await readBytes(
     repositoryRoot, "compatibility/ts-050-evidence-v1.json")).toString("utf8"));
   const releasePolicy = JSON.parse((await readBytes(
-    repositoryRoot, ".runa/release-policy.json")).toString("utf8"));
+    repositoryRoot, ".cuna/release-policy.json")).toString("utf8"));
   const contractIdentity = await loadCanonicalContractIdentity(repositoryRoot);
   assert.deepEqual(releasePolicy, EXPECTED_RELEASE_POLICY);
   assert.equal(candidate.package, packageJson.name);
@@ -256,7 +256,7 @@ export async function createReleaseManifestCore({
       release_mapping_jcs_sha256: await jsonDigest(
         repositoryRoot, "governance/release-mapping.json"),
       release_policy_jcs_sha256: await jsonDigest(
-        repositoryRoot, ".runa/release-policy.json"),
+        repositoryRoot, ".cuna/release-policy.json"),
       release_workflow_sha256: sha256(await readBytes(
         repositoryRoot, ".github/workflows/release.yml")),
     },

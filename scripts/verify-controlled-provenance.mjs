@@ -13,7 +13,7 @@ const lockfileSha256 = createHash("sha256").update(
 const workflowSha256 = createHash("sha256").update(
   await readFile(".github/workflows/ci.yml"),
 ).digest("hex");
-const bundleBytes = await readFile(process.env.RUNA_ATTESTATION_BUNDLE);
+const bundleBytes = await readFile(process.env.CUNA_ATTESTATION_BUNDLE);
 const statement = extractAttestationStatement(bundleBytes.toString("utf8"), candidate);
 const predicate = statement.predicate;
 const predicateBytes = Buffer.from(`${JSON.stringify(predicate, null, 2)}\n`);

@@ -110,11 +110,11 @@ interface PreparedRequest {
 }
 
 function safeTransportFailure(): TypeError {
-  return new TypeError("The Runa request failed.");
+  return new TypeError("The Cuna request failed.");
 }
 
 function timeoutFailure(): DOMException {
-  return new DOMException("The Runa request timed out.", "TimeoutError");
+  return new DOMException("The Cuna request timed out.", "TimeoutError");
 }
 
 function renderPath(
@@ -166,19 +166,19 @@ function prepare(
   let body: BodyInit | undefined;
   const binaryBody = operationKey === "workspaces.sync.chunk";
   if (binaryBody) {
-    if (!(input.bytes instanceof Uint8Array) || input.body !== undefined) throw new TypeError("The Runa request body is invalid.");
+    if (!(input.bytes instanceof Uint8Array) || input.body !== undefined) throw new TypeError("The Cuna request body is invalid.");
     body = input.bytes.slice().buffer;
   } else if (descriptor.hasRequestBody) {
     try {
       body = JSON.stringify(input.body);
     } catch {
-      throw new TypeError("The Runa request body is invalid.");
+      throw new TypeError("The Cuna request body is invalid.");
     }
     if (body === undefined) {
-      throw new TypeError("The Runa request body is invalid.");
+      throw new TypeError("The Cuna request body is invalid.");
     }
   } else if (input.body !== undefined) {
-    throw new TypeError("The Runa request body is invalid.");
+    throw new TypeError("The Cuna request body is invalid.");
   }
   const needsIdempotencyKey = operationKey === "agentSessions.create" ||
     operationKey === "agentSessions.createTerminalConnection" ||
@@ -190,7 +190,7 @@ function prepare(
     operationKey === "workspaces.sync.commit" ||
     operationKey === "workspaces.sync.reconcile";
   if (needsIdempotencyKey !== (input.idempotencyKey !== undefined)) {
-    throw new TypeError("The Runa idempotency key is invalid.");
+    throw new TypeError("The Cuna idempotency key is invalid.");
   }
   return Object.freeze({
     url: target.href,
@@ -283,7 +283,7 @@ function cancelResponseBody(response: Response): void {
 }
 
 function cancellationFailure(): DOMException {
-  return new DOMException("The Runa request was cancelled.", "AbortError");
+  return new DOMException("The Cuna request was cancelled.", "AbortError");
 }
 
 function signalAborted(signal?: AbortSignal): boolean {

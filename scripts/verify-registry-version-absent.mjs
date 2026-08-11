@@ -9,7 +9,7 @@ const candidate = JSON.parse(
 const mapping = JSON.parse(
   await readFile("governance/release-mapping.json", "utf8"),
 );
-if (process.env.RUNA_VERIFY_ONLY !== "true") {
+if (process.env.CUNA_VERIFY_ONLY !== "true") {
   await assertRegistryVersionAbsent({
   fetchImpl: globalThis.fetch,
   registry: mapping.registry,

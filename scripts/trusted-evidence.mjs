@@ -2,7 +2,6 @@ import { createHash, verify } from "node:crypto";
 
 const ACCEPTED_AUTHORITY_REPOSITORIES = new Set([
   "Cuna-Labs/cuna-release-authority",
-  "Runa-Laboratories/runa-release-authority",
 ]);
 
 const exactKeys = (value, fields) =>

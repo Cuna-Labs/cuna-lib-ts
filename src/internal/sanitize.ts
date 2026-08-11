@@ -13,6 +13,6 @@ function containsMarker(value: unknown): boolean {
 }
 
 export function sanitizeWire(value: unknown): unknown {
-  if (containsMarker(value)) throw new TypeError("Unsafe Runa response.");
+  if (containsMarker(value)) throw new TypeError("Unsafe Cuna response.");
   return value;
 }

@@ -215,7 +215,7 @@ Invokes the accepted public `list` operation owned by `RecordsManager`.
 **Example**
 
 ```ts
-await runa.records.list();
+await cuna.records.list();
 ```
 
 Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-RECORDS_LIST`

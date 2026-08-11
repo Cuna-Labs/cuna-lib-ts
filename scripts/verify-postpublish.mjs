@@ -17,11 +17,11 @@ const mapping = JSON.parse(await readFile("governance/release-mapping.json", "ut
 validateReleaseMapping(mapping);
 const candidate = JSON.parse(await readFile("release-artifacts/candidate.json", "utf8"));
 const release = resolveReleaseChannel(mapping, candidate.version);
-const bundle = process.env.RUNA_ATTESTATION_BUNDLE ??
+const bundle = process.env.CUNA_ATTESTATION_BUNDLE ??
   `evidence/${candidate.filename}.intoto.jsonl`;
 const receiptPath = "evidence/postpublish-receipt.json";
-const uploadedOnly = process.env.RUNA_VERIFY_UPLOADED_ONLY === "1";
-const registryTag = process.env.RUNA_REGISTRY_TAG ?? release.dist_tag;
+const uploadedOnly = process.env.CUNA_VERIFY_UPLOADED_ONLY === "1";
+const registryTag = process.env.CUNA_REGISTRY_TAG ?? release.dist_tag;
 await mkdir("evidence", { recursive: true });
 const transitions = ["published-unverified"];
 const writeState = async (state, extra = {}) => writeFile(receiptPath,

@@ -5,7 +5,7 @@ dist/
 .env.*
 !.env.example
 coverage/
-.runa-tmp/
+.sdk-tmp/
 evidence/vitest-acceptance.json
 evidence/vitest-oracle.json
 evidence/vitest-results.json

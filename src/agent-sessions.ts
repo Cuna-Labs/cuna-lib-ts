@@ -64,7 +64,7 @@ export type AgentSessionProcessState =
 export interface AgentSession {
   readonly id: string;
   readonly machineId: string;
-  /** Immutable Runa workspace-sync binding identifier. Absent only on legacy sessions. */
+  /** Immutable Cuna workspace-sync binding identifier. Absent only on legacy sessions. */
   readonly workspaceBindingId?: string;
   /** Immutable committed workspace generation. Absent only on legacy sessions. */
   readonly workspaceGeneration?: number;

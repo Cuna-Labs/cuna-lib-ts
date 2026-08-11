@@ -1,40 +1,40 @@
-import { Runa } from "@cuna_labs/sdk";
+import { Cuna } from "@cuna_labs/sdk";
 import type { Session } from "@cuna_labs/sdk";
 
-declare const runa: Runa;
+declare const cuna: Cuna;
 declare const session: Session;
 declare const sessionId: string;
 
-// example:runa-constructor
-const apiKey = process.env.RUNA_API_KEY;
-if (apiKey === undefined) throw new Error("RUNA_API_KEY is required.");
-const client = new Runa({ apiKey });
+// example:cuna-constructor
+const apiKey = process.env.CUNA_API_KEY;
+if (apiKey === undefined) throw new Error("CUNA_API_KEY is required.");
+const client = new Cuna({ apiKey });
 await client.close();
 // end-example
 
-// example:runa-me
-await runa.me();
+// example:cuna-me
+await cuna.me();
 // end-example
 
-// example:runa-close
-await runa.close();
+// example:cuna-close
+await cuna.close();
 // end-example
 
 // example:records-list
-await runa.records.list();
+await cuna.records.list();
 // end-example
 
 // example:sessions-create
-const created = await runa.sessions.create("worker", { agent: "codex" });
+const created = await cuna.sessions.create("worker", { agent: "codex" });
 if (created.snapshot.status === "creating") await created.refresh();
 // end-example
 
 // example:sessions-list
-await runa.sessions.list();
+await cuna.sessions.list();
 // end-example
 
 // example:sessions-get
-await runa.sessions.get(sessionId);
+await cuna.sessions.get(sessionId);
 // end-example
 
 // example:session-refresh

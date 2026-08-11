@@ -14,7 +14,6 @@ export const AUTHORITY_REPOSITORY = "Cuna-Labs/cuna-release-authority";
 export const AUTHORITY_WORKFLOW = ".github/workflows/release-authority.yml";
 const ACCEPTED_AUTHORITY_REPOSITORIES = new Set([
   AUTHORITY_REPOSITORY,
-  "Runa-Laboratories/runa-release-authority",
 ]);
 const API_ROOT = "https://api.github.com";
 const ASSET_NAMES = Object.freeze([

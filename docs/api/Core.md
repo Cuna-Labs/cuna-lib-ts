@@ -5,27 +5,14 @@ Generated from the released public TypeScript declarations.
 <a id="cuna"></a>
 ## Cuna
 
-Canonical Cuna client alias with the same lifecycle and managers as Runa.
+Constructible Cuna client that owns managers, transport lifecycle, and cleanup.
 
 **Kind:** runtime
 
 **Signature**
 
 ```ts
-alias Cuna
-```
-
-<a id="runa"></a>
-## Runa
-
-Constructible Runa client that owns managers, transport lifecycle, and cleanup.
-
-**Kind:** runtime
-
-**Signature**
-
-```ts
-class Runa
+class Cuna
 ```
 
 ### Public members
@@ -35,7 +22,7 @@ class Runa
 Constructs the documented public value.
 
 ```ts
-constructor(config?: RunaConfig): Runa
+constructor(config?: CunaConfig): Cuna
 ```
 
 #### sessions
@@ -110,11 +97,11 @@ Closes this client after already admitted work completes.
 close(): Promise<void>
 ```
 
-### Runa#constructor
+### Cuna#constructor
 
-Invokes the accepted public `constructor` operation owned by `Runa`.
+Invokes the accepted public `constructor` operation owned by `Cuna`.
 
-**Returns:** A configured Runa client.
+**Returns:** A configured Cuna client.
 
 - **config:** Optional client configuration resolved under the documented precedence rules.
 
@@ -125,17 +112,17 @@ Invokes the accepted public `constructor` operation owned by `Runa`.
 **Example**
 
 ```ts
-const apiKey = process.env.RUNA_API_KEY;
-if (apiKey === undefined) throw new Error("RUNA_API_KEY is required.");
-const client = new Runa({ apiKey });
+const apiKey = process.env.CUNA_API_KEY;
+if (apiKey === undefined) throw new Error("CUNA_API_KEY is required.");
+const client = new Cuna({ apiKey });
 await client.close();
 ```
 
-Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-RUNA_CONSTRUCTOR`
+Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-CUNA_CONSTRUCTOR`
 
-### Runa#me
+### Cuna#me
 
-Invokes the accepted public `me` operation owned by `Runa`.
+Invokes the accepted public `me` operation owned by `Cuna`.
 
 **Returns:** The caller profile and workspace state.
 
@@ -146,36 +133,36 @@ Invokes the accepted public `me` operation owned by `Runa`.
 **Example**
 
 ```ts
-await runa.me();
+await cuna.me();
 ```
 
-Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-RUNA_ME`
+Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-CUNA_ME`
 
-### Runa#close
+### Cuna#close
 
-Invokes the accepted public `close` operation owned by `Runa`.
+Invokes the accepted public `close` operation owned by `Cuna`.
 
 **Returns:** A promise that resolves after client-owned cleanup completes.
 
 **Example**
 
 ```ts
-await runa.close();
+await cuna.close();
 ```
 
-Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-RUNA_CLOSE`
+Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-CUNA_CLOSE`
 
-<a id="runaconfig"></a>
-## RunaConfig
+<a id="cunaconfig"></a>
+## CunaConfig
 
-Configuration accepted while constructing a Runa client.
+Configuration accepted while constructing a Cuna client.
 
 **Kind:** type
 
 **Signature**
 
 ```ts
-interface RunaConfig
+interface CunaConfig
 ```
 
 ### Public members
@@ -190,7 +177,7 @@ apiKey?: string
 
 #### baseUrl
 
-Optional explicit canonical Runa API origin.
+Optional explicit canonical Cuna API origin.
 
 ```ts
 baseUrl?: string

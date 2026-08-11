@@ -13,10 +13,10 @@ import {
 } from "../../docs/reference.config.mjs";
 
 const requiredPageOwnership = Object.freeze({
-  "Core.md": Object.freeze(["Cuna", "Runa", "RunaConfig"]),
+  "Core.md": Object.freeze(["Cuna", "CunaConfig"]),
   "Sessions.md": Object.freeze(["Session", "SessionsManager", "SessionAgent", "OutboundPolicyMode", "OutboundPolicy", "SessionCreateOptions", "SessionSnapshot", "SessionStatus", "ExecOptions", "ExecResult", "Acknowledgement", "OpenSessionResult"]),
   "Account-and-records.md": Object.freeze(["Me", "Workspace", "AssignedWorkspace", "UnassignedWorkspace", "EstimatedUsage", "RecordsManager", "Record"]),
-  "Shared.md": Object.freeze(["ConfigError", "ApiError", "CommandError", "CunaError", "RunaError", "OpaqueWireValue", "stdoutText", "stderrText"]),
+  "Shared.md": Object.freeze(["ConfigError", "ApiError", "CommandError", "CunaError", "OpaqueWireValue", "stdoutText", "stderrText"]),
 });
 
 const kindName = (node) => {
@@ -155,7 +155,7 @@ const validateContractReference = async (contractRef) => {
 const parseSourceTags = (text) => {
   const lines = text.split(/\r?\n/).filter((line) => line !== "");
   for (const line of lines) {
-    assert.match(line, /^@runa-contract [a-z0-9-]+ PRD-\d{3}#R-\d{3}-\d{2}$/);
+    assert.match(line, /^@cuna-contract [a-z0-9-]+ PRD-\d{3}#R-\d{3}-\d{2}$/);
   }
   assert.equal(new Set(lines).size, lines.length);
   return lines;
@@ -198,8 +198,8 @@ const validateReflectionDocumentation = (roots) => {
     const entryComment = entry.comment ?? entry.signatures?.[0]?.comment;
     assert(commentText(entryComment).length > 0, `R-048-04: missing summary:${entry.name}`);
     if (entry.kind !== 64) {
-      for (const tag of blockTags(entryComment, "@runa-contract")) {
-        observedContractTags.push(`@runa-contract ${blockText(tag)}`);
+      for (const tag of blockTags(entryComment, "@cuna-contract")) {
+        observedContractTags.push(`@cuna-contract ${blockText(tag)}`);
       }
     }
     for (const child of publicChildren(entry)) {
@@ -249,12 +249,12 @@ const validateReflectionDocumentation = (roots) => {
         `${expectedExample.sourcePath}#${expectedExample.marker}`,
         `R-048-09: example source mismatch:${operationKey}`);
     }
-    for (const tag of blockTags(signature.comment, "@runa-contract")) {
-      observedContractTags.push(`@runa-contract ${blockText(tag)}`);
+    for (const tag of blockTags(signature.comment, "@cuna-contract")) {
+      observedContractTags.push(`@cuna-contract ${blockText(tag)}`);
     }
   }
   const expectedTags = claimRegistry.flatMap((row) => row.contractRefs.map((contractRef) =>
-    `@runa-contract ${row.claimId} ${contractRef}`)).sort();
+    `@cuna-contract ${row.claimId} ${contractRef}`)).sort();
   assert.deepEqual(observedContractTags.sort(), expectedTags,
     "R-048-07: reflection contract tags do not match the claim registry");
   return true;
@@ -271,12 +271,12 @@ const validateRegistries = async (operations, sourceTags) => {
     assert(row.contractRefs.length > 0);
     for (const contractRef of row.contractRefs) await validateContractReference(contractRef);
     for (const contractRef of row.contractRefs) {
-      assert(sourceTags.includes(`@runa-contract ${row.claimId} ${contractRef}`));
+      assert(sourceTags.includes(`@cuna-contract ${row.claimId} ${contractRef}`));
     }
   }
   assert.equal(new Set(sourceTags).size, sourceTags.length);
   const expectedTags = claimRegistry.flatMap((row) => row.contractRefs.map((contractRef) =>
-    `@runa-contract ${row.claimId} ${contractRef}`)).sort();
+    `@cuna-contract ${row.claimId} ${contractRef}`)).sort();
   assert.deepEqual([...sourceTags].sort(), expectedTags);
   const operationKeys = operations.map((item) => item.operationKey).sort();
   assert.deepEqual(errorMatrix.map((item) => item.operationKey).sort(), operationKeys);
@@ -341,7 +341,7 @@ const memberDescriptions = Object.freeze({
   allowedHosts: "Optional ordered host allowlist copied into the create request.",
   apiKey: "Optional constructor API key selected before environment or explicit-file sources.",
   assigned: "Literal discriminator for the workspace assignment variant.",
-  baseUrl: "Optional explicit canonical Runa API origin.",
+  baseUrl: "Optional explicit canonical Cuna API origin.",
   capabilities: "Returns the stable capability discovery manager owned by this client.",
   checkpoint: "Creates one named checkpoint through the owning session handle.",
   close: "Closes this client after already admitted work completes.",
@@ -410,9 +410,9 @@ const memberDescriptions = Object.freeze({
 });
 
 const returnDescriptions = Object.freeze({
-  "Runa#constructor": "A configured Runa client.",
-  "Runa#me": "The caller profile and workspace state.",
-  "Runa#close": "A promise that resolves after client-owned cleanup completes.",
+  "Cuna#constructor": "A configured Cuna client.",
+  "Cuna#me": "The caller profile and workspace state.",
+  "Cuna#close": "A promise that resolves after client-owned cleanup completes.",
   "RecordsManager#list": "A fresh readonly ordered collection of records.",
   "SessionsManager#create": "A client-owned handle for the created session.",
   "SessionsManager#list": "A fresh readonly ordered collection of client-owned session handles.",
@@ -433,7 +433,7 @@ const returnDescriptions = Object.freeze({
 });
 
 const parameterDescriptions = Object.freeze({
-  "Runa#constructor.config": "Optional client configuration resolved under the documented precedence rules.",
+  "Cuna#constructor.config": "Optional client configuration resolved under the documented precedence rules.",
   "SessionsManager#create.name": "Session name containing between one and eighty characters.",
   "SessionsManager#create.options": "Optional agent, resource, host, and runtime-port settings.",
   "SessionsManager#get.id": "Exact canonical lowercase session UUID.",
@@ -562,7 +562,7 @@ const validateLinks = (files) => {
 
 const validateModel = (model, expectedNames) => {
   assert.deepEqual(model.entries.map((item) => item.name).sort(), expectedNames);
-  assert.equal(new Set(model.entries.map((item) => item.name)).size, 30);
+  assert.equal(new Set(model.entries.map((item) => item.name)).size, 28);
   for (const entry of model.entries) {
     assert.equal(curation[entry.name].page, entry.page);
     assert.equal(entry.signature.length > 3, true);
@@ -614,7 +614,7 @@ const mutationGate = (model, expectedNames, files, sourceTags) => {
   passed.push("example");
   const missingTag = sourceTags.slice(1);
   const expectedTags = claimRegistry.flatMap((row) => row.contractRefs.map((contractRef) =>
-    `@runa-contract ${row.claimId} ${contractRef}`)).sort();
+    `@cuna-contract ${row.claimId} ${contractRef}`)).sort();
   assert.throws(() => assert.deepEqual([...missingTag].sort(), expectedTags));
   passed.push("claim-tag");
   return passed;
@@ -626,27 +626,27 @@ const reflectionMutationGate = (roots) => {
     .find((item) => item.operationKey === key);
   const mutations = [
     ["reflection-tag-delete", (candidate) => {
-      const target = operation(candidate, "Runa#constructor").signature.comment.blockTags;
-      target.splice(target.findIndex((tag) => tag.tag === "@runa-contract"), 1);
+      const target = operation(candidate, "Cuna#constructor").signature.comment.blockTags;
+      target.splice(target.findIndex((tag) => tag.tag === "@cuna-contract"), 1);
     }],
     ["reflection-tag-change", (candidate) => {
-      const target = operation(candidate, "Runa#constructor").signature.comment.blockTags
-        .find((tag) => tag.tag === "@runa-contract");
-      target.content[0].text = target.content[0].text.replace("runa-constructor", "changed");
+      const target = operation(candidate, "Cuna#constructor").signature.comment.blockTags
+        .find((tag) => tag.tag === "@cuna-contract");
+      target.content[0].text = target.content[0].text.replace("cuna-constructor", "changed");
     }],
     ["reflection-param", (candidate) => {
-      operation(candidate, "Runa#constructor").signature.parameters[0].comment = undefined;
+      operation(candidate, "Cuna#constructor").signature.parameters[0].comment = undefined;
     }],
     ["reflection-returns", (candidate) => {
-      const tags = operation(candidate, "Runa#constructor").signature.comment.blockTags;
+      const tags = operation(candidate, "Cuna#constructor").signature.comment.blockTags;
       tags.splice(tags.findIndex((tag) => tag.tag === "@returns"), 1);
     }],
     ["reflection-throws", (candidate) => {
-      const tags = operation(candidate, "Runa#constructor").signature.comment.blockTags;
+      const tags = operation(candidate, "Cuna#constructor").signature.comment.blockTags;
       tags.splice(tags.findIndex((tag) => tag.tag === "@throws"), 1);
     }],
     ["reflection-example", (candidate) => {
-      const tag = operation(candidate, "Runa#constructor").signature.comment.blockTags
+      const tag = operation(candidate, "Cuna#constructor").signature.comment.blockTags
         .find((item) => item.tag === "@example");
       tag.content[0].text = "docs/reference/examples/workflows.ts#changed";
     }],
@@ -665,7 +665,7 @@ export async function runReferencePipeline({ write = true } = {}) {
   const reflection = JSON.parse(await readFile("docs/.reflection.json", "utf8"));
   const surface = JSON.parse(await readFile("evidence/export-snapshot.json", "utf8"));
   const expectedNames = [...surface.runtime_exports, ...surface.type_exports].sort();
-  assert.equal(expectedNames.length, 30);
+  assert.equal(expectedNames.length, 28);
   assert.deepEqual(Object.keys(curation).sort(), expectedNames);
   const reflectedRoots = (reflection.children ?? []).filter((entry) =>
     expectedNames.includes(entry.name));
@@ -684,7 +684,7 @@ export async function runReferencePipeline({ write = true } = {}) {
   const operations = entries.flatMap((entry) => entry.operations)
     .filter((operation) => errorMatrix.some((row) => row.operationKey === operation.operationKey))
     .sort((left, right) => left.operationKey.localeCompare(right.operationKey));
-  const sourceClaimBytes = await readFile("docs/reference/claims.runa-contract", "utf8");
+  const sourceClaimBytes = await readFile("docs/reference/claims.cuna-contract", "utf8");
   const sourceClaimTags = parseSourceTags(sourceClaimBytes);
   await validateRegistries(operations, sourceClaimTags);
   const model = { entries, operations };
@@ -730,7 +730,7 @@ export async function runReferencePipeline({ write = true } = {}) {
       operation_count: operations.length,
       claim_count: claimRegistry.length,
       source_claims_sha256: createHash("sha256").update(sourceClaimBytes).digest("hex"),
-      source_claims_owner: "docs/reference/claims.runa-contract",
+      source_claims_owner: "docs/reference/claims.cuna-contract",
       error_matrix_count: errorMatrix.length,
       example_count: Object.keys(examples).length,
       deterministic_output_sha256: outputDigest,

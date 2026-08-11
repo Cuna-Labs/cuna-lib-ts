@@ -10,15 +10,12 @@ const TEST_ID = /^TC-\d{3}-\d{2}$/u;
 const ACTIVE_AUTHORITY_REPOSITORY = "Cuna-Labs/cuna-release-authority";
 const ACCEPTED_AUTHORITY_REPOSITORIES = new Set([
   ACTIVE_AUTHORITY_REPOSITORY,
-  "Runa-Laboratories/runa-release-authority",
 ]);
 const ACCEPTED_SDK_REPOSITORIES = new Set([
   "Cuna-Labs/cuna-lib-ts",
-  "Runa-Laboratories/runa-lib-ts",
 ]);
 const ACCEPTED_PACKAGE_NAMES = new Set([
   "@cuna_labs/sdk",
-  "@runa_laboratories/sdk",
 ]);
 const AUTHORITY_WORKFLOW = ".github/workflows/release-authority.yml";
 
@@ -41,7 +38,7 @@ const artifact = (value, kind) => {
   exact(value, ["filename", "sha256"], `${kind} artifact`);
   assert.match(value.filename, kind === "wheel" ? /^[A-Za-z0-9_.-]+\.whl$/u :
     kind === "sdist" ? /^[A-Za-z0-9_.-]+\.tar\.gz$/u :
-      /^(?:cuna_labs|runa_laboratories)-sdk-[0-9A-Za-z.-]+\.tgz$/u);
+      /^cuna_labs-sdk-[0-9A-Za-z.-]+\.tgz$/u);
   sha256(value.sha256, `${kind}.sha256`);
 };
 
@@ -62,7 +59,7 @@ export function validateTrustedRolePayload(role, payload) {
     assert.match(payload.approver_identity, /^github-actor-id:[1-9][0-9]*$/u);
     assert.match(payload.approver_login, /^[A-Za-z0-9-]{1,39}$/u);
     assert.equal(payload.approver_role, "release-owner");
-    assert.equal(payload.policy_id, "RUNA-RELEASE-V1");
+    assert.equal(payload.policy_id, "CUNA-RELEASE-V1");
   } else if (role === "version-classification") {
     exact(payload, [
       "candidate_sha256", "classification", "expires_at", "issued_at",
@@ -86,8 +83,8 @@ export function validateTrustedRolePayload(role, payload) {
     assert.equal(payload.pull_request_required, true);
     assert.equal(payload.required_approving_reviews, 0);
     assert.equal(payload.dismiss_stale_reviews, true);
-    assert.deepEqual(payload.required_status_checks,
-      ["release-admission", "ts-quality-gates"]);
+    assert.deepEqual([...payload.required_status_checks].sort(),
+      ["CodeQL", "release-admission", "ts-quality-gates"]);
     assert.equal(payload.administrators_enforced, true);
     assert.equal(payload.force_pushes_allowed, false);
     assert.equal(payload.deletions_allowed, false);
@@ -162,9 +159,9 @@ export function validateTrustedRolePayload(role, payload) {
       sha256: "454879e6a4a405c8a13bff49b8982adcb0596f3019b26b0811c66e4d7f0783e1",
     });
     assert.deepEqual(payload.schema_sha256s, {
-      ".runa/schemas/cyclonedx-1.6.schema.json": "3e92dddbc30cf7f6a02b80f0942b1a4cfd4fb1c26f1dfc4310afa9d613cafb93",
-      ".runa/schemas/jsf-0.82.schema.json": "8bae002c25e723db7ee1f26afde680ae1a2b1a8f6b4b4b0fd65dc3becb090aae",
-      ".runa/schemas/spdx.schema.json": "baa9d3bd1ed57b6751b0887edead6b5063ff53ff7429cf85d476c6c94af0166e",
+      ".cuna/schemas/cyclonedx-1.6.schema.json": "3e92dddbc30cf7f6a02b80f0942b1a4cfd4fb1c26f1dfc4310afa9d613cafb93",
+      ".cuna/schemas/jsf-0.82.schema.json": "8bae002c25e723db7ee1f26afde680ae1a2b1a8f6b4b4b0fd65dc3becb090aae",
+      ".cuna/schemas/spdx.schema.json": "baa9d3bd1ed57b6751b0887edead6b5063ff53ff7429cf85d476c6c94af0166e",
     });
   } else if (role === "external-interfaces") {
     exact(payload, [

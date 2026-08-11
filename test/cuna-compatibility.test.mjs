@@ -4,11 +4,11 @@ import { test } from "vitest";
 import {
   Cuna,
   CunaError,
-  Runa,
-  RunaError,
 } from "../dist/index.js";
 
-test("Cuna names alias the stable Runa public API", () => {
-  assert.equal(Cuna, Runa);
-  assert.equal(CunaError, RunaError);
+test("the public SDK surface is Cuna-native", async () => {
+  assert.equal(Cuna.name, "Cuna");
+  assert.equal(CunaError.name, "CunaError");
+  assert.equal("Runa" in await import("../dist/index.js"), false);
+  assert.equal("RunaError" in await import("../dist/index.js"), false);
 });

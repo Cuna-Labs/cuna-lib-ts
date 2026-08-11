@@ -87,7 +87,7 @@ const sbomBytes = Buffer.from(`${JSON.stringify(sbom, null, 2)}\n`);
 await writeFile("evidence/sbom.cdx.json", sbomBytes);
 const sbomLocalValidation = await validateSbomWithPinnedTools(
   "evidence/sbom.cdx.json",
-  process.env.RUNA_CYCLONEDX_CLI ?? "cyclonedx-cli",
+  process.env.CUNA_CYCLONEDX_CLI ?? "cyclonedx-cli",
 );
 await writeFile("evidence/sbom-local-validation.json",
   `${JSON.stringify(sbomLocalValidation, null, 2)}\n`);

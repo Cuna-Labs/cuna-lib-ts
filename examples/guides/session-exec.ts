@@ -1,10 +1,10 @@
-import { Runa, stdoutText } from "@cuna_labs/sdk";
+import { Cuna, stdoutText } from "@cuna_labs/sdk";
 
-const runa = new Runa();
+const cuna = new Cuna();
 try {
-  const session = await runa.sessions.get(process.env.RUNA_SESSION_ID ?? "");
+  const session = await cuna.sessions.get(process.env.CUNA_SESSION_ID ?? "");
   const result = await session.exec(["printf", "%s", "hello"], { timeoutSecs: 30 });
-  process.stdout.write(stdoutText(result));
+  process.stdout.write(stdoutText(result) ?? "");
 } finally {
-  await runa.close();
+  await cuna.close();
 }

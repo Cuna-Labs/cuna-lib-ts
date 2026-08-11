@@ -239,7 +239,7 @@ function digest(value: unknown): string {
 
 function key(value: unknown): string {
   if (typeof value !== "string" || !IDEMPOTENCY.test(value)) {
-    throw new TypeError("The Runa idempotency key is invalid.");
+    throw new TypeError("The Cuna idempotency key is invalid.");
   }
   return value;
 }

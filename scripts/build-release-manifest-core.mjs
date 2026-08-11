@@ -6,7 +6,7 @@ import {
   releaseManifestCoreBytes,
 } from "./release-manifest-core.mjs";
 
-const handoffRoot = process.env.RUNA_HANDOFF_ROOT ?? ".";
+const handoffRoot = process.env.CUNA_HANDOFF_ROOT ?? ".";
 const core = await createReleaseManifestCore({ handoffRoot });
 const output = path.join(
   handoffRoot,

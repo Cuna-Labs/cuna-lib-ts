@@ -100,7 +100,7 @@ test("the scanner spells no brand outside its literal exclusion list", async () 
  */
 test("the scanner's excluded directories are literals no authority can grow", () => {
   assert.deepEqual([...ignoredDirectories], [
-    ".codex-work", ".git", ".runa-tmp", "coverage", "node_modules",
+    ".codex-work", ".git", ".sdk-tmp", "coverage", "node_modules",
   ]);
   assert.equal(ignoredDirectories.includes(".cuna-tmp"), false,
     "an exclusion derived from the accept list turns every future brand into a blind spot");

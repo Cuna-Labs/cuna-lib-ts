@@ -38,7 +38,7 @@ code: "config_error"
 Fixed safe English public error message.
 
 ```ts
-message: "Runa SDK configuration is invalid."
+message: "Cuna SDK configuration is invalid."
 ```
 
 #### constructor
@@ -99,7 +99,7 @@ status: number
 Fixed safe English public error message.
 
 ```ts
-message: "The Runa API request failed." | "The Runa API returned an invalid response."
+message: "The Cuna API request failed." | "The Cuna API returned an invalid response."
 ```
 
 #### problem
@@ -169,27 +169,14 @@ message: "The session command failed."
 <a id="cunaerror"></a>
 ## CunaError
 
-Canonical Cuna alias for the normalized public SDK error base class.
+Base class for normalized public Cuna SDK errors.
 
 **Kind:** runtime
 
 **Signature**
 
 ```ts
-alias CunaError
-```
-
-<a id="runaerror"></a>
-## RunaError
-
-Base class for normalized public Runa SDK errors.
-
-**Kind:** runtime
-
-**Signature**
-
-```ts
-class RunaError
+class CunaError
 ```
 
 ### Public members

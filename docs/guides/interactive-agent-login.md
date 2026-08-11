@@ -5,10 +5,10 @@ can use the user's provider subscription through an interactive login. The SDK
 does not accept or embed a provider API key for this flow.
 
 ```ts
-const agentSession = await runa.agentSessions.get(
+const agentSession = await cuna.agentSessions.get(
   "22222222-2222-4222-8222-222222222222",
 );
-const authentication = await runa.agentSessions.agentAuth(agentSession);
+const authentication = await cuna.agentSessions.agentAuth(agentSession);
 
 if (authentication.state === "login_required") {
   // Present the product's terminal sign-in flow. Never infer authentication

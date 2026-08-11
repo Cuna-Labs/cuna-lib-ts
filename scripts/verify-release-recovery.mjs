@@ -15,7 +15,7 @@ import {
 } from "./postpublish-policy.mjs";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
-const tag = process.env.RUNA_RELEASE_TAG;
+const tag = process.env.CUNA_RELEASE_TAG;
 const repository = process.env.GITHUB_REPOSITORY;
 assert.match(tag ?? "", /^ts-v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/u);
 assert.equal(repository, "Cuna-Labs/cuna-lib-ts");

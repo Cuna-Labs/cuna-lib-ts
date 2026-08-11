@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "vitest";
-import { Runa } from "../dist/index.js";
+import { Cuna } from "../dist/index.js";
 import { API_KEY, jsonResponse, meFixture, openUrl, recordFixture, sessionFixture } from "./helpers.mjs";
 
 test("PRD-019/054 five synthetic journeys pass 30 times with cleanup", async () => {
@@ -22,12 +22,12 @@ test("PRD-019/054 five synthetic journeys pass 30 times with cleanup", async () 
     return jsonResponse(sessionFixture());
   };
   for (let run = 0; run < 30; run += 1) {
-    let runa = new Runa({ apiKey: API_KEY, baseUrl: "https://api.getcuna.com", fetch });
+    let runa = new Cuna({ apiKey: API_KEY, baseUrl: "https://api.getcuna.com", fetch });
     await runa.me(); await runa.close(); counts.ttfc += 1;
-    runa = new Runa({ apiKey: API_KEY, baseUrl: "https://api.getcuna.com", fetch });
+    runa = new Cuna({ apiKey: API_KEY, baseUrl: "https://api.getcuna.com", fetch });
     await runa.records.list(); await runa.close(); counts.records += 1;
     for (const journey of ["first-session", "first-exec", "lifecycle-open"]) {
-      runa = new Runa({ apiKey: API_KEY, baseUrl: "https://api.getcuna.com", fetch });
+      runa = new Cuna({ apiKey: API_KEY, baseUrl: "https://api.getcuna.com", fetch });
       const session = await runa.sessions.create(journey);
       try {
         if (journey === "first-exec") await session.exec("true");

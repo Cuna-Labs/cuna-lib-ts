@@ -1,9 +1,9 @@
-import { Runa } from "@cuna_labs/sdk";
+import { Cuna } from "@cuna_labs/sdk";
 
-const runa = new Runa();
+const cuna = new Cuna();
 try {
-  const session = await runa.sessions.create("cleanup");
+  const session = await cuna.sessions.create("cleanup");
   await session.delete();
 } finally {
-  await runa.close();
+  await cuna.close();
 }

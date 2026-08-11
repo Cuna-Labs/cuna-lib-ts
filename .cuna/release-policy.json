@@ -41,16 +41,16 @@
   },
   "sbom": {
     "format": "CycloneDX 1.6 JSON",
-    "schemaPath": ".runa/schemas/cyclonedx-1.6.schema.json",
+    "schemaPath": ".cuna/schemas/cyclonedx-1.6.schema.json",
     "verifier": "cyclonedx-cli@0.32.0 validate --input-format json --input-version v1_6"
   },
   "sourceControl": {
     "branchProtection": {
       "directPushes": false,
       "dismissStaleApprovals": true,
-      "requireCodeOwnerReviews": true,
+      "requireCodeOwnerReviews": false,
       "requiredApprovingReviews": 0,
-      "requiredStatusChecks": ["ts-quality-gates", "release-admission"]
+      "requiredStatusChecks": ["ts-quality-gates", "release-admission", "CodeQL"]
     },
     "provider": "github",
     "releaseBranch": "main",

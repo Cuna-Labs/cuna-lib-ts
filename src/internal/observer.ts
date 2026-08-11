@@ -1,4 +1,4 @@
-import { ApiError, RunaError } from "../errors.js";
+import { ApiError, CunaError } from "../errors.js";
 import type {
   DiagnosticEvent,
   DiagnosticSink,
@@ -152,7 +152,7 @@ export class OperationObserver {
       } else {
         outcome = "error";
         severity = "ERROR";
-        if (error instanceof RunaError) error_code = error.code;
+        if (error instanceof CunaError) error_code = error.code;
         if (error instanceof ApiError) http_status = error.status;
       }
     }

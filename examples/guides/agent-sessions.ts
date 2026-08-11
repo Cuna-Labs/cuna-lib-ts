@@ -1,11 +1,11 @@
-import { Runa } from "@cuna_labs/sdk";
+import { Cuna } from "@cuna_labs/sdk";
 
-const runa = new Runa();
+const cuna = new Cuna();
 try {
-  const page = await runa.agentSessions.list("11111111-1111-4111-8111-111111111111", {
+  const page = await cuna.agentSessions.list("11111111-1111-4111-8111-111111111111", {
     limit: 25,
   });
-  const created = await runa.agentSessions.create(
+  const created = await cuna.agentSessions.create(
     "11111111-1111-4111-8111-111111111111",
     {
       idempotencyKey: crypto.randomUUID(),
@@ -16,11 +16,11 @@ try {
       name: "review",
     },
   );
-  const authentication = await runa.agentSessions.agentAuth(created);
-  await runa.agentSessions.rename(created.id, "review-api");
-  await runa.agentSessions.terminate(created.id);
+  const authentication = await cuna.agentSessions.agentAuth(created);
+  await cuna.agentSessions.rename(created.id, "review-api");
+  await cuna.agentSessions.terminate(created.id);
   console.log(page.nextCursor);
   console.log(authentication.state);
 } finally {
-  await runa.close();
+  await cuna.close();
 }

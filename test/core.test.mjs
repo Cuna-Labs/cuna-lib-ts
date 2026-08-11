@@ -8,8 +8,8 @@ import {
   ApiError,
   CommandError,
   ConfigError,
-  Runa,
-  RunaError,
+  Cuna,
+  CunaError,
   Session,
   stderrText,
   stdoutText,
@@ -165,7 +165,7 @@ test("PRD-001/023 reject prohibited hosts including trailing dot", () => {
   );
 });
 
-test("PRD-023 accepts canonical Cuna and legacy Runa API origins", () => {
+test("PRD-023 accepts canonical Cuna and legacy Cuna API origins", () => {
   for (const baseUrl of [
     "https://example.invalid",
     "https://api.runacode.io.example.invalid",
@@ -188,17 +188,17 @@ test("PRD-023 accepts canonical Cuna and legacy Runa API origins", () => {
 
 test("PRD-024 exposes the closed error surface", () => {
   const config = new ConfigError();
-  assert.equal(config.message, "Runa SDK configuration is invalid.");
+  assert.equal(config.message, "Cuna SDK configuration is invalid.");
   assert(config instanceof Error);
-  assert(config instanceof RunaError);
+  assert(config instanceof CunaError);
 
   const api = new ApiError(409);
   assert.equal(api.code, "api_error");
   assert.equal(api.status, 409);
-  assert.equal(api.message, "The Runa API request failed.");
+  assert.equal(api.message, "The Cuna API request failed.");
 
   const malformed = new ApiError(200, "malformed_response");
-  assert.equal(malformed.message, "The Runa API returned an invalid response.");
+  assert.equal(malformed.message, "The Cuna API returned an invalid response.");
   assert.throws(() => new CommandError(), TypeError);
   assert.throws(() => new Session(), TypeError);
   assert.deepEqual(Reflect.ownKeys(Session), [
@@ -214,8 +214,8 @@ test("PRD-024 exposes the closed error surface", () => {
       ApiError,
       CommandError,
       ConfigError,
-      Runa,
-      RunaError,
+      Cuna,
+      CunaError,
       Session,
       stderrText,
       stdoutText,
@@ -224,8 +224,8 @@ test("PRD-024 exposes the closed error surface", () => {
       "ApiError",
       "CommandError",
       "ConfigError",
-      "Runa",
-      "RunaError",
+      "Cuna",
+      "CunaError",
       "Session",
       "stderrText",
       "stdoutText",

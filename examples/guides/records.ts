@@ -1,8 +1,8 @@
-import { Runa } from "@cuna_labs/sdk";
+import { Cuna } from "@cuna_labs/sdk";
 
-const runa = new Runa();
+const cuna = new Cuna();
 try {
-  await runa.records.list();
+  await cuna.records.list();
 } finally {
-  await runa.close();
+  await cuna.close();
 }

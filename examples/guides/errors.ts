@@ -1,11 +1,11 @@
-import { ApiError, ConfigError, Runa } from "@cuna_labs/sdk";
+import { ApiError, ConfigError, Cuna } from "@cuna_labs/sdk";
 
 try {
-  const runa = new Runa();
+  const cuna = new Cuna();
   try {
-    await runa.me();
+    await cuna.me();
   } finally {
-    await runa.close();
+    await cuna.close();
   }
 } catch (error) {
   if (error instanceof ConfigError || error instanceof ApiError) {

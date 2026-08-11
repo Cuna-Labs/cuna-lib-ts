@@ -41,7 +41,7 @@ try {
   const install = npmRun(["install", "--ignore-scripts", "--no-audit", "--no-fund"], { cwd: workspace });
   assert.equal(install.status, 0);
   const probe = spawnSync(process.execPath, ["--input-type=module", "-e",
-    "import('@cuna_labs/sdk').then(m=>{if(Object.keys(m).length!==10)process.exit(2)})"], {
+    "import('@cuna_labs/sdk').then(m=>{const expected=['ApiError','CommandError','ConfigError','Cuna','CunaError','Session','stderrText','stdoutText'];if(JSON.stringify(Object.keys(m).sort())!==JSON.stringify(expected))process.exit(2)})"], {
     cwd: workspace, encoding: "utf8"
   });
   assert.equal(probe.status, 0);

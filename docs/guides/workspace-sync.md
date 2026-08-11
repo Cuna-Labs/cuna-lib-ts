@@ -6,13 +6,13 @@ connects a local project to a machine. Use `workspaceId` in workspace routes and
 
 The bounded workflow is:
 
-1. `runa.workspaceSync.begin(...)`
-2. `runa.workspaceSync.negotiate(...)` for each manifest page
-3. `runa.workspaceSync.uploadChunk(...)` for each missing local digest
-4. `runa.workspaceSync.downloadChunk(...)` for content referenced by remote changes
-5. `runa.workspaceSync.commit(...)`
-6. `runa.workspaceSync.changes(...)`
-7. `runa.workspaceSync.reconcile(...)` when explicit convergence evidence is needed
+1. `cuna.workspaceSync.begin(...)`
+2. `cuna.workspaceSync.negotiate(...)` for each manifest page
+3. `cuna.workspaceSync.uploadChunk(...)` for each missing local digest
+4. `cuna.workspaceSync.downloadChunk(...)` for content referenced by remote changes
+5. `cuna.workspaceSync.commit(...)`
+6. `cuna.workspaceSync.changes(...)`
+7. `cuna.workspaceSync.reconcile(...)` when explicit convergence evidence is needed
 
 `downloadChunk(syncId, digest)` returns a fresh `Uint8Array`. The SDK validates canonical base64,
 the declared byte length, protocol-reader compatibility, the requested digest, and the computed

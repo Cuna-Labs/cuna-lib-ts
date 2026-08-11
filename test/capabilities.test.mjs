@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "vitest";
 
-import { ApiError, Runa } from "../dist/index.js";
+import { ApiError, Cuna } from "../dist/index.js";
 import {
   API_KEY,
   SESSION_ID,
@@ -16,7 +16,7 @@ function capabilityResponse(value, status = 200) {
 
 test("capabilities.get sends the exact account query and decodes leased evidence", async () => {
   const calls = [];
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (url, init) => {
       calls.push({ url: new URL(url), init });
@@ -52,7 +52,7 @@ test("machine discovery binds the resource query to the returned subject", async
     subject_scope: "machine",
     subject_id: SESSION_ID,
   });
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (url) => {
       target = new URL(url);
@@ -74,7 +74,7 @@ test("agent-session discovery binds the resource query to the returned subject",
     subject_scope: "agent_session",
     subject_id: SESSION_ID,
   });
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (url) => {
       target = new URL(url);
@@ -102,7 +102,7 @@ test("capability requests and decoders fail closed without provider leakage", as
     }] }),
     capabilitySnapshotFixture({ expires_at: "2026-08-08T11:59:59.000Z" }),
   ];
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => {
       calls += 1;
@@ -124,7 +124,7 @@ test("capability requests and decoders fail closed without provider leakage", as
 });
 
 test("capability response ETag must match the body digest", async () => {
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => jsonResponse(
       capabilitySnapshotFixture(),

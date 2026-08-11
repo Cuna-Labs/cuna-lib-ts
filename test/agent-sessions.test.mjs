@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "vitest";
 
-import { ApiError, Runa } from "../dist/index.js";
+import { ApiError, Cuna } from "../dist/index.js";
 import { API_KEY, jsonResponse } from "./helpers.mjs";
 
 const MACHINE_ID = "11111111-1111-4111-8111-111111111111";
@@ -74,7 +74,7 @@ function authFixture(overrides = {}) {
 
 test("AgentSession auth is child-scoped, immutable, fresh, and authority-bound", async () => {
   const calls = [];
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (url, init) => {
       calls.push({ url: String(url), init });
@@ -122,7 +122,7 @@ test("AgentSession auth rejects stale, contradictory, cacheable, and sibling evi
     { payload: authFixture(), headers: {} },
   ];
   for (const item of cases) {
-    const runa = new Runa({
+    const runa = new Cuna({
       apiKey: API_KEY,
       fetch: async (url) => new URL(url).pathname.endsWith("/agent-auth")
         ? jsonResponse(item.payload, 200, item.headers ?? { "cache-control": "no-store" })
@@ -139,7 +139,7 @@ test("AgentSession auth rejects stale, contradictory, cacheable, and sibling evi
 
 test("AgentSession unavailable auth preserves an empty evidence lease", async () => {
   const observed = new Date().toISOString();
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (url) => new URL(url).pathname.endsWith("/agent-auth")
       ? jsonResponse(authFixture({
@@ -160,7 +160,7 @@ test("AgentSession unavailable auth preserves an empty evidence lease", async ()
 
 test("AgentSession methods preserve the authoritative wire contract", async () => {
   const calls = [];
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (url, init) => {
       calls.push({ url: String(url), init });
@@ -259,7 +259,7 @@ test("terminal connection input and grant decoding are closed and effect-bounded
         { name: "resume", availability: "supported" },
       ] }),
     ];
-    const runa = new Runa({
+    const runa = new Cuna({
       apiKey: API_KEY,
       fetch: async () => {
         calls += 1;
@@ -305,7 +305,7 @@ test("terminal connection Problem responses remain typed without exposing raw fi
     detail: "Another client owns the attachment.",
     action: "none",
   };
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => jsonResponse(problem, 409),
   });
@@ -336,7 +336,7 @@ test("terminal connection Problem responses remain typed without exposing raw fi
 });
 
 test("malformed Problem metadata is discarded instead of widening the public error", async () => {
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => jsonResponse({
       type: "https://api.runacode.io/problems/attachment_conflict",
@@ -366,7 +366,7 @@ test("malformed Problem metadata is discarded instead of widening the public err
 
 test("AgentSession validation and strict decoding fail closed", async () => {
   let calls = 0;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async () => {
       calls += 1;
@@ -409,7 +409,7 @@ test("AgentSession validation and strict decoding fail closed", async () => {
   assert.equal(calls, 1);
   await runa.close();
 
-  const expiredLease = new Runa({
+  const expiredLease = new Cuna({
     apiKey: API_KEY,
     fetch: async () => jsonResponse(fixture({ runtime_expires_at: "not-a-date" })),
   });
@@ -427,7 +427,7 @@ test("AgentSession validation and strict decoding fail closed", async () => {
     for (const key of Object.keys(partial)) {
       if (partial[key] === undefined) delete partial[key];
     }
-    const invalidWorkspace = new Runa({
+    const invalidWorkspace = new Cuna({
       apiKey: API_KEY,
       fetch: async () => jsonResponse(partial),
     });
@@ -441,7 +441,7 @@ test("AgentSession validation and strict decoding fail closed", async () => {
   const legacy = fixture();
   delete legacy.workspace_binding_id;
   delete legacy.workspace_generation;
-  const legacyReader = new Runa({ apiKey: API_KEY, fetch: async () => jsonResponse(legacy) });
+  const legacyReader = new Cuna({ apiKey: API_KEY, fetch: async () => jsonResponse(legacy) });
   const legacySession = await legacyReader.agentSessions.get(AGENT_SESSION_ID);
   assert.equal(legacySession.workspaceBindingId, undefined);
   assert.equal(legacySession.workspaceGeneration, undefined);
@@ -450,7 +450,7 @@ test("AgentSession validation and strict decoding fail closed", async () => {
   const renamedWireField = fixture();
   renamedWireField.workspace_id = renamedWireField.workspace_binding_id;
   delete renamedWireField.workspace_binding_id;
-  const renamedWireReader = new Runa({
+  const renamedWireReader = new Cuna({
     apiKey: API_KEY,
     fetch: async () => jsonResponse(renamedWireField),
   });
@@ -466,7 +466,7 @@ test("AgentSession create rejects substituted workspace authority", async () => 
     { workspace_binding_id: "88888888-8888-4888-8888-888888888888" },
     { workspace_generation: WORKSPACE_GENERATION + 1 },
   ]) {
-    const runa = new Runa({
+    const runa = new Cuna({
       apiKey: API_KEY,
       fetch: async () => jsonResponse(fixture(substitution), 201),
     });
