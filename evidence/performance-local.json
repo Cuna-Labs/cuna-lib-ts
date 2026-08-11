@@ -3,7 +3,7 @@
   "status": "PASS",
   "identity": {
     "artifact_sha256": "a93bbaacd2921942a0b74487f720924683e0b6c2a13e995e2938b1fb49265002",
-    "catalog_sha256": "cd52a60ba3c71da47d4ddf2b9a41c1e98cc93b7d443c5e44eeee0340840fded5",
+    "catalog_sha256": "32c7cd55c860987eaab6d074cb032059f68baa2569521eac592281a756de10a7",
     "catalog_revision": "TS-050-EVIDENCE-V1",
     "matrix_cell": null,
     "environment_classification": "local-non-matrix"
@@ -36,12 +36,12 @@
   },
   "metrics": {
     "tarball_bytes": 107071,
-    "import_p95_ms": 57.31060000000001,
-    "construction_p95_ms": 0.5908000000000015,
-    "request_overhead_p95_ms": 0.0036000000000058208,
-    "allocation_delta_bytes_max": 120384,
+    "import_p95_ms": 32.0094,
+    "construction_p95_ms": 0.3342000000000027,
+    "request_overhead_p95_ms": 0.006699999999909778,
+    "allocation_delta_bytes_max": 251072,
     "connection_establishments": 1,
-    "retained_memory_delta_bytes_p95": 1213232,
+    "retained_memory_delta_bytes_p95": 1693952,
     "openConnections": 0,
     "poolEntries": 0,
     "timers": 0,
