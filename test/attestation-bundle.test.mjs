@@ -3,7 +3,7 @@ import { test } from "vitest";
 import { validateAttestationJsonl } from "../scripts/attestation-bundle.mjs";
 
 const candidate = {
-  filename: "runa_laboratories-sdk-1.2.3.tgz",
+  filename: "cuna_labs-sdk-1.2.3.tgz",
   sha256: "a".repeat(64),
 };
 const statement = {

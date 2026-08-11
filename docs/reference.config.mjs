@@ -1,23 +1,20 @@
 const pages = Object.freeze({
-  "Core.md": ["Runa", "RunaConfig"],
-  "Sessions.md": ["Session", "SessionsManager", "SessionAgent", "AgentAuthenticationMethod", "AgentAuthenticationState", "AgentAuthenticationStatus", "OutboundPolicyMode", "OutboundPolicy", "SessionCreateOptions", "SessionSnapshot", "SessionStatus", "ExecOptions", "ExecResult", "Acknowledgement", "OpenSessionResult"],
+  "Core.md": ["Cuna", "CunaConfig"],
+  "Sessions.md": ["Session", "SessionsManager", "SessionAgent", "OutboundPolicyMode", "OutboundPolicy", "SessionCreateOptions", "SessionSnapshot", "SessionStatus", "ExecOptions", "ExecResult", "Acknowledgement", "OpenSessionResult"],
   "Account-and-records.md": ["Me", "Workspace", "AssignedWorkspace", "UnassignedWorkspace", "EstimatedUsage", "RecordsManager", "Record"],
-  "Shared.md": ["ConfigError", "ApiError", "CommandError", "RunaError", "OpaqueWireValue", "stdoutText", "stderrText"],
+  "Shared.md": ["ConfigError", "ApiError", "CommandError", "CunaError", "OpaqueWireValue", "stdoutText", "stderrText"],
 });
 
 const summaries = Object.freeze({
-  Runa: "Constructible Runa client that owns managers, transport lifecycle, and cleanup.",
-  RunaConfig: "Configuration accepted while constructing a Runa client.",
+  Cuna: "Constructible Cuna client that owns managers, transport lifecycle, and cleanup.",
+  CunaConfig: "Configuration accepted while constructing a Cuna client.",
   ConfigError: "Safe public error raised when selected client configuration is invalid.",
   ApiError: "Safe public error for an API failure or malformed successful response.",
   CommandError: "Reserved non-constructible public command-error type.",
-  RunaError: "Base class for normalized public Runa SDK errors.",
+  CunaError: "Base class for normalized public Cuna SDK errors.",
   Session: "Client-owned session handle with an immutable current snapshot and bounded operations.",
   SessionsManager: "Client-owned entry point for creating, listing, and retrieving sessions.",
   SessionAgent: "Accepted agent identifier for a session.",
-  AgentAuthenticationMethod: "Authentication method selected for a session agent.",
-  AgentAuthenticationState: "Secret-free authentication state reported for a session agent.",
-  AgentAuthenticationStatus: "Secret-free authentication status of a session agent.",
   OutboundPolicyMode: "Accepted outbound network policy mode.",
   OutboundPolicy: "Explicit allow-list or deny-list policy for session creation.",
   SessionCreateOptions: "Optional agent provisioning, resources, and network policy supplied during session creation.",
@@ -40,18 +37,15 @@ const summaries = Object.freeze({
 });
 
 const entryContracts = Object.freeze({
-  Runa: "PRD-023#R-023-01",
-  RunaConfig: "PRD-023#R-023-01",
+  Cuna: "PRD-023#R-023-01",
+  CunaConfig: "PRD-023#R-023-01",
   ConfigError: "PRD-024#R-024-01",
   ApiError: "PRD-024#R-024-01",
   CommandError: "PRD-024#R-024-01",
-  RunaError: "PRD-024#R-024-01",
+  CunaError: "PRD-024#R-024-01",
   Session: "PRD-031#R-031-01",
   SessionsManager: "PRD-027#R-027-01",
   SessionAgent: "PRD-022#R-022-02",
-  AgentAuthenticationMethod: "PRD-022#R-022-02",
-  AgentAuthenticationState: "PRD-022#R-022-02",
-  AgentAuthenticationStatus: "PRD-022#R-022-02",
   OutboundPolicyMode: "PRD-028#R-028-01",
   OutboundPolicy: "PRD-028#R-028-01",
   SessionCreateOptions: "PRD-028#R-028-01",
@@ -74,9 +68,9 @@ const entryContracts = Object.freeze({
 });
 
 const operationDefinitions = [
-  ["Runa#constructor", "PRD-023#R-023-01", "runa-constructor", true],
-  ["Runa#me", "PRD-036#R-036-01", "runa-me", true],
-  ["Runa#close", "PRD-027#R-027-10", "runa-close", true],
+  ["Cuna#constructor", "PRD-023#R-023-01", "cuna-constructor", true],
+  ["Cuna#me", "PRD-036#R-036-01", "cuna-me", true],
+  ["Cuna#close", "PRD-027#R-027-10", "cuna-close", true],
   ["RecordsManager#list", "PRD-037#R-037-01", "records-list", true],
   ["SessionsManager#create", "PRD-028#R-028-01", "sessions-create", true],
   ["SessionsManager#list", "PRD-029#R-029-01", "sessions-list", true],
@@ -90,7 +84,6 @@ const operationDefinitions = [
   ["Session#exec", "PRD-033#R-033-01", "session-exec", true],
   ["Session#checkpoint", "PRD-034#R-034-01", "session-checkpoint", true],
   ["Session#open", "PRD-035#R-035-01", "session-open", true],
-  ["Session#authenticationStatus", "PRD-031#R-031-01", "session-authentication-status", true],
   ["stdoutText#stdoutText", "PRD-022#R-022-02", null, false],
   ["stderrText#stderrText", "PRD-022#R-022-02", null, false],
   ["ConfigError#constructor", "PRD-024#R-024-01", null, false],
@@ -124,13 +117,13 @@ export const examples = Object.freeze(Object.fromEntries(
 
 export const errorMatrix = Object.freeze(operationDefinitions.map(
   ([operationKey, contractRef]) => {
-    if (operationKey === "Runa#constructor") {
+    if (operationKey === "Cuna#constructor") {
       return Object.freeze({
         operationKey,
         disposition: "accepted",
         cases: [Object.freeze({
           errorType: "ConfigError",
-          conditionClaimId: "runa-constructor-throws-config",
+          conditionClaimId: "cuna-constructor-throws-config",
           contractRefs: ["PRD-023#R-023-06"],
         })],
       });
@@ -138,7 +131,7 @@ export const errorMatrix = Object.freeze(operationDefinitions.map(
     if (operationKey.includes("#constructor") ||
         operationKey.startsWith("stdoutText#") ||
         operationKey.startsWith("stderrText#") ||
-        operationKey === "Runa#close") {
+        operationKey === "Cuna#close") {
       return Object.freeze({
         operationKey,
         disposition: "none",
@@ -191,7 +184,7 @@ export const claimRegistry = Object.freeze([
     return claims;
   }),
   ...[
-    ["Runa#constructor", "config", "PRD-023#R-023-01"],
+    ["Cuna#constructor", "config", "PRD-023#R-023-01"],
     ["SessionsManager#create", "name", "PRD-028#R-028-01"],
     ["SessionsManager#create", "options", "PRD-028#R-028-01"],
     ["SessionsManager#get", "id", "PRD-030#R-030-01"],

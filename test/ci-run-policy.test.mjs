@@ -6,7 +6,7 @@ import { validateCiRunIdentity } from "../scripts/ci-run-policy.mjs";
 test("candidate selection rejects every untrusted CI run mutation", () => {
   const commit = "a".repeat(40);
   const context = {
-    repository: "Runa-Laboratories/runa-lib-ts",
+    repository: "Cuna-Labs/cuna-lib-ts",
     runId: "1234",
     sourceCommit: commit,
   };

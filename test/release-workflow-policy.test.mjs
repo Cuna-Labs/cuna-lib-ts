@@ -18,8 +18,8 @@ test("release workflow is one protected dispatch with pinned signing and at-most
   ) ?? []).length, 2);
   assert.match(workflow, /actions: read/u);
   assert.match(workflow, /node scripts\/verify-ci-run\.mjs/u);
-  assert.doesNotMatch(workflow, /RUNA_RELEASE_AUTHORITY_BUNDLE_BASE64/u);
-  assert.doesNotMatch(workflow, /recovery_mode|RUNA_VERIFY_ONLY|--clobber/u);
+  assert.doesNotMatch(workflow, /CUNA_RELEASE_AUTHORITY_BUNDLE_BASE64/u);
+  assert.doesNotMatch(workflow, /recovery_mode|CUNA_VERIFY_ONLY|--clobber/u);
   assert.doesNotMatch(workflow, /actions\/attest-build-provenance/u);
   assert.match(ci, /actions\/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d/u);
   assert.match(ci, /subject-path: release-artifacts\/\*\.tgz/u);
@@ -33,7 +33,7 @@ test("release workflow is one protected dispatch with pinned signing and at-most
   assert.equal(ciAttest >= 0 && ciAttest < ciVerify && ciVerify < ciRetain &&
     ciRetain < ciCore, true);
   assert.match(workflow, /evidence\/\$\{\{ needs\.admission\.outputs\.filename \}\}\.intoto\.jsonl/u);
-  assert.doesNotMatch(workflow, /RUNA_AUTHORITY_READ_TOKEN|personal.access.token|github.app/iu);
+  assert.doesNotMatch(workflow, /CUNA_AUTHORITY_READ_TOKEN|personal.access.token|github.app/iu);
   assert.equal((workflow.match(/release:authority:download/gu) ?? []).length, 2);
   assert.doesNotMatch(workflow,
     /repository: \$\{\{ (?:steps|needs)\.phase-a\.outputs\.authority_repository \}\}/u);
@@ -42,7 +42,7 @@ test("release workflow is one protected dispatch with pinned signing and at-most
   ) ?? [];
   assert.equal(authoritySteps.length, 4);
   for (const step of authoritySteps) {
-    assert.doesNotMatch(step, /GH_TOKEN|github-token|RUNA_AUTHORITY_READ_TOKEN/u);
+    assert.doesNotMatch(step, /GH_TOKEN|github-token|CUNA_AUTHORITY_READ_TOKEN/u);
   }
   assert.match(workflow, /gh release create/u);
   assert.match(workflow, /gh release upload/u);
@@ -51,7 +51,7 @@ test("release workflow is one protected dispatch with pinned signing and at-most
   assert.match(workflow, /release-manifest-envelope\.authority-admitted\.json/u);
   assert.match(recovery, /name: release-recovery-read-only/u);
   assert.match(recovery, /ref: refs\/tags\/ts-v\$\{\{ inputs\.version \}\}/u);
-  assert.match(recovery, /RUNA_SOURCE_COMMIT: \$\{\{ env\.RUNA_SOURCE_COMMIT \}\}/u);
+  assert.match(recovery, /CUNA_SOURCE_COMMIT: \$\{\{ env\.CUNA_SOURCE_COMMIT \}\}/u);
   assert.match(recovery, /release:recovery:verify/u);
   assert.equal((recovery.match(/contents: read/gu) ?? []).length >= 2, true);
   assert.equal((recovery.match(/actions: read/gu) ?? []).length >= 2, true);
@@ -77,13 +77,13 @@ test("release workflow is one protected dispatch with pinned signing and at-most
   const immutableTag = signTagBody.indexOf("git tag -s");
   assert.equal(signTagFreshness >= 0 && signTagFreshness < immutableTag, true);
   const gitAuthentication = signTagBody.indexOf("gh auth setup-git");
-  const tagPush = signTagBody.indexOf('git push origin "refs/tags/$RUNA_RELEASE_TAG"');
+  const tagPush = signTagBody.indexOf('git push origin "refs/tags/$CUNA_RELEASE_TAG"');
   assert.match(signTagBody, /GH_TOKEN: \$\{\{ github\.token \}\}/u);
   assert.match(signTagBody, /persist-credentials: false/u);
   assert.equal(gitAuthentication > immutableTag && gitAuthentication < tagPush, true);
   assert.match(signTagBody, /name: pretag-authority-evidence/u);
   assert.match(signTagBody,
-    /RUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256: \$\{\{ needs\.phase-a\.outputs\.authority_bundle_sha256 \}\}/u);
+    /CUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256: \$\{\{ needs\.phase-a\.outputs\.authority_bundle_sha256 \}\}/u);
   const assetBody = workflow.slice(
     workflow.indexOf("  asset-staging:"), workflow.indexOf("  publish:"),
   );
@@ -111,7 +111,7 @@ test("release workflow is one protected dispatch with pinned signing and at-most
     /authority_bundle_sha256: \$\{\{ steps\.authority_bundle\.outputs\.bundle_sha256 \}\}/u);
   assert.equal((workflow.match(/authority-input\//gu) ?? []).length >= 2, true);
   assert.match(workflow,
-    /RUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256: \$\{\{ needs\.phase-a\.outputs\.authority_bundle_sha256 \}\}/u);
+    /CUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256: \$\{\{ needs\.phase-a\.outputs\.authority_bundle_sha256 \}\}/u);
   assert.match(ci, /release-admission:\s*\n\s+name: release-admission/u);
   assert.match(ci, /name: release-admission\s*\n\s+needs: \[candidate, compatibility\]/u);
   assert.match(ci, /npm run release:ci:admission/u);

@@ -7,14 +7,14 @@ import {
   validateAuthorityContinuity,
 } from "./public-authority-transport.mjs";
 
-const policy = JSON.parse(await readFile(".runa/release-policy.json", "utf8"));
+const policy = JSON.parse(await readFile(".cuna/release-policy.json", "utf8"));
 assert.equal(policy.releaseAuthority.status, "configured");
 const expected = policy.releaseAuthority.authority;
 assert.notEqual(expected, null);
-const runId = process.env.RUNA_AUTHORITY_RUN_ID;
+const runId = process.env.CUNA_AUTHORITY_RUN_ID;
 assert.match(runId ?? "", /^[1-9][0-9]*$/u);
 const trustPolicy = JSON.parse(await readFile("governance/release-trust.json", "utf8"));
-const output = process.env.RUNA_AUTHORITY_INPUT_DIR ?? "authority-input";
+const output = process.env.CUNA_AUTHORITY_INPUT_DIR ?? "authority-input";
 const result = await retrievePublicAuthorityAssets(expected, runId, trustPolicy);
 validateAuthorityContinuity({
   bundleSha256: result.detached.bundle_sha256,
@@ -22,10 +22,10 @@ validateAuthorityContinuity({
   runId: result.run.id,
   runAttempt: result.run.run_attempt,
 }, {
-  bundleSha256: process.env.RUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256,
-  headSha: process.env.RUNA_EXPECTED_AUTHORITY_HEAD_SHA,
-  runId: process.env.RUNA_EXPECTED_AUTHORITY_RUN_ID,
-  runAttempt: process.env.RUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT,
+  bundleSha256: process.env.CUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256,
+  headSha: process.env.CUNA_EXPECTED_AUTHORITY_HEAD_SHA,
+  runId: process.env.CUNA_EXPECTED_AUTHORITY_RUN_ID,
+  runAttempt: process.env.CUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT,
 });
 await mkdir(output, { recursive: true });
 for (const [name, bytes] of result.assets) {

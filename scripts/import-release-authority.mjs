@@ -19,8 +19,8 @@ import {
 } from "./postpublish-policy.mjs";
 import { verifyAuthorityAssets } from "./public-authority-transport.mjs";
 
-const preflightOnly = process.env.RUNA_AUTHORITY_PREFLIGHT === "1";
-const authorityInput = process.env.RUNA_AUTHORITY_INPUT_DIR ?? "authority-input";
+const preflightOnly = process.env.CUNA_AUTHORITY_PREFLIGHT === "1";
+const authorityInput = process.env.CUNA_AUTHORITY_INPUT_DIR ?? "authority-input";
 let bundle;
 let bundleBytes;
 try {
@@ -54,7 +54,7 @@ try {
   console.log("release authority import: BLOCKED (no accepted trust root)");
   process.exit(0);
 }
-const releasePolicy = JSON.parse(await readFile(".runa/release-policy.json", "utf8"));
+const releasePolicy = JSON.parse(await readFile(".cuna/release-policy.json", "utf8"));
 const authorityRun = JSON.parse(await readFile("evidence/authority-run.json", "utf8"));
 const authorityAssets = new Map([
   ["release-authority-bundle.json", bundleBytes],
@@ -67,7 +67,7 @@ const verifiedAuthority = verifyAuthorityAssets(
   authorityAssets, trustPolicy, Date.now(), authorityRun,
 );
 bundle = verifiedAuthority.bundle;
-const expectedBundleSha = process.env.RUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256;
+const expectedBundleSha = process.env.CUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256;
 if (expectedBundleSha !== undefined) {
   assert.match(expectedBundleSha, /^[a-f0-9]{64}$/u);
   assert.equal(verifiedAuthority.detached.bundle_sha256, expectedBundleSha,
@@ -87,9 +87,9 @@ assert.match(authorityRun.head_sha, /^[0-9a-f]{40}$/u);
 assert(Number.isSafeInteger(authorityRun.run_id) && authorityRun.run_id > 0);
 assert(Number.isSafeInteger(authorityRun.run_attempt) && authorityRun.run_attempt > 0);
 for (const [environment, actual, pattern] of [
-  ["RUNA_EXPECTED_AUTHORITY_HEAD_SHA", authorityRun.head_sha, /^[a-f0-9]{40}$/u],
-  ["RUNA_EXPECTED_AUTHORITY_RUN_ID", String(authorityRun.run_id), /^[1-9][0-9]*$/u],
-  ["RUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT", String(authorityRun.run_attempt), /^[1-9][0-9]*$/u],
+  ["CUNA_EXPECTED_AUTHORITY_HEAD_SHA", authorityRun.head_sha, /^[a-f0-9]{40}$/u],
+  ["CUNA_EXPECTED_AUTHORITY_RUN_ID", String(authorityRun.run_id), /^[1-9][0-9]*$/u],
+  ["CUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT", String(authorityRun.run_attempt), /^[1-9][0-9]*$/u],
 ]) {
   const expectedValue = process.env[environment];
   if (expectedValue !== undefined) {

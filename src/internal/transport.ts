@@ -4,25 +4,36 @@ import { TextDecoder } from "node:util";
 import type { EffectiveConfig } from "../config.js";
 import {
   decodeAcknowledgement,
-  decodeAgentAuthenticationStatus,
+  decodeAgentSessionAuth,
+  decodeAgentSession,
+  decodeAgentSessionPage,
+  decodeWorkspaceBinding,
+  decodeMachineCreateRequest,
+  decodeProblem,
+  decodeTerminalConnectionGrant,
+  decodeCapabilitySnapshot,
   decodeExec,
   decodeMe,
   decodeOpen,
   decodeRecords,
   decodeSession,
   decodeSessions,
+  decodeWorkspaceSyncEnvelope,
+  decodeWorkspaceSyncProblem,
   DecodeFailure,
 } from "../domain.js";
-import { ApiError, ConfigError } from "../errors.js";
+import { ApiError, ConfigError, apiErrorWithProblem } from "../errors.js";
 import type {
   Acknowledgement,
-  AgentAuthenticationStatus,
+  CapabilitySnapshot,
   ExecResult,
   Me,
   OpenSessionResult,
   Record,
   SessionSnapshot,
 } from "../types.js";
+import type { AgentSession, AgentSessionAuth, AgentSessionPage } from "../agent-sessions.js";
+import type { TerminalConnectionGrant } from "../agent-sessions.js";
 import {
   operationDescriptor,
   type OperationKey,
@@ -30,32 +41,54 @@ import {
 import { OperationObserver } from "./observer.js";
 import { sanitizeWire } from "./sanitize.js";
 import { SDK_VERSION } from "../version.js";
+import type { MachineCreateRequest } from "../machine-creates.js";
+import type { WorkspaceBinding } from "../workspace-bindings.js";
+import type { WorkspaceSyncEnvelope } from "../workspace-sync.js";
 
-const MAX_RESPONSE_BYTES = 8_388_608;
+const MAX_RESPONSE_BYTES = 16_777_216;
 const READS = new Set<OperationKey>([
+  "agentSessions.list",
+  "agentSessions.get",
+  "agentSessions.agentAuth",
+  "capabilities.get",
   "me.get",
   "sessions.list",
   "sessions.get",
-  "sessions.agentAuth",
   "records.list",
+  "workspaces.sync.changes",
+  "workspaces.sync.chunkDownload",
+  "machineCreates.get",
+  "workspaceBindings.get",
 ]);
 
 export interface DispatchInput {
   readonly id?: string;
+  readonly query?: Readonly<globalThis.Record<string, string>>;
   readonly body?: unknown;
   readonly timeoutSecs?: number;
   readonly signal?: AbortSignal;
+  readonly idempotencyKey?: string;
+  readonly bindingId?: string;
+  readonly digest?: string;
+  readonly bytes?: Uint8Array;
 }
 
 export type DispatchResult =
   | Acknowledgement
-  | AgentAuthenticationStatus
+  | AgentSession
+  | AgentSessionAuth
+  | AgentSessionPage
+  | TerminalConnectionGrant
+  | CapabilitySnapshot
   | ExecResult
   | Me
   | OpenSessionResult
   | readonly Record[]
   | SessionSnapshot
-  | readonly SessionSnapshot[];
+  | readonly SessionSnapshot[]
+  | WorkspaceSyncEnvelope<unknown>
+  | MachineCreateRequest
+  | WorkspaceBinding;
 
 export interface CancelableTimer {
   cancel(): void;
@@ -71,25 +104,40 @@ export interface TransportRuntime {
 
 interface PreparedRequest {
   readonly url: string;
-  readonly method: "GET" | "POST" | "DELETE";
+  readonly method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   readonly headers: Readonly<globalThis.Record<string, string>>;
-  readonly body?: string;
+  readonly body?: BodyInit;
 }
 
 function safeTransportFailure(): TypeError {
-  return new TypeError("The Runa request failed.");
+  return new TypeError("The Cuna request failed.");
 }
 
 function timeoutFailure(): DOMException {
-  return new DOMException("The Runa request timed out.", "TimeoutError");
+  return new DOMException("The Cuna request timed out.", "TimeoutError");
 }
 
-function renderPath(template: string, id?: string): string {
+function renderPath(
+  template: string,
+  id?: string,
+  digest?: string,
+  bindingId?: string,
+): string {
   if (template.includes(":id")) {
     if (id === undefined) throw new TypeError("Invalid session ID.");
-    return template.replace(":id", id);
+    template = template.replace(":id", id);
   }
-  if (id !== undefined) throw new TypeError("Invalid session ID.");
+  else if (id !== undefined) throw new TypeError("Invalid session ID.");
+  if (template.includes(":digest")) {
+    if (digest === undefined || !/^[0-9a-f]{64}$/.test(digest)) throw new TypeError("Invalid workspace sync digest.");
+    template = template.replace(":digest", digest);
+  }
+  else if (digest !== undefined) throw new TypeError("Invalid workspace sync digest.");
+  if (template.includes(":binding_id")) {
+    if (bindingId === undefined) throw new TypeError("Invalid workspace binding ID.");
+    return template.replace(":binding_id", bindingId);
+  }
+  if (bindingId !== undefined) throw new TypeError("Invalid workspace binding ID.");
   return template;
 }
 
@@ -99,34 +147,66 @@ function prepare(
   input: DispatchInput,
 ): PreparedRequest {
   const descriptor = operationDescriptor(operationKey);
-  const path = renderPath(descriptor.pathTemplate, input.id);
+  const path = renderPath(
+    descriptor.pathTemplate,
+    input.id,
+    input.digest,
+    input.bindingId,
+  );
   const target = new URL(path, `${config.baseUrl}/`);
-  if (target.origin !== config.baseUrl || target.href !== `${config.baseUrl}${path}`) {
+  if (input.query !== undefined) {
+    for (const [key, value] of Object.entries(input.query)) {
+      target.searchParams.append(key, value);
+    }
+  }
+  const expectedHref = `${config.baseUrl}${path}${target.search}`;
+  if (target.origin !== config.baseUrl || target.href !== expectedHref) {
     throw new ConfigError();
   }
-  let body: string | undefined;
-  if (descriptor.hasRequestBody) {
+  let body: BodyInit | undefined;
+  const binaryBody = operationKey === "workspaces.sync.chunk";
+  if (binaryBody) {
+    if (!(input.bytes instanceof Uint8Array) || input.body !== undefined) throw new TypeError("The Cuna request body is invalid.");
+    body = input.bytes.slice().buffer;
+  } else if (descriptor.hasRequestBody) {
     try {
       body = JSON.stringify(input.body);
     } catch {
-      throw new TypeError("The Runa request body is invalid.");
+      throw new TypeError("The Cuna request body is invalid.");
     }
     if (body === undefined) {
-      throw new TypeError("The Runa request body is invalid.");
+      throw new TypeError("The Cuna request body is invalid.");
     }
   } else if (input.body !== undefined) {
-    throw new TypeError("The Runa request body is invalid.");
+    throw new TypeError("The Cuna request body is invalid.");
+  }
+  const needsIdempotencyKey = operationKey === "agentSessions.create" ||
+    operationKey === "agentSessions.createTerminalConnection" ||
+    operationKey === "sessions.create" ||
+    operationKey === "workspaceBindings.create" ||
+    operationKey === "workspaces.sync.begin" ||
+    operationKey === "workspaces.sync.negotiate" ||
+    operationKey === "workspaces.sync.chunk" ||
+    operationKey === "workspaces.sync.commit" ||
+    operationKey === "workspaces.sync.reconcile";
+  if (needsIdempotencyKey !== (input.idempotencyKey !== undefined)) {
+    throw new TypeError("The Cuna idempotency key is invalid.");
   }
   return Object.freeze({
     url: target.href,
     method: descriptor.method,
     headers: Object.freeze({
-      Accept: "application/json",
+      Accept: "application/json, application/problem+json",
       Authorization: `Bearer ${config.apiKey}`,
       "User-Agent": `runa-sdk-typescript/${SDK_VERSION}`,
+      ...(input.idempotencyKey === undefined
+        ? {}
+        : { "Idempotency-Key": input.idempotencyKey }),
       ...(body === undefined
         ? {}
-        : { "Content-Type": "application/json; charset=utf-8" }),
+        : binaryBody
+          ? { "Content-Type": "application/octet-stream", "Content-Length": String(input.bytes!.byteLength) }
+          : { "Content-Type": "application/json; charset=utf-8" }),
     }),
     ...(body === undefined ? {} : { body }),
   });
@@ -203,7 +283,7 @@ function cancelResponseBody(response: Response): void {
 }
 
 function cancellationFailure(): DOMException {
-  return new DOMException("The Runa request was cancelled.", "AbortError");
+  return new DOMException("The Cuna request was cancelled.", "AbortError");
 }
 
 function signalAborted(signal?: AbortSignal): boolean {
@@ -221,13 +301,28 @@ async function disposition(
     throw new ApiError(response.status, "malformed_response");
   }
   if (response.status !== descriptor.successStatus) {
-    cancelResponseBody(response);
     if (response.status >= 200 && response.status < 300) {
+      cancelResponseBody(response);
       throw new ApiError(response.status, "malformed_response");
     }
+    if (descriptor.errorKind === "problem") {
+      throw await problemFailure(
+        response,
+        signal,
+        descriptor.responseKind === "workspace-sync",
+      );
+    }
+    cancelResponseBody(response);
     throw new ApiError(response.status, "api_error");
   }
   if (signal.aborted) throw cancellationFailure();
+  if (
+    operationKey === "agentSessions.agentAuth" &&
+    response.headers.get("cache-control")?.trim().toLowerCase() !== "no-store"
+  ) {
+    cancelResponseBody(response);
+    throw new ApiError(response.status, "malformed_response");
+  }
   const contentType = response.headers.get("content-type");
   if (
     contentType === null ||
@@ -250,8 +345,22 @@ async function disposition(
     switch (descriptor.responseKind) {
       case "acknowledgement":
         return decodeAcknowledgement(value);
-      case "agent-authentication-status":
-        return decodeAgentAuthenticationStatus(value);
+      case "agent-auth":
+        return decodeAgentSessionAuth(value);
+      case "agent-session":
+        return decodeAgentSession(value);
+      case "agent-session-page":
+        return decodeAgentSessionPage(value);
+      case "terminal-connection-grant":
+        return decodeTerminalConnectionGrant(value);
+      case "capability-snapshot": {
+        const snapshot = decodeCapabilitySnapshot(value);
+        const etag = response.headers.get("etag");
+        if (etag !== `"${snapshot.etag}"`) {
+          throw new ApiError(response.status, "malformed_response");
+        }
+        return snapshot;
+      }
       case "exec":
         return decodeExec(value);
       case "me":
@@ -264,12 +373,56 @@ async function disposition(
         return decodeSession(value);
       case "sessions":
         return decodeSessions(value);
+      case "workspace-binding":
+        return decodeWorkspaceBinding(value);
+      case "workspace-sync":
+        return decodeWorkspaceSyncEnvelope(
+          operationKey as
+            | "workspaces.sync.begin"
+            | "workspaces.sync.negotiate"
+            | "workspaces.sync.chunk"
+            | "workspaces.sync.commit"
+            | "workspaces.sync.changes"
+            | "workspaces.sync.reconcile",
+          value,
+        );
+      case "machine-create":
+        return decodeMachineCreateRequest(value);
     }
   } catch (error) {
     if (error instanceof DecodeFailure) {
       throw new ApiError(response.status, "malformed_response");
     }
     throw error;
+  }
+}
+
+async function problemFailure(
+  response: Response,
+  signal: AbortSignal,
+  workspaceSync: boolean,
+): Promise<ApiError> {
+  const contentType = response.headers.get("content-type");
+  const mediaType = contentType?.split(";", 1)[0]?.trim().toLowerCase() ?? "";
+  if (!["application/json", "application/problem+json"].includes(mediaType)) {
+    cancelResponseBody(response);
+    return new ApiError(response.status);
+  }
+  try {
+    const bytes = await readLimited(response, signal);
+    if (signal.aborted) throw cancellationFailure();
+    const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    const value = sanitizeWire(JSON.parse(text));
+    return apiErrorWithProblem(
+      response.status,
+      workspaceSync && mediaType === "application/problem+json"
+        ? decodeWorkspaceSyncProblem(value, response.status)
+        : decodeProblem(value, response.status),
+    );
+  } catch (error) {
+    if (signal.aborted) throw cancellationFailure();
+    if (error instanceof DOMException && error.name === "AbortError") throw error;
+    return new ApiError(response.status);
   }
 }
 
@@ -280,7 +433,6 @@ async function disposition(
 const SESSION_CREATE_DEADLINE_MS = 31 * 60 * 1_000;
 
 function deadlineFor(operationKey: OperationKey, timeoutSecs?: number): number {
-  if (operationKey === "sessions.agentAuth") return 30_000;
   if (READS.has(operationKey)) return 10_000;
   if (operationKey === "sessions.create") return SESSION_CREATE_DEADLINE_MS;
   if (operationKey === "sessions.exec") {
@@ -290,7 +442,6 @@ function deadlineFor(operationKey: OperationKey, timeoutSecs?: number): number {
 }
 
 function totalDeadlineFor(operationKey: OperationKey, timeoutSecs?: number): number {
-  if (operationKey === "sessions.agentAuth") return 90_000;
   if (READS.has(operationKey)) return 30_000;
   return deadlineFor(operationKey, timeoutSecs);
 }

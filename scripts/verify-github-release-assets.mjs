@@ -5,8 +5,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
-const tag = process.env.RUNA_RELEASE_TAG;
-const configured = JSON.parse(process.env.RUNA_RELEASE_ASSETS_JSON ?? "[]");
+const tag = process.env.CUNA_RELEASE_TAG;
+const configured = JSON.parse(process.env.CUNA_RELEASE_ASSETS_JSON ?? "[]");
 assert.match(tag ?? "", /^ts-v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/u);
 assert(Array.isArray(configured) && configured.length >= 5);
 const names = configured.map((file) => path.basename(file));

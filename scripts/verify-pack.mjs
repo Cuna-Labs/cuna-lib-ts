@@ -19,7 +19,7 @@ assert.equal(validateApprovedLicense(
 ), true);
 assert.deepEqual(packedManifest.repository, {
   type: "git",
-  url: "git+https://github.com/Runa-Laboratories/runa-lib-ts.git",
+  url: "git+https://github.com/Cuna-Labs/cuna-lib-ts.git",
 });
 assert.deepEqual(packedManifest.publishConfig, {
   access: "public",
@@ -36,12 +36,12 @@ try {
   await writeFile(path.join(workspace, "package.json"), `${JSON.stringify({
     private: true,
     type: "module",
-    dependencies: { "@runa_laboratories/sdk": `file:${archive.replaceAll("\\", "/")}` }
+    dependencies: { "@cuna_labs/sdk": `file:${archive.replaceAll("\\", "/")}` }
   })}\n`);
   const install = npmRun(["install", "--ignore-scripts", "--no-audit", "--no-fund"], { cwd: workspace });
   assert.equal(install.status, 0);
   const probe = spawnSync(process.execPath, ["--input-type=module", "-e",
-    "import('@runa_laboratories/sdk').then(m=>{if(Object.keys(m).length!==8)process.exit(2)})"], {
+    "import('@cuna_labs/sdk').then(m=>{const expected=['ApiError','CommandError','ConfigError','Cuna','CunaError','Session','stderrText','stdoutText'];if(JSON.stringify(Object.keys(m).sort())!==JSON.stringify(expected))process.exit(2)})"], {
     cwd: workspace, encoding: "utf8"
   });
   assert.equal(probe.status, 0);

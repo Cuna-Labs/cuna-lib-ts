@@ -50,13 +50,13 @@ jobs:
       - run: npm ci
       - name: Validate protected source and requested version
         env:
-          RUNA_REQUESTED_VERSION: ${{ inputs.version }}
-        run: node -e "const p=require('./package.json');if(process.env.GITHUB_REF!=='refs/heads/main'||process.env.RUNA_REQUESTED_VERSION!==p.version)process.exit(1)"
+          CUNA_REQUESTED_VERSION: ${{ inputs.version }}
+        run: node -e "const p=require('./package.json');if(process.env.GITHUB_REF!=='refs/heads/main'||process.env.CUNA_REQUESTED_VERSION!==p.version)process.exit(1)"
       - name: Validate selected CI run
         run: node scripts/verify-ci-run.mjs
         env:
           GH_TOKEN: ${{ github.token }}
-          RUNA_CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
+          CUNA_CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
       - name: Require public provenance-capable release context
         run: npm run release:context:verify
         env:
@@ -67,7 +67,7 @@ jobs:
       - name: Verify independent authority run identity before tagging
         run: npm run release:authority:run:verify
         env:
-          RUNA_AUTHORITY_RUN_ID: ${{ inputs.authority_run_id }}
+          CUNA_AUTHORITY_RUN_ID: ${{ inputs.authority_run_id }}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: npm-release-candidate
@@ -75,19 +75,19 @@ jobs:
           github-token: ${{ github.token }}
       - name: Validate downloaded candidate identity
         env:
-          RUNA_REQUESTED_VERSION: ${{ inputs.version }}
-        run: node -e "const c=require('./release-artifacts/candidate.json');if(c.source_commit!==process.env.GITHUB_SHA||c.version!==process.env.RUNA_REQUESTED_VERSION||c.source_tree_clean!==true)process.exit(1)"
+          CUNA_REQUESTED_VERSION: ${{ inputs.version }}
+        run: node -e "const c=require('./release-artifacts/candidate.json');if(c.source_commit!==process.env.GITHUB_SHA||c.version!==process.env.CUNA_REQUESTED_VERSION||c.source_tree_clean!==true)process.exit(1)"
       - name: Retrieve public signed release-authority assets without credentials
         id: authority_bundle
         run: npm run release:authority:download
         env:
-          RUNA_AUTHORITY_RUN_ID: ${{ inputs.authority_run_id }}
-          RUNA_AUTHORITY_INPUT_DIR: authority-preflight
+          CUNA_AUTHORITY_RUN_ID: ${{ inputs.authority_run_id }}
+          CUNA_AUTHORITY_INPUT_DIR: authority-preflight
       - name: Verify non-approval authority evidence and bindings before tagging
         run: npm run release:authority:import
         env:
-          RUNA_AUTHORITY_PREFLIGHT: '1'
-          RUNA_AUTHORITY_INPUT_DIR: authority-preflight
+          CUNA_AUTHORITY_PREFLIGHT: '1'
+          CUNA_AUTHORITY_INPUT_DIR: authority-preflight
       - name: Verify all local non-approval gates before tagging
         run: npm run release:pretag:verify
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -136,26 +136,26 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GITSIGN_TOKEN_PROVIDER: github-actions
-          RUNA_RELEASE_TAG: ts-v${{ inputs.version }}
-          RUNA_AUTHORITY_INPUT_DIR: authority-preflight
-          RUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256: ${{ needs.phase-a.outputs.authority_bundle_sha256 }}
-          RUNA_EXPECTED_AUTHORITY_HEAD_SHA: ${{ needs.phase-a.outputs.authority_head_sha }}
-          RUNA_EXPECTED_AUTHORITY_RUN_ID: ${{ needs.phase-a.outputs.authority_run_id }}
-          RUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT: ${{ needs.phase-a.outputs.authority_run_attempt }}
+          CUNA_RELEASE_TAG: ts-v${{ inputs.version }}
+          CUNA_AUTHORITY_INPUT_DIR: authority-preflight
+          CUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256: ${{ needs.phase-a.outputs.authority_bundle_sha256 }}
+          CUNA_EXPECTED_AUTHORITY_HEAD_SHA: ${{ needs.phase-a.outputs.authority_head_sha }}
+          CUNA_EXPECTED_AUTHORITY_RUN_ID: ${{ needs.phase-a.outputs.authority_run_id }}
+          CUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT: ${{ needs.phase-a.outputs.authority_run_attempt }}
         run: |
           git fetch --no-tags origin main
           test "$(git rev-parse origin/main)" = "$GITHUB_SHA"
           git config --local gpg.format x509
           git config --local gpg.x509.program gitsign
-          test -z "$(git ls-remote --tags origin "refs/tags/$RUNA_RELEASE_TAG")"
+          test -z "$(git ls-remote --tags origin "refs/tags/$CUNA_RELEASE_TAG")"
           npm run release:authority:freshness:verify
-          git tag -s -m "Release $RUNA_RELEASE_TAG" "$RUNA_RELEASE_TAG" "$GITHUB_SHA"
+          git tag -s -m "Release $CUNA_RELEASE_TAG" "$CUNA_RELEASE_TAG" "$GITHUB_SHA"
           gitsign verify \
-            --certificate-identity=https://github.com/Runa-Laboratories/runa-lib-ts/.github/workflows/release.yml@refs/heads/main \
+            --certificate-identity=https://github.com/Cuna-Labs/cuna-lib-ts/.github/workflows/release.yml@refs/heads/main \
             --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
-            "$RUNA_RELEASE_TAG"
+            "$CUNA_RELEASE_TAG"
           gh auth setup-git
-          git push origin "refs/tags/$RUNA_RELEASE_TAG"
+          git push origin "refs/tags/$CUNA_RELEASE_TAG"
 
   admission:
     name: release-admission
@@ -186,8 +186,8 @@ jobs:
       - name: Verify immutable tag before authority retrieval
         run: node scripts/verify-release-tag.mjs
         env:
-          RUNA_RELEASE_TAG: ts-v${{ inputs.version }}
-          RUNA_RELEASE_COMMIT: ${{ github.sha }}
+          CUNA_RELEASE_TAG: ts-v${{ inputs.version }}
+          CUNA_RELEASE_COMMIT: ${{ github.sha }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22.17.1
@@ -196,15 +196,15 @@ jobs:
       - name: Verify independent authority run identity
         run: npm run release:authority:run:verify
         env:
-          RUNA_AUTHORITY_RUN_ID: ${{ inputs.authority_run_id }}
+          CUNA_AUTHORITY_RUN_ID: ${{ inputs.authority_run_id }}
       - name: Retrieve public signed release-authority assets without credentials
         run: npm run release:authority:download
         env:
-          RUNA_AUTHORITY_RUN_ID: ${{ inputs.authority_run_id }}
-          RUNA_AUTHORITY_INPUT_DIR: authority-input
-          RUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256: ${{ needs.phase-a.outputs.authority_bundle_sha256 }}
-          RUNA_EXPECTED_AUTHORITY_HEAD_SHA: ${{ needs.phase-a.outputs.authority_head_sha }}
-          RUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT: ${{ needs.phase-a.outputs.authority_run_attempt }}
+          CUNA_AUTHORITY_RUN_ID: ${{ inputs.authority_run_id }}
+          CUNA_AUTHORITY_INPUT_DIR: authority-input
+          CUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256: ${{ needs.phase-a.outputs.authority_bundle_sha256 }}
+          CUNA_EXPECTED_AUTHORITY_HEAD_SHA: ${{ needs.phase-a.outputs.authority_head_sha }}
+          CUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT: ${{ needs.phase-a.outputs.authority_run_attempt }}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: npm-release-candidate
@@ -212,8 +212,8 @@ jobs:
           github-token: ${{ github.token }}
       - name: Validate downloaded candidate identity
         env:
-          RUNA_REQUESTED_VERSION: ${{ inputs.version }}
-        run: node -e "const c=require('./release-artifacts/candidate.json');if(c.source_commit!==process.env.GITHUB_SHA||c.version!==process.env.RUNA_REQUESTED_VERSION||c.source_tree_clean!==true)process.exit(1)"
+          CUNA_REQUESTED_VERSION: ${{ inputs.version }}
+        run: node -e "const c=require('./release-artifacts/candidate.json');if(c.source_commit!==process.env.GITHUB_SHA||c.version!==process.env.CUNA_REQUESTED_VERSION||c.source_tree_clean!==true)process.exit(1)"
       - run: npm run release:authority:import
       - id: candidate
         run: echo "filename=$(node -p 'require(\"./release-artifacts/candidate.json\").filename')" >> "$GITHUB_OUTPUT"
@@ -254,7 +254,7 @@ jobs:
         run: echo "filename=$(node -p 'require(\"./release-artifacts/candidate.json\").filename')" >> "$GITHUB_OUTPUT"
       - name: Bind exact provenance to the immutable core without mutating it
         env:
-          RUNA_ATTESTATION_BUNDLE: evidence/${{ needs.admission.outputs.filename }}.intoto.jsonl
+          CUNA_ATTESTATION_BUNDLE: evidence/${{ needs.admission.outputs.filename }}.intoto.jsonl
         run: |
           cp release-artifacts/release-manifest-envelope.json \
             release-artifacts/release-manifest-envelope.authority-admitted.json
@@ -264,23 +264,23 @@ jobs:
       - name: Create draft GitHub Release and upload exact pre-promotion assets
         env:
           GH_TOKEN: ${{ github.token }}
-          RUNA_RELEASE_TAG: ts-v${{ inputs.version }}
-          RUNA_ATTESTATION_BUNDLE: evidence/${{ needs.admission.outputs.filename }}.intoto.jsonl
+          CUNA_RELEASE_TAG: ts-v${{ inputs.version }}
+          CUNA_ATTESTATION_BUNDLE: evidence/${{ needs.admission.outputs.filename }}.intoto.jsonl
         run: |
-          gh release create "$RUNA_RELEASE_TAG" --draft --verify-tag --title "$RUNA_RELEASE_TAG"
-          gh release upload "$RUNA_RELEASE_TAG" \
+          gh release create "$CUNA_RELEASE_TAG" --draft --verify-tag --title "$CUNA_RELEASE_TAG"
+          gh release upload "$CUNA_RELEASE_TAG" \
             "release-artifacts/${{ needs.admission.outputs.filename }}" \
             release-artifacts/release-manifest-core.json \
             release-artifacts/release-manifest-envelope.authority-admitted.json \
             release-artifacts/release-manifest-envelope.provenance-attested.json \
             evidence/sbom.cdx.json \
-            "$RUNA_ATTESTATION_BUNDLE"
+            "$CUNA_ATTESTATION_BUNDLE"
       - name: Re-download and verify every GitHub Release asset before npm promotion
         run: npm run release:assets:verify
         env:
           GH_TOKEN: ${{ github.token }}
-          RUNA_RELEASE_TAG: ts-v${{ inputs.version }}
-          RUNA_RELEASE_ASSETS_JSON: '["release-artifacts/${{ needs.admission.outputs.filename }}","release-artifacts/release-manifest-core.json","release-artifacts/release-manifest-envelope.authority-admitted.json","release-artifacts/release-manifest-envelope.provenance-attested.json","evidence/sbom.cdx.json","evidence/${{ needs.admission.outputs.filename }}.intoto.jsonl"]'
+          CUNA_RELEASE_TAG: ts-v${{ inputs.version }}
+          CUNA_RELEASE_ASSETS_JSON: '["release-artifacts/${{ needs.admission.outputs.filename }}","release-artifacts/release-manifest-core.json","release-artifacts/release-manifest-envelope.authority-admitted.json","release-artifacts/release-manifest-envelope.provenance-attested.json","evidence/sbom.cdx.json","evidence/${{ needs.admission.outputs.filename }}.intoto.jsonl"]'
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: staged-npm-release-candidate
@@ -322,24 +322,24 @@ jobs:
       - name: Revalidate exact authority bytes, identity, bindings, and freshness
         run: npm run release:authority:import
         env:
-          RUNA_AUTHORITY_PREFLIGHT: '1'
-          RUNA_AUTHORITY_INPUT_DIR: authority-input
-          RUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256: ${{ needs.phase-a.outputs.authority_bundle_sha256 }}
-          RUNA_EXPECTED_AUTHORITY_HEAD_SHA: ${{ needs.phase-a.outputs.authority_head_sha }}
-          RUNA_EXPECTED_AUTHORITY_RUN_ID: ${{ needs.phase-a.outputs.authority_run_id }}
-          RUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT: ${{ needs.phase-a.outputs.authority_run_attempt }}
+          CUNA_AUTHORITY_PREFLIGHT: '1'
+          CUNA_AUTHORITY_INPUT_DIR: authority-input
+          CUNA_EXPECTED_AUTHORITY_BUNDLE_SHA256: ${{ needs.phase-a.outputs.authority_bundle_sha256 }}
+          CUNA_EXPECTED_AUTHORITY_HEAD_SHA: ${{ needs.phase-a.outputs.authority_head_sha }}
+          CUNA_EXPECTED_AUTHORITY_RUN_ID: ${{ needs.phase-a.outputs.authority_run_id }}
+          CUNA_EXPECTED_AUTHORITY_RUN_ATTEMPT: ${{ needs.phase-a.outputs.authority_run_attempt }}
       - run: npm publish "release-artifacts/${{ needs.asset-staging.outputs.filename }}" --provenance --access public --registry https://registry.npmjs.org/ --tag "${{ steps.mapping.outputs.dist_tag }}"
       - name: Persist exact uploaded-unverified state before final promotion checks
         run: npm run release:postpublish:verify
         env:
-          RUNA_VERIFY_UPLOADED_ONLY: '1'
-          RUNA_REGISTRY_TAG: ${{ steps.mapping.outputs.dist_tag }}
-          RUNA_ATTESTATION_BUNDLE: evidence/${{ needs.asset-staging.outputs.filename }}.intoto.jsonl
+          CUNA_VERIFY_UPLOADED_ONLY: '1'
+          CUNA_REGISTRY_TAG: ${{ steps.mapping.outputs.dist_tag }}
+          CUNA_ATTESTATION_BUNDLE: evidence/${{ needs.asset-staging.outputs.filename }}.intoto.jsonl
           GH_TOKEN: ${{ github.token }}
       - name: Verify final registry, provenance, and promotion state
         run: npm run release:postpublish:verify
         env:
-          RUNA_ATTESTATION_BUNDLE: evidence/${{ needs.asset-staging.outputs.filename }}.intoto.jsonl
+          CUNA_ATTESTATION_BUNDLE: evidence/${{ needs.asset-staging.outputs.filename }}.intoto.jsonl
           GH_TOKEN: ${{ github.token }}
       - if: failure()
         run: npm run release:recovery:plan
@@ -375,22 +375,22 @@ jobs:
       - name: Publish final verified release envelope and receipt
         env:
           GH_TOKEN: ${{ github.token }}
-          RUNA_RELEASE_TAG: ts-v${{ inputs.version }}
+          CUNA_RELEASE_TAG: ts-v${{ inputs.version }}
         run: |
-          gh release upload "$RUNA_RELEASE_TAG" \
+          gh release upload "$CUNA_RELEASE_TAG" \
             release-artifacts/release-manifest-envelope.json \
             evidence/postpublish-receipt.json
       - name: Re-download and verify final GitHub Release state
         run: npm run release:assets:verify
         env:
           GH_TOKEN: ${{ github.token }}
-          RUNA_RELEASE_TAG: ts-v${{ inputs.version }}
-          RUNA_RELEASE_ASSETS_JSON: '["release-artifacts/${{ needs.publish.outputs.filename }}","release-artifacts/release-manifest-core.json","release-artifacts/release-manifest-envelope.authority-admitted.json","release-artifacts/release-manifest-envelope.provenance-attested.json","release-artifacts/release-manifest-envelope.json","evidence/sbom.cdx.json","evidence/${{ needs.publish.outputs.filename }}.intoto.jsonl","evidence/postpublish-receipt.json"]'
+          CUNA_RELEASE_TAG: ts-v${{ inputs.version }}
+          CUNA_RELEASE_ASSETS_JSON: '["release-artifacts/${{ needs.publish.outputs.filename }}","release-artifacts/release-manifest-core.json","release-artifacts/release-manifest-envelope.authority-admitted.json","release-artifacts/release-manifest-envelope.provenance-attested.json","release-artifacts/release-manifest-envelope.json","evidence/sbom.cdx.json","evidence/${{ needs.publish.outputs.filename }}.intoto.jsonl","evidence/postpublish-receipt.json"]'
       - name: Promote verified GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          RUNA_RELEASE_TAG: ts-v${{ inputs.version }}
-        run: gh release edit "$RUNA_RELEASE_TAG" --draft=false
+          CUNA_RELEASE_TAG: ts-v${{ inputs.version }}
+        run: gh release edit "$CUNA_RELEASE_TAG" --draft=false
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

@@ -1,4 +1,4 @@
-// @generated {"contract_id":"runa-sdk-contract","generator_path":"tools/runa-contract-generator.mjs","generator_sha256":"75de6242dde7fccfc9251d371020c5dc5ffb96a65399647b6d54d2c8850202e1","generator_version":"0.2.0","snapshot_path":"runa-sdk-contract.snapshot.json","snapshot_sha256":"497ad3bfd712d7ed0c55289e94808435a924fd5cc909f1ab0620f860a6ebfc98","snapshot_version":"1.3.0"}
+// @generated {"contract_id":"runa-sdk-contract","generator_path":"tools/runa-contract-generator.mjs","generator_sha256":"879fbef4d654c1f7769e1724c065133d6744bbda6b913d5bd3cd5b8104ce31e4","generator_version":"0.2.0","projection_path":"runa-sdk.projection.json","projection_sha256":"145dc0f4ff47d3721d37f475c1c859e6797d1dd08c74736de414a80d69150cbe","projection_version":"1.7.0","snapshot_path":"runa-sdk-contract.snapshot.json","snapshot_sha256":"e7416b1e20843e0a96290428419e1e137d8189e30b7c82c62b011978516126bd","snapshot_version":"1.7.0"}
 import type { GeneratedWireValue } from "./wire-types.js";
 
 export function serializeGeneratedRequest(value: GeneratedWireValue): string {

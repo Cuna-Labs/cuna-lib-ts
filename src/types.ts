@@ -1,12 +1,64 @@
 /**
  * Opaque record detail preserved without an SDK-defined shape.
- * @runa-contract opaquewirevalue-summary PRD-022#R-022-02
+ * @cuna-contract opaquewirevalue-summary PRD-022#R-022-02
  */
 export type OpaqueWireValue = unknown;
 
+/** Scope accepted by capability discovery. */
+export type CapabilityScope = "account" | "machine" | "agent_session";
+
+/** Scope represented by a successful capability snapshot. */
+export type CapabilitySubjectScope = CapabilityScope;
+
+/** Current availability reported for a capability. */
+export type CapabilityAvailability =
+  | "supported"
+  | "unsupported"
+  | "temporarily_unavailable"
+  | "unknown";
+
+/** Product surface on which a capability can be used. */
+export type CapabilitySurface = "cli" | "web" | "sdk";
+
+/** Interaction required to use a capability. */
+export type CapabilityInteraction =
+  | "native"
+  | "read_only"
+  | "browser_handoff";
+
+/** Consequence class of the operation behind a capability. */
+export type CapabilityMutationClass =
+  | "none"
+  | "reversible"
+  | "destructive"
+  | "secret_revealing"
+  | "financial";
+
+/** Immutable capability description returned by discovery. */
+export interface Capability {
+  readonly id: string;
+  readonly availability: CapabilityAvailability;
+  readonly surfaces: readonly CapabilitySurface[];
+  readonly interaction: CapabilityInteraction;
+  readonly mutationClass: CapabilityMutationClass;
+  readonly requiredPermissions: readonly string[];
+  readonly reasonCode?: string;
+}
+
+/** Leased capability evidence for one account, machine, or AgentSession. */
+export interface CapabilitySnapshot {
+  readonly schemaVersion: "1.0";
+  readonly subjectScope: CapabilitySubjectScope;
+  readonly subjectId?: string;
+  readonly observedAt: string;
+  readonly expiresAt: string;
+  readonly etag: string;
+  readonly capabilities: readonly Capability[];
+}
+
 /**
  * Documented session status returned by the API.
- * @runa-contract sessionstatus-summary PRD-022#R-022-02
+ * @cuna-contract sessionstatus-summary PRD-022#R-022-02
  */
 export type SessionStatus =
   | "creating"
@@ -19,54 +71,20 @@ export type SessionStatus =
 
 /**
  * Accepted agent identifier for a session.
- * @runa-contract sessionagent-summary PRD-022#R-022-02
+ * @cuna-contract sessionagent-summary PRD-022#R-022-02
  */
 export type SessionAgent = "claude-code" | "codex" | "openclaw";
 
 /**
- * Authentication method selected for the session agent.
- * @runa-contract agentauthenticationmethod-summary PRD-022#R-022-02
- */
-export type AgentAuthenticationMethod =
-  | "none"
-  | "interactive_login"
-  | "api_key";
-
-/**
- * Secret-free authentication state reported for the session agent.
- * @runa-contract agentauthenticationstate-summary PRD-022#R-022-02
- */
-export type AgentAuthenticationState =
-  | "not_applicable"
-  | "installing"
-  | "login_required"
-  | "authenticated"
-  | "configured"
-  | "unavailable";
-
-/**
- * Secret-free authentication status for the selected session agent.
- * @runa-contract agentauthenticationstatus-summary PRD-022#R-022-02
- */
-export interface AgentAuthenticationStatus {
-  /** Selected agent, or null when the session has no agent. */
-  readonly agent: SessionAgent | null;
-  /** Authentication method configured for the agent. */
-  readonly method: AgentAuthenticationMethod;
-  /** Current strict authentication state. */
-  readonly state: AgentAuthenticationState;
-}
-
-/**
  * Public outbound network policy mode.
- * @runa-contract outboundpolicymode-summary PRD-028#R-028-01
+ * @cuna-contract outboundpolicymode-summary PRD-028#R-028-01
  */
 export type OutboundPolicyMode = "allowlist" | "denylist";
 
 /**
  * Outbound network policy applied when the session is created.
  * Empty host arrays are explicit and retain the selected mode's semantics.
- * @runa-contract outboundpolicy-summary PRD-028#R-028-01
+ * @cuna-contract outboundpolicy-summary PRD-028#R-028-01
  */
 export interface OutboundPolicy {
   /** Selected allow-list or deny-list policy mode. */
@@ -77,7 +95,7 @@ export interface OutboundPolicy {
 
 /**
  * Immutable public observation of a session.
- * @runa-contract sessionsnapshot-summary PRD-022#R-022-02
+ * @cuna-contract sessionsnapshot-summary PRD-022#R-022-02
  */
 export interface SessionSnapshot {
   /** Canonical lowercase UUID returned for this session. */
@@ -108,17 +126,13 @@ export interface SessionSnapshot {
 
 /**
  * Optional agent provisioning, resources, and network policy supplied during session creation.
- * @runa-contract sessioncreateoptions-summary PRD-028#R-028-01
+ * @cuna-contract sessioncreateoptions-summary PRD-028#R-028-01
  */
 export interface SessionCreateOptions {
+  /** Stable printable retry key. Reuse it only for the same create intent. */
+  readonly idempotencyKey?: string;
   /** Optional selected session agent. */
   readonly agent?: SessionAgent;
-  /**
-   * Whether creation should return while the machine is still being prepared.
-   * Defaults to `true` for interactive Claude Code and Codex sessions. Pass
-   * `false` to request the legacy synchronous creation behavior explicitly.
-   */
-  readonly background?: boolean;
   /** Optional virtual CPU quantity. */
   readonly vcpus?: number;
   /** Optional memory quantity in mebibytes. */
@@ -135,7 +149,7 @@ export interface SessionCreateOptions {
 
 /**
  * Optional working directory and timeout for buffered execution.
- * @runa-contract execoptions-summary PRD-033#R-033-04
+ * @cuna-contract execoptions-summary PRD-033#R-033-04
  */
 export interface ExecOptions {
   /** Optional working directory passed to buffered execution. */
@@ -146,7 +160,7 @@ export interface ExecOptions {
 
 /**
  * Complete buffered command result returned after execution.
- * @runa-contract execresult-summary PRD-033#R-033-09
+ * @cuna-contract execresult-summary PRD-033#R-033-09
  */
 export interface ExecResult {
   /** Integer process exit code returned after execution. */
@@ -165,7 +179,7 @@ export interface ExecResult {
 
 /**
  * Successful acknowledgement with literal true status.
- * @runa-contract acknowledgement-summary PRD-034#R-034-03
+ * @cuna-contract acknowledgement-summary PRD-034#R-034-03
  */
 export interface Acknowledgement {
   /** Literal true acknowledgement of successful completion. */
@@ -174,7 +188,7 @@ export interface Acknowledgement {
 
 /**
  * Single-use session handoff result returned without automatic use.
- * @runa-contract opensessionresult-summary PRD-035#R-035-02
+ * @cuna-contract opensessionresult-summary PRD-035#R-035-02
  */
 export interface OpenSessionResult {
   /** Validated handoff URL returned only to the caller. */
@@ -183,7 +197,7 @@ export interface OpenSessionResult {
 
 /**
  * Immutable record associated with a session.
- * @runa-contract record-summary PRD-037#R-037-01
+ * @cuna-contract record-summary PRD-037#R-037-01
  */
 export interface Record {
   /** Canonical lowercase UUID returned for this record. */
@@ -202,7 +216,7 @@ export interface Record {
 
 /**
  * Estimated spend, remaining amount, and explanatory note.
- * @runa-contract estimatedusage-summary PRD-036#R-036-01
+ * @cuna-contract estimatedusage-summary PRD-036#R-036-01
  */
 export interface EstimatedUsage {
   /** Estimated spend amount in US dollars. */
@@ -215,11 +229,13 @@ export interface EstimatedUsage {
 
 /**
  * Assigned workspace state with estimated usage.
- * @runa-contract assignedworkspace-summary PRD-036#R-036-01
+ * @cuna-contract assignedworkspace-summary PRD-036#R-036-01
  */
 export interface AssignedWorkspace {
   /** Literal discriminator for the assigned workspace variant. */
   readonly assigned: true;
+  /** Canonical public workspace UUID used by synchronization APIs. */
+  readonly id: string;
   /** Estimated usage for this assigned workspace. */
   readonly usage: EstimatedUsage;
   /** Absent waitlist position in the assigned variant. */
@@ -228,7 +244,7 @@ export interface AssignedWorkspace {
 
 /**
  * Unassigned workspace state with a waitlist position.
- * @runa-contract unassignedworkspace-summary PRD-036#R-036-01
+ * @cuna-contract unassignedworkspace-summary PRD-036#R-036-01
  */
 export interface UnassignedWorkspace {
   /** Literal discriminator for the unassigned workspace variant. */
@@ -241,13 +257,13 @@ export interface UnassignedWorkspace {
 
 /**
  * Assigned or unassigned workspace state.
- * @runa-contract workspace-summary PRD-036#R-036-01
+ * @cuna-contract workspace-summary PRD-036#R-036-01
  */
 export type Workspace = AssignedWorkspace | UnassignedWorkspace;
 
 /**
  * Caller profile and workspace assignment.
- * @runa-contract me-summary PRD-036#R-036-01
+ * @cuna-contract me-summary PRD-036#R-036-01
  */
 export interface Me {
   /** Canonical identifier returned for the caller. */
@@ -259,7 +275,17 @@ export interface Me {
 }
 
 export type OperationKey =
+  | "agentSessions.agentAuth"
+  | "agentSessions.create"
+  | "agentSessions.createTerminalConnection"
+  | "agentSessions.get"
+  | "agentSessions.list"
+  | "agentSessions.rename"
+  | "agentSessions.terminate"
+  | "capabilities.get"
   | "me.get"
+  | "machineCreates.get"
+  | "machineCreates.reconcile"
   | "records.list"
   | "sessions.agentAuth"
   | "sessions.checkpoint"
@@ -272,7 +298,16 @@ export type OperationKey =
   | "sessions.pause"
   | "sessions.resume"
   | "sessions.start"
-  | "sessions.stop";
+  | "sessions.stop"
+  | "workspaceBindings.create"
+  | "workspaceBindings.get"
+  | "workspaces.sync.begin"
+  | "workspaces.sync.changes"
+  | "workspaces.sync.chunk"
+  | "workspaces.sync.chunkDownload"
+  | "workspaces.sync.commit"
+  | "workspaces.sync.negotiate"
+  | "workspaces.sync.reconcile";
 
 export type NormalizedErrorCode =
   | "config_error"
@@ -283,7 +318,7 @@ export type NormalizedErrorCode =
 interface EventBase {
   readonly request_id: string;
   readonly operation_key: OperationKey;
-  readonly method: "GET" | "POST" | "DELETE";
+  readonly method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   readonly relative_path_template: string;
   readonly sdk_language: "typescript";
   readonly sdk_version: string;
@@ -366,13 +401,13 @@ export interface TraceSink {
 }
 
 /**
- * Configuration accepted while constructing a Runa client.
- * @runa-contract runaconfig-summary PRD-023#R-023-01
+ * Configuration accepted while constructing a Cuna client.
+ * @cuna-contract cunaconfig-summary PRD-023#R-023-01
  */
-export interface RunaConfig {
+export interface CunaConfig {
   /** Optional constructor API key selected before environment or explicit-file sources. */
   readonly apiKey?: string;
-  /** Optional explicit Runa API origin; only https://api.runacode.io is accepted. */
+  /** Optional Cuna API origin; api.getcuna.com is canonical and api.runacode.io is legacy. */
   readonly baseUrl?: string;
   /** Optional explicit JSON configuration file, or null to disable file loading. */
   readonly configFile?: string | null;

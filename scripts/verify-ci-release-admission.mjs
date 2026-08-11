@@ -7,7 +7,7 @@ const candidate = JSON.parse(await readFile(
   "release-artifacts/candidate.json", "utf8"));
 const packageJson = JSON.parse(await readFile("package.json", "utf8"));
 const releasePolicy = JSON.parse(await readFile(
-  ".runa/release-policy.json", "utf8"));
+  ".cuna/release-policy.json", "utf8"));
 const workflow = await readFile(".github/workflows/release.yml", "utf8");
 assert.match(process.env.GITHUB_SHA ?? "", /^[a-f0-9]{40}$/);
 assert.equal(candidate.source_commit, process.env.GITHUB_SHA);

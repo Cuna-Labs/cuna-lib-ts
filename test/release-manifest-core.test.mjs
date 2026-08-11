@@ -27,6 +27,17 @@ test("release manifest core uses deterministic canonical JSON", () => {
 });
 
 test("version-controlled release policy matches the exact accepted policy", async () => {
-  const policy = JSON.parse(await readFile(".runa/release-policy.json", "utf8"));
+  const policy = JSON.parse(await readFile(".cuna/release-policy.json", "utf8"));
   assert.deepEqual(policy, EXPECTED_RELEASE_POLICY);
+});
+
+test("single-author branch controls preserve zero approvals without weakening mandatory checks", async () => {
+  const policy = JSON.parse(await readFile(".cuna/release-policy.json", "utf8"));
+  const protection = policy.sourceControl.branchProtection;
+  assert.equal(protection.directPushes, false);
+  assert.equal(protection.requireCodeOwnerReviews, false);
+  assert.equal(protection.requiredApprovingReviews, 0);
+  assert.deepEqual([...protection.requiredStatusChecks].sort(), [
+    "CodeQL", "release-admission", "ts-quality-gates",
+  ]);
 });

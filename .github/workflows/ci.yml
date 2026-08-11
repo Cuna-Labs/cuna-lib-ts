@@ -32,7 +32,7 @@ jobs:
           curl --proto '=https' --tlsv1.2 --location --fail --show-error --output "$RUNNER_TEMP/cyclonedx-bin/cyclonedx-cli" "https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.32.0/cyclonedx-linux-x64"
           echo "454879e6a4a405c8a13bff49b8982adcb0596f3019b26b0811c66e4d7f0783e1  $RUNNER_TEMP/cyclonedx-bin/cyclonedx-cli" | sha256sum --check --strict
           chmod 0555 "$RUNNER_TEMP/cyclonedx-bin/cyclonedx-cli"
-          echo "RUNA_CYCLONEDX_CLI=$RUNNER_TEMP/cyclonedx-bin/cyclonedx-cli" >> "$GITHUB_ENV"
+          echo "CUNA_CYCLONEDX_CLI=$RUNNER_TEMP/cyclonedx-bin/cyclonedx-cli" >> "$GITHUB_ENV"
       - run: npm run release:local-gates
       - run: npm run release:smoke
       - run: node scripts/record-quality-gate.mjs
@@ -125,8 +125,8 @@ jobs:
           merge-multiple: true
       - run: npm run compatibility:aggregate
         env:
-          RUNA_COMPAT_SIGNING_KEY_ID: ${{ vars.RUNA_COMPAT_SIGNING_KEY_ID }}
-          RUNA_COMPAT_SIGNING_KEY_PEM: ${{ secrets.RUNA_COMPAT_SIGNING_KEY_PEM }}
+          CUNA_COMPAT_SIGNING_KEY_ID: ${{ vars.CUNA_COMPAT_SIGNING_KEY_ID }}
+          CUNA_COMPAT_SIGNING_KEY_PEM: ${{ secrets.CUNA_COMPAT_SIGNING_KEY_PEM }}
       - id: attest
         uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d
         with:
@@ -135,13 +135,13 @@ jobs:
         run: npm run release:provenance:verify
         env:
           GH_TOKEN: ${{ github.token }}
-          RUNA_ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          CUNA_ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
       - name: Retain exact controlled-build provenance
         run: npm run release:provenance:evidence
         env:
-          RUNA_ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
-          RUNA_ATTESTATION_ID: ${{ steps.attest.outputs.attestation-id }}
-          RUNA_ATTESTATION_URL: ${{ steps.attest.outputs.attestation-url }}
+          CUNA_ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          CUNA_ATTESTATION_ID: ${{ steps.attest.outputs.attestation-id }}
+          CUNA_ATTESTATION_URL: ${{ steps.attest.outputs.attestation-url }}
       - run: npm run release:manifest:core
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

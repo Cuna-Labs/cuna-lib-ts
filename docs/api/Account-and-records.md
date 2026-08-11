@@ -77,6 +77,14 @@ Literal discriminator for the workspace assignment variant.
 assigned: true
 ```
 
+#### id
+
+Canonical lowercase UUID returned for this public value.
+
+```ts
+id: string
+```
+
 #### usage
 
 Estimated usage available only for an assigned workspace.
@@ -207,7 +215,7 @@ Invokes the accepted public `list` operation owned by `RecordsManager`.
 **Example**
 
 ```ts
-await runa.records.list();
+await cuna.records.list();
 ```
 
 Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-RECORDS_LIST`

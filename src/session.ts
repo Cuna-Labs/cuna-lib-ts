@@ -3,7 +3,6 @@ import { assertUuid } from "./domain.js";
 import type { ClientPort } from "./internal/client-port.js";
 import type {
   Acknowledgement,
-  AgentAuthenticationStatus,
   ExecOptions,
   ExecResult,
   OpenSessionResult,
@@ -78,7 +77,7 @@ function prepareExec(
 
 /**
  * Client-owned session handle with an immutable current snapshot and bounded operations.
- * @runa-contract session-summary PRD-031#R-031-01
+ * @cuna-contract session-summary PRD-031#R-031-01
  */
 export class Session {
   readonly #owner: ClientPort;
@@ -135,10 +134,10 @@ export class Session {
    * @returns The same session handle after an atomic successful refresh.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#session-refresh
-   * @runa-contract session-refresh-description PRD-031#R-031-05
-   * @runa-contract session-refresh-returns PRD-031#R-031-05
-   * @runa-contract session-refresh-throws-api PRD-024#R-024-03
-   * @runa-contract session-refresh-example PRD-031#R-031-05
+   * @cuna-contract session-refresh-description PRD-031#R-031-05
+   * @cuna-contract session-refresh-returns PRD-031#R-031-05
+   * @cuna-contract session-refresh-throws-api PRD-024#R-024-03
+   * @cuna-contract session-refresh-example PRD-031#R-031-05
    */
   refresh(): Promise<this> {
     return this.#replace("sessions.get");
@@ -149,10 +148,10 @@ export class Session {
    * @returns The same session handle after a successful start response.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#session-start
-   * @runa-contract session-start-description PRD-032#R-032-01
-   * @runa-contract session-start-returns PRD-032#R-032-01
-   * @runa-contract session-start-throws-api PRD-024#R-024-03
-   * @runa-contract session-start-example PRD-032#R-032-01
+   * @cuna-contract session-start-description PRD-032#R-032-01
+   * @cuna-contract session-start-returns PRD-032#R-032-01
+   * @cuna-contract session-start-throws-api PRD-024#R-024-03
+   * @cuna-contract session-start-example PRD-032#R-032-01
    */
   start(): Promise<this> {
     return this.#replace("sessions.start");
@@ -163,10 +162,10 @@ export class Session {
    * @returns The same session handle after a successful pause response.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#session-pause
-   * @runa-contract session-pause-description PRD-032#R-032-01
-   * @runa-contract session-pause-returns PRD-032#R-032-01
-   * @runa-contract session-pause-throws-api PRD-024#R-024-03
-   * @runa-contract session-pause-example PRD-032#R-032-01
+   * @cuna-contract session-pause-description PRD-032#R-032-01
+   * @cuna-contract session-pause-returns PRD-032#R-032-01
+   * @cuna-contract session-pause-throws-api PRD-024#R-024-03
+   * @cuna-contract session-pause-example PRD-032#R-032-01
    */
   pause(): Promise<this> {
     return this.#replace("sessions.pause");
@@ -177,10 +176,10 @@ export class Session {
    * @returns The same session handle after a successful resume response.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#session-resume
-   * @runa-contract session-resume-description PRD-032#R-032-01
-   * @runa-contract session-resume-returns PRD-032#R-032-01
-   * @runa-contract session-resume-throws-api PRD-024#R-024-03
-   * @runa-contract session-resume-example PRD-032#R-032-01
+   * @cuna-contract session-resume-description PRD-032#R-032-01
+   * @cuna-contract session-resume-returns PRD-032#R-032-01
+   * @cuna-contract session-resume-throws-api PRD-024#R-024-03
+   * @cuna-contract session-resume-example PRD-032#R-032-01
    */
   resume(): Promise<this> {
     return this.#replace("sessions.resume");
@@ -191,10 +190,10 @@ export class Session {
    * @returns The same session handle after a successful stop response.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#session-stop
-   * @runa-contract session-stop-description PRD-032#R-032-01
-   * @runa-contract session-stop-returns PRD-032#R-032-01
-   * @runa-contract session-stop-throws-api PRD-024#R-024-03
-   * @runa-contract session-stop-example PRD-032#R-032-01
+   * @cuna-contract session-stop-description PRD-032#R-032-01
+   * @cuna-contract session-stop-returns PRD-032#R-032-01
+   * @cuna-contract session-stop-throws-api PRD-024#R-024-03
+   * @cuna-contract session-stop-example PRD-032#R-032-01
    */
   stop(): Promise<this> {
     return this.#replace("sessions.stop");
@@ -205,10 +204,10 @@ export class Session {
    * @returns An acknowledgement whose ok member is literal true.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#session-delete
-   * @runa-contract session-delete-description PRD-032#R-032-06
-   * @runa-contract session-delete-returns PRD-032#R-032-06
-   * @runa-contract session-delete-throws-api PRD-024#R-024-03
-   * @runa-contract session-delete-example PRD-032#R-032-06
+   * @cuna-contract session-delete-description PRD-032#R-032-06
+   * @cuna-contract session-delete-returns PRD-032#R-032-06
+   * @cuna-contract session-delete-throws-api PRD-024#R-024-03
+   * @cuna-contract session-delete-example PRD-032#R-032-06
    */
   async delete(): Promise<Acknowledgement> {
     const id = this.#snapshot.id;
@@ -225,12 +224,12 @@ export class Session {
    * @returns The complete buffered execution result.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#session-exec
-   * @runa-contract session-exec-description PRD-033#R-033-01
-   * @runa-contract session-exec-param-command PRD-033#R-033-01
-   * @runa-contract session-exec-param-options PRD-033#R-033-04
-   * @runa-contract session-exec-returns PRD-033#R-033-01
-   * @runa-contract session-exec-throws-api PRD-024#R-024-03
-   * @runa-contract session-exec-example PRD-033#R-033-01
+   * @cuna-contract session-exec-description PRD-033#R-033-01
+   * @cuna-contract session-exec-param-command PRD-033#R-033-01
+   * @cuna-contract session-exec-param-options PRD-033#R-033-04
+   * @cuna-contract session-exec-returns PRD-033#R-033-01
+   * @cuna-contract session-exec-throws-api PRD-024#R-024-03
+   * @cuna-contract session-exec-example PRD-033#R-033-01
    */
   async exec(
     command: string | readonly string[],
@@ -254,11 +253,11 @@ export class Session {
    * @returns An acknowledgement whose ok member is literal true.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#session-checkpoint
-   * @runa-contract session-checkpoint-description PRD-034#R-034-01
-   * @runa-contract session-checkpoint-param-name PRD-034#R-034-01
-   * @runa-contract session-checkpoint-returns PRD-034#R-034-01
-   * @runa-contract session-checkpoint-throws-api PRD-024#R-024-03
-   * @runa-contract session-checkpoint-example PRD-034#R-034-01
+   * @cuna-contract session-checkpoint-description PRD-034#R-034-01
+   * @cuna-contract session-checkpoint-param-name PRD-034#R-034-01
+   * @cuna-contract session-checkpoint-returns PRD-034#R-034-01
+   * @cuna-contract session-checkpoint-throws-api PRD-024#R-024-03
+   * @cuna-contract session-checkpoint-example PRD-034#R-034-01
    */
   async checkpoint(name: string): Promise<Acknowledgement> {
     if (typeof name !== "string" || [...name].length < 1 || [...name].length > 80) {
@@ -277,10 +276,10 @@ export class Session {
    * @returns A validated handoff result returned without automatic use.
    * @throws ApiError when the API rejects the operation or returns an invalid response.
    * @example docs/reference/examples/workflows.ts#session-open
-   * @runa-contract session-open-description PRD-035#R-035-01
-   * @runa-contract session-open-returns PRD-035#R-035-01
-   * @runa-contract session-open-throws-api PRD-024#R-024-03
-   * @runa-contract session-open-example PRD-035#R-035-01
+   * @cuna-contract session-open-description PRD-035#R-035-01
+   * @cuna-contract session-open-returns PRD-035#R-035-01
+   * @cuna-contract session-open-throws-api PRD-024#R-024-03
+   * @cuna-contract session-open-example PRD-035#R-035-01
    */
   async open(): Promise<OpenSessionResult> {
     const id = this.#snapshot.id;
@@ -290,24 +289,6 @@ export class Session {
     })) as OpenSessionResult;
   }
 
-  /**
-   * Reads the secret-free authentication status of this session's agent.
-   * Use {@link open} to obtain the terminal handoff when interactive login is required.
-   * @returns The strict agent authentication method and state.
-   * @throws ApiError when the API rejects the operation or returns an invalid response.
-   * @example docs/reference/examples/workflows.ts#session-authentication-status
-   * @runa-contract session-authenticationstatus-description PRD-031#R-031-01
-   * @runa-contract session-authenticationstatus-returns PRD-031#R-031-01
-   * @runa-contract session-authenticationstatus-throws-api PRD-024#R-024-03
-   * @runa-contract session-authenticationstatus-example PRD-031#R-031-01
-   */
-  async authenticationStatus(): Promise<AgentAuthenticationStatus> {
-    const id = this.#snapshot.id;
-    assertUuid(id);
-    return (await this.#owner.invoke("sessions.agentAuth", {
-      id,
-    })) as AgentAuthenticationStatus;
-  }
 }
 
 export const constructSession: (

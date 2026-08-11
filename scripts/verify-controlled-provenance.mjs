@@ -13,31 +13,31 @@ const lockfileSha256 = createHash("sha256").update(
 const workflowSha256 = createHash("sha256").update(
   await readFile(".github/workflows/ci.yml"),
 ).digest("hex");
-const bundleBytes = await readFile(process.env.RUNA_ATTESTATION_BUNDLE);
+const bundleBytes = await readFile(process.env.CUNA_ATTESTATION_BUNDLE);
 const statement = extractAttestationStatement(bundleBytes.toString("utf8"), candidate);
 const predicate = statement.predicate;
 const predicateBytes = Buffer.from(`${JSON.stringify(predicate, null, 2)}\n`);
 const builderIdentity =
-  "https://github.com/Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml@refs/heads/main";
+  "https://github.com/Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml@refs/heads/main";
 assert.match(process.env.GITHUB_REPOSITORY_ID ?? "", /^\d+$/u);
 assert.match(process.env.GITHUB_REPOSITORY_OWNER_ID ?? "", /^\d+$/u);
 validateSignedProvenancePredicate(predicate, {
   sourceCommit: candidate.source_commit,
   workflowRef: "refs/heads/main",
-  repository: "https://github.com/Runa-Laboratories/runa-lib-ts",
+  repository: "https://github.com/Cuna-Labs/cuna-lib-ts",
   workflowPath: ".github/workflows/ci.yml",
   eventName: "push",
   repositoryId: process.env.GITHUB_REPOSITORY_ID,
   repositoryOwnerId: process.env.GITHUB_REPOSITORY_OWNER_ID,
   runnerEnvironment: "github-hosted",
-  sourceUri: "git+https://github.com/Runa-Laboratories/runa-lib-ts@refs/heads/main",
+  sourceUri: "git+https://github.com/Cuna-Labs/cuna-lib-ts@refs/heads/main",
   builderIdentity,
-  invocationId: `https://github.com/Runa-Laboratories/runa-lib-ts/actions/runs/${process.env.GITHUB_RUN_ID}/attempts/${process.env.GITHUB_RUN_ATTEMPT}`,
+  invocationId: `https://github.com/Cuna-Labs/cuna-lib-ts/actions/runs/${process.env.GITHUB_RUN_ID}/attempts/${process.env.GITHUB_RUN_ATTEMPT}`,
 });
 const command = [
   "attestation", "verify", `release-artifacts/${candidate.filename}`,
-  "--repo", "Runa-Laboratories/runa-lib-ts",
-  "--signer-workflow", "Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml",
+  "--repo", "Cuna-Labs/cuna-lib-ts",
+  "--signer-workflow", "Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml",
 ];
 const result = spawnSync("gh", command, { encoding: "utf8" });
 assert.equal(result.status, 0,
@@ -52,7 +52,7 @@ await writeFile("evidence/provenance-verifier.json", `${JSON.stringify({
   status: "PASS",
   candidate_sha256: candidate.sha256,
   command: ["gh", ...command],
-  signer_workflow: "Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml",
+  signer_workflow: "Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml",
   builder_identity: builderIdentity,
   source_commit: candidate.source_commit,
   intended_tag: `ts-v${candidate.version}`,

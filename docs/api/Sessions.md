@@ -105,14 +105,6 @@ Acquires and returns a validated session handoff without using it automatically.
 open(): Promise<OpenSessionResult>
 ```
 
-#### authenticationStatus
-
-Reads the secret-free authentication status of this session's agent.
-
-```ts
-authenticationStatus(): Promise<AgentAuthenticationStatus>
-```
-
 ### Session#refresh
 
 Invokes the accepted public `refresh` operation owned by `Session`.
@@ -280,28 +272,6 @@ await session.open();
 
 Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-SESSION_OPEN`
 
-### Session#authenticationStatus
-
-Invokes the accepted public `authenticationStatus` operation owned by `Session`.
-
-**Returns:** The strict agent authentication method and state.
-
-**Throws**
-
-- `ApiError` when the contract-backed failure condition applies.
-
-**Example**
-
-```ts
-const authentication = await session.authenticationStatus();
-if (authentication.state === "login_required") {
-  const handoff = await session.open();
-  void handoff; // Pass to the user's browser; never log or persist it.
-}
-```
-
-Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-SESSION_AUTHENTICATION_STATUS`
-
 <a id="sessionsmanager"></a>
 ## SessionsManager
 
@@ -348,7 +318,7 @@ Invokes the accepted public `create` operation owned by `SessionsManager`.
 **Returns:** A client-owned handle for the created session.
 
 - **name:** Session name containing between one and eighty characters.
-- **options:** Optional agent, background, resource, host, and runtime-port settings.
+- **options:** Optional agent, resource, host, and runtime-port settings.
 
 **Throws**
 
@@ -357,7 +327,7 @@ Invokes the accepted public `create` operation owned by `SessionsManager`.
 **Example**
 
 ```ts
-const created = await runa.sessions.create("worker", { agent: "codex" });
+const created = await cuna.sessions.create("worker", { agent: "codex" });
 if (created.snapshot.status === "creating") await created.refresh();
 ```
 
@@ -376,7 +346,7 @@ Invokes the accepted public `list` operation owned by `SessionsManager`.
 **Example**
 
 ```ts
-await runa.sessions.list();
+await cuna.sessions.list();
 ```
 
 Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-SESSIONS_LIST`
@@ -396,7 +366,7 @@ Invokes the accepted public `get` operation owned by `SessionsManager`.
 **Example**
 
 ```ts
-await runa.sessions.get(sessionId);
+await cuna.sessions.get(sessionId);
 ```
 
 Source: [docs/reference/examples/workflows.ts](../reference/examples/workflows.ts) - Test: `TC-048-EXAMPLE-SESSIONS_GET`
@@ -412,71 +382,6 @@ Accepted agent identifier for a session.
 
 ```ts
 type SessionAgent = "claude-code" | "codex" | "openclaw"
-```
-
-<a id="agentauthenticationmethod"></a>
-## AgentAuthenticationMethod
-
-Authentication method selected for a session agent.
-
-**Kind:** type
-
-**Signature**
-
-```ts
-type AgentAuthenticationMethod = "none" | "interactive_login" | "api_key"
-```
-
-<a id="agentauthenticationstate"></a>
-## AgentAuthenticationState
-
-Secret-free authentication state reported for a session agent.
-
-**Kind:** type
-
-**Signature**
-
-```ts
-type AgentAuthenticationState = "not_applicable" | "installing" | "login_required" | "authenticated" | "configured" | "unavailable"
-```
-
-<a id="agentauthenticationstatus"></a>
-## AgentAuthenticationStatus
-
-Secret-free authentication status of a session agent.
-
-**Kind:** type
-
-**Signature**
-
-```ts
-interface AgentAuthenticationStatus
-```
-
-### Public members
-
-#### agent
-
-Selected session agent, when the API returned or the caller supplied one.
-
-```ts
-agent: SessionAgent | null
-```
-
-#### method
-
-Authentication method selected for the session agent.
-
-```ts
-method: AgentAuthenticationMethod
-```
-
-#### state
-
-Strict secret-free authentication state of the session agent.
-
-```ts
-state: AgentAuthenticationState
 ```
 
 <a id="outboundpolicymode"></a>
@@ -538,20 +443,20 @@ interface SessionCreateOptions
 
 ### Public members
 
+#### idempotencyKey
+
+Optional caller-stable key used to make one create request retry-safe.
+
+```ts
+idempotencyKey?: string
+```
+
 #### agent
 
 Selected session agent, when the API returned or the caller supplied one.
 
 ```ts
 agent?: SessionAgent
-```
-
-#### background
-
-Whether creation may return while session provisioning is still in progress.
-
-```ts
-background?: boolean
 ```
 
 #### vcpus

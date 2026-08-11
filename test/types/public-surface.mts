@@ -1,8 +1,19 @@
 import { stderrText, stdoutText } from "../../src/index.js";
 import type {
-  AgentAuthenticationStatus,
+  AgentSession,
+  AgentSessionCreateOptions,
   AssignedWorkspace,
+  CapabilitySnapshot,
+  Problem,
+  TerminalConnectionCapability,
+  TerminalConnectionCreateOptions,
+  TerminalConnectionGrant,
   Workspace,
+  WorkspaceBinding,
+  WorkspaceBindingCreateRequest,
+  WorkspaceSyncBeginRequest,
+  WorkspaceSyncChangeItem,
+  WorkspaceSyncProblem,
 } from "../../src/index.js";
 
 type Equal<Left, Right> =
@@ -22,14 +33,127 @@ type StdoutHelperContract = Assert<
 type StderrHelperContract = Assert<
   Equal<ReturnType<typeof stderrText>, string | undefined>
 >;
-type AgentAuthenticationStatusIsClosed = Assert<
-  Equal<keyof AgentAuthenticationStatus, "agent" | "method" | "state">
+type CapabilitySnapshotIsClosed = Assert<
+  Equal<
+    keyof CapabilitySnapshot,
+    | "schemaVersion"
+    | "subjectScope"
+    | "subjectId"
+    | "observedAt"
+    | "expiresAt"
+    | "etag"
+    | "capabilities"
+  >
+>;
+type ProblemIsClosed = Assert<
+  Equal<
+    keyof Problem,
+    | "type"
+    | "title"
+    | "status"
+    | "code"
+    | "requestId"
+    | "retryable"
+    | "detail"
+    | "action"
+  >
+>;
+type WorkspaceBindingIsClosed = Assert<
+  Equal<
+    keyof WorkspaceBinding,
+    | "bindingId"
+    | "workspaceId"
+    | "projectId"
+    | "localInstanceId"
+    | "machineId"
+    | "remoteRoot"
+    | "exclusionPolicyDigest"
+    | "activeGeneration"
+    | "activeManifestRoot"
+    | "bindingEpoch"
+    | "minimumReader"
+    | "minimumWriter"
+    | "createdAt"
+    | "updatedAt"
+  >
+>;
+type WorkspaceBindingCreateRequestIsClosed = Assert<
+  Equal<
+    keyof WorkspaceBindingCreateRequest,
+    | "workspaceId"
+    | "projectId"
+    | "localInstanceId"
+    | "machineId"
+    | "exclusionPolicyDigest"
+    | "excludedPrefixes"
+  >
+>;
+type WorkspaceSyncBeginSeparatesAuthorities = Assert<
+  Equal<keyof WorkspaceSyncBeginRequest,
+    | "workspaceBindingId"
+    | "machineId"
+    | "baseGeneration"
+    | "exclusionPolicyDigest"
+    | "protocol"
+    | "minimumReader"
+    | "minimumWriter"
+  >
+>;
+type WorkspaceSyncChangeItemIsTyped = Assert<
+  Equal<WorkspaceSyncChangeItem["operation"], "revision" | "upsert" | "delete">
+>;
+type WorkspaceSyncProblemIsSpecialized = Assert<
+  Equal<WorkspaceSyncProblem["selectedProtocol"], 1 | 2 | null>
+>;
+type TerminalConnectionCapabilityIsClosed = Assert<
+  Equal<keyof TerminalConnectionCapability, "name" | "availability">
+>;
+type AgentSessionBindingNameIsUnambiguous = Assert<
+  Equal<
+    Extract<keyof AgentSession, "workspaceBindingId" | "workspaceId">,
+    "workspaceBindingId"
+  >
+>;
+type AgentSessionCreateBindingNameIsUnambiguous = Assert<
+  Equal<
+    Extract<keyof AgentSessionCreateOptions, "workspaceBindingId" | "workspaceId">,
+    "workspaceBindingId"
+  >
+>;
+type TerminalConnectionCreateOptionsIsClosed = Assert<
+  Equal<
+    keyof TerminalConnectionCreateOptions,
+    "idempotencyKey" | "clientInstanceId" | "protocol" | "resumeHandle"
+  >
+>;
+type TerminalConnectionGrantIsClosed = Assert<
+  Equal<
+    keyof TerminalConnectionGrant,
+    | "terminalSessionId"
+    | "resumeHandle"
+    | "connectUrl"
+    | "connectToken"
+    | "protocol"
+    | "capabilities"
+    | "expiresAt"
+  >
 >;
 
 export type {
-  AgentAuthenticationStatusIsClosed,
+  AgentSessionBindingNameIsUnambiguous,
+  AgentSessionCreateBindingNameIsUnambiguous,
+  CapabilitySnapshotIsClosed,
+  ProblemIsClosed,
+  WorkspaceBindingCreateRequestIsClosed,
+  WorkspaceBindingIsClosed,
+  WorkspaceSyncBeginSeparatesAuthorities,
+  WorkspaceSyncChangeItemIsTyped,
+  WorkspaceSyncProblemIsSpecialized,
   AssignedDiscriminantIsLiteral,
   StderrHelperContract,
   StdoutHelperContract,
+  TerminalConnectionCapabilityIsClosed,
+  TerminalConnectionCreateOptionsIsClosed,
+  TerminalConnectionGrantIsClosed,
   WorkspaceDiscriminantIsClosed
 };

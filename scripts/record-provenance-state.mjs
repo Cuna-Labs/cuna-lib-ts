@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { validateAttestationJsonl } from "./attestation-bundle.mjs";
 import { appendReleaseManifestState } from "./release-manifest-envelope.mjs";
 
-const bundle = process.env.RUNA_ATTESTATION_BUNDLE;
+const bundle = process.env.CUNA_ATTESTATION_BUNDLE;
 assert.equal(typeof bundle, "string");
 assert.match(bundle, /\.intoto\.jsonl$/u);
 const candidate = JSON.parse(await readFile("release-artifacts/candidate.json", "utf8"));

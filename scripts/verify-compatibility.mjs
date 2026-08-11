@@ -32,7 +32,7 @@ try {
   await writeFile(path.join(workspace, "package.json"), `${JSON.stringify({
     name: "runa-compatibility-clean-room", version: "0.0.0",
     private: true, type: "module",
-    dependencies: { "@runa_laboratories/sdk": `file:${archivePath.replaceAll("\\", "/")}` }
+    dependencies: { "@cuna_labs/sdk": `file:${archivePath.replaceAll("\\", "/")}` }
   })}\n`);
   probe = "isolated-offline-lockfile";
   let result = runNpm(["install", "--package-lock-only", "--ignore-scripts", "--offline",
@@ -43,12 +43,12 @@ try {
   assert.equal(result.status, 0, result.stderr || result.stdout);
   probe = "root-esm-import";
   const imported = spawnSync(process.execPath, ["--input-type=module", "-e",
-    "import('@runa_laboratories/sdk').then(m=>{if(Object.keys(m).sort().join(',')!=='ApiError,CommandError,ConfigError,Runa,RunaError,Session,stderrText,stdoutText')process.exit(2)})"],
+    "import('@cuna_labs/sdk').then(m=>{if(Object.keys(m).sort().join(',')!=='ApiError,CommandError,ConfigError,Cuna,CunaError,Session,stderrText,stdoutText')process.exit(2)})"],
     { cwd: workspace, encoding: "utf8" });
   assert.equal(imported.status, 0, imported.stderr || imported.stdout);
   probe = "declarations";
   await writeFile(path.join(workspace, "consumer.mts"),
-    "import { Runa, stdoutText } from '@runa_laboratories/sdk'; import type { AssignedWorkspace } from '@runa_laboratories/sdk'; const r: Runa = new Runa({apiKey: 'runa_sk_synthetic'}); const x: true = (null as unknown as AssignedWorkspace).assigned; void stdoutText; void r;\n");
+    "import { Cuna, stdoutText } from '@cuna_labs/sdk'; import type { AssignedWorkspace } from '@cuna_labs/sdk'; const c: Cuna = new Cuna({apiKey: 'cuna_sk_synthetic'}); const x: true = (null as unknown as AssignedWorkspace).assigned; void stdoutText; void c;\n");
   await writeFile(path.join(workspace, "tsconfig.json"), JSON.stringify({
     compilerOptions: {
       target: "ES2022", module: "NodeNext", moduleResolution: "NodeNext", strict: true,
@@ -61,12 +61,12 @@ try {
     { cwd: workspace, encoding: "utf8" });
   assert.equal(tsc.status, 0, tsc.stderr || tsc.stdout);
   probe = "package-surface";
-  const installed = JSON.parse(await readFile(path.join(workspace, "node_modules/@runa_laboratories/sdk/package.json"), "utf8"));
+  const installed = JSON.parse(await readFile(path.join(workspace, "node_modules/@cuna_labs/sdk/package.json"), "utf8"));
   assert.deepEqual(Object.keys(installed.exports), ["."]);
   assert.equal(installed.sideEffects, false);
   probe = "runtime-smoke";
-  const sdk = await import(new URL(`file://${path.join(workspace, "node_modules/@runa_laboratories/sdk/dist/index.js").replaceAll("\\", "/")}`));
-  const client = new sdk.Runa({
+  const sdk = await import(new URL(`file://${path.join(workspace, "node_modules/@cuna_labs/sdk/dist/index.js").replaceAll("\\", "/")}`));
+  const client = new sdk.Cuna({
     apiKey: "runa_sk_synthetic",
     baseUrl: "https://api.runacode.io",
     fetch: async () => new Response(JSON.stringify({
@@ -79,11 +79,11 @@ try {
   assert.equal(account.workspace.assigned, false);
   await client.close();
   probe = "readme";
-  const readme = await readFile(path.join(workspace, "node_modules/@runa_laboratories/sdk/README.md"), "utf8");
-  assert.match(readme, /npm install @runa_laboratories\/sdk/);
+  const readme = await readFile(path.join(workspace, "node_modules/@cuna_labs/sdk/README.md"), "utf8");
+  assert.match(readme, /npm install @cuna_labs\/sdk/);
   probe = "tree-shaking";
   await writeFile(path.join(workspace, "bundle-entry.mjs"),
-    "export { stdoutText } from '@runa_laboratories/sdk';\n");
+    "export { stdoutText } from '@cuna_labs/sdk';\n");
   const bundleResult = await bundle({
     absWorkingDir: workspace,
     entryPoints: ["bundle-entry.mjs"],

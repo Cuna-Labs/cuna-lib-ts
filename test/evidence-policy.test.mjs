@@ -64,7 +64,7 @@ test("readiness rejects fabricated smoke counters and missing guards", () => {
   const digest = "a".repeat(64);
   const journey = (cleanup = "pass") => ({
     passed: 30,
-    public_calls: ["Runa"],
+    public_calls: ["Cuna"],
     cleanup,
     elapsed_ms: Array(30).fill(1),
   });

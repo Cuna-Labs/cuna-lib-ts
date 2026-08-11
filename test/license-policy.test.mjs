@@ -7,7 +7,7 @@ import {
 
 const approvedText = `Apache License
 Version 2.0, January 2004
-Copyright 2026 Runa Laboratories
+Copyright 2026 Cuna Labs
 `;
 
 test("the GA license policy accepts only the approved Apache-2.0 identity", () => {
@@ -20,7 +20,7 @@ test("the GA license policy accepts only the approved Apache-2.0 identity", () =
     { license: APPROVED_LICENSE },
   ));
   assert.throws(() => validateApprovedLicense(
-    approvedText.replace("Runa Laboratories", "Unknown Owner"),
+    approvedText.replace("Cuna Labs", "Unknown Owner"),
     { license: APPROVED_LICENSE },
   ));
 });

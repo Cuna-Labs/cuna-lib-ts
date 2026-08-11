@@ -10,7 +10,7 @@ const candidate = JSON.parse(await readFile("release-artifacts/candidate.json", 
 const archivePath = path.resolve("release-artifacts", candidate.filename);
 const archive = await readFile(archivePath);
 assert.equal(createHash("sha256").update(archive).digest("hex"), candidate.sha256);
-assert.equal(candidate.package, "@runa_laboratories/sdk");
+assert.equal(candidate.package, "@cuna_labs/sdk");
 
 const collect = (child) => new Promise((resolve, reject) => {
   let stdout = "";
@@ -37,7 +37,7 @@ import assert from "node:assert/strict";
 import { syncBuiltinESMExports } from "node:module";
 import http from "node:http";
 import https from "node:https";
-import { Runa } from "@runa_laboratories/sdk";
+import { Cuna } from "@cuna_labs/sdk";
 
 const journey = process.argv[2];
 const sessionId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
@@ -55,7 +55,7 @@ let publicNetworkDispatches = 0;
 let cleanup = "not-required";
 const denyNetwork = () => {
   publicNetworkDispatches += 1;
-  throw new TypeError("Real network access is disabled by the Runa smoke harness.");
+  throw new TypeError("Real network access is disabled by the Cuna smoke harness.");
 };
 globalThis.fetch = denyNetwork;
 http.request = denyNetwork;
@@ -72,7 +72,7 @@ const json = (value, status = 200) => new Response(JSON.stringify(value), {
 const fetch = async (url, init) => {
   syntheticDispatches += 1;
   const parsed = new URL(url);
-  assert.equal(parsed.origin, "https://api.runacode.io");
+  assert.equal(parsed.origin, "https://api.getcuna.com");
   const route = parsed.pathname;
   if (route === "/v1/me" && init.method === "GET") {
     return json({ id: userId, email: "sdk@example.invalid",
@@ -98,24 +98,24 @@ const fetch = async (url, init) => {
 };
 
 const started = performance.now();
-const runa = new Runa({
-  apiKey: ["runa", "sk", "synthetic"].join("_"),
-  baseUrl: "https://api.runacode.io",
+const cuna = new Cuna({
+  apiKey: ["cuna", "sk", "synthetic"].join("_"),
+  baseUrl: "https://api.getcuna.com",
   fetch
 });
 try {
   if (journey === "ttfc") {
-    calls.push("Runa", "me");
-    await runa.me();
+    calls.push("Cuna", "me");
+    await cuna.me();
   } else if (journey === "first-session") {
-    calls.push("Runa", "sessions.create");
-    const created = await runa.sessions.create("first-session");
+    calls.push("Cuna", "sessions.create");
+    const created = await cuna.sessions.create("first-session");
     calls.push("session.delete");
     await created.delete();
     cleanup = "pass";
   } else if (journey === "first-exec") {
-    calls.push("Runa", "sessions.create");
-    const created = await runa.sessions.create("first-exec");
+    calls.push("Cuna", "sessions.create");
+    const created = await cuna.sessions.create("first-exec");
     try {
       calls.push("session.exec");
       const result = await created.exec("true");
@@ -126,8 +126,8 @@ try {
       cleanup = "pass";
     }
   } else if (journey === "session-lifecycle-checkpoint") {
-    calls.push("Runa", "sessions.create");
-    const created = await runa.sessions.create("session-lifecycle-checkpoint");
+    calls.push("Cuna", "sessions.create");
+    const created = await cuna.sessions.create("session-lifecycle-checkpoint");
     try {
       calls.push("session.pause"); await created.pause();
       calls.push("session.resume"); await created.resume();
@@ -140,11 +140,11 @@ try {
       cleanup = "pass";
     }
   } else if (journey === "read-and-open-boundary") {
-    calls.push("Runa", "records.list");
-    const records = await runa.records.list();
+    calls.push("Cuna", "records.list");
+    const records = await cuna.records.list();
     assert.equal(Array.isArray(records), true);
     calls.push("sessions.create");
-    const created = await runa.sessions.create("read-and-open-boundary");
+    const created = await cuna.sessions.create("read-and-open-boundary");
     try {
       calls.push("session.open");
       await created.open();
@@ -157,7 +157,7 @@ try {
     throw new Error("Unknown journey.");
   }
 } finally {
-  await runa.close();
+  await cuna.close();
 }
 process.stdout.write(JSON.stringify({
   journey, calls, outcome: "structural-pass", cleanup,
@@ -181,7 +181,7 @@ const installManifest = `${JSON.stringify({
   version: "0.0.0",
   private: true,
   type: "module",
-  dependencies: { "@runa_laboratories/sdk": `file:${archivePath.replaceAll("\\", "/")}` },
+  dependencies: { "@cuna_labs/sdk": `file:${archivePath.replaceAll("\\", "/")}` },
 })}\n`;
 const lockRoom = await mkdtemp(path.join(tmpdir(), "runa-ts054-lock-"));
 let lockBefore;
@@ -196,8 +196,8 @@ try {
   assert.equal(lock.status, 0, "R-054-03: exact offline lock creation failed.");
   lockBefore = await readFile(path.join(lockRoom, "package-lock.json"));
   const lockJson = JSON.parse(lockBefore);
-  assert.equal(lockJson.packages["node_modules/@runa_laboratories/sdk"].version, candidate.version);
-  assert.match(lockJson.packages["node_modules/@runa_laboratories/sdk"].resolved,
+  assert.equal(lockJson.packages["node_modules/@cuna_labs/sdk"].version, candidate.version);
+  assert.match(lockJson.packages["node_modules/@cuna_labs/sdk"].resolved,
     new RegExp(`${candidate.filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`));
 } finally {
   await rm(lockRoom, { recursive: true, force: true });
@@ -221,7 +221,7 @@ const execute = async ({ run, journey }) => {
     assert.equal(install.status, 0, "R-054-03: exact offline install failed.");
     assert.deepEqual(await readFile(path.join(workspace, "package-lock.json")), lockBefore);
     const installed = JSON.parse(await readFile(
-      path.join(workspace, "node_modules/@runa_laboratories/sdk/package.json"), "utf8"));
+      path.join(workspace, "node_modules/@cuna_labs/sdk/package.json"), "utf8"));
     assert.equal(installed.name, candidate.package);
     assert.equal(installed.version, candidate.version);
     assert.equal(Object.keys(installed.dependencies ?? {}).length, 0);

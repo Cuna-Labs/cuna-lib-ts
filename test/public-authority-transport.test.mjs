@@ -84,8 +84,8 @@ function signedAssets() {
       ...common, administrators_enforced: true, branch: "main", commit_sha: headSha,
       deletions_allowed: false, dismiss_stale_reviews: true,
       force_pushes_allowed: false, pull_request_required: true,
-      repository: "Runa-Laboratories/runa-lib-ts", required_approving_reviews: 0,
-      required_status_checks: ["release-admission", "ts-quality-gates"],
+      repository: "Cuna-Labs/cuna-lib-ts", required_approving_reviews: 0,
+      required_status_checks: ["CodeQL", "release-admission", "ts-quality-gates"],
     },
     cross_language: {
       ...common, authority_head_sha: headSha, candidate_sha256: candidateSha,
@@ -97,16 +97,16 @@ function signedAssets() {
       python_artifacts: {
         candidate_manifest_sha256: digest("1"), candidate_run_id: 44,
         source_commit: "2".repeat(40),
-        wheel: { filename: "runa_sdk-0.1.0-py3-none-any.whl", sha256: pythonWheelSha },
-        sdist: { filename: "runa_sdk-0.1.0.tar.gz", sha256: pythonSdistSha },
+        wheel: { filename: "cuna_sdk-0.1.0-py3-none-any.whl", sha256: pythonWheelSha },
+        sdist: { filename: "cuna_sdk-0.1.0.tar.gz", sha256: pythonSdistSha },
       },
       typescript_artifact: {
-        filename: "runa_laboratories-sdk-0.1.0.tgz", sha256: candidateSha,
+        filename: "cuna_labs-sdk-0.1.0.tgz", sha256: candidateSha,
       },
     },
     publication_readiness: {
       ...common, candidate_sha256: candidateSha, dist_tag: "latest",
-      oidc_trusted_publisher: true, package_name: "@runa_laboratories/sdk",
+      oidc_trusted_publisher: true, package_name: "@cuna_labs/sdk",
       provenance_attestation_required: true, registry: "https://registry.npmjs.org",
       registry_retrieval_required: true, version: "0.1.0",
     },
@@ -115,9 +115,9 @@ function signedAssets() {
       candidate_sha256: candidateSha, dependency_closure_sha256: digest("3"),
       local_validation_sha256: digest("4"), sbom_sha256: digest("5"),
       schema_sha256s: {
-        ".runa/schemas/cyclonedx-1.6.schema.json": "3e92dddbc30cf7f6a02b80f0942b1a4cfd4fb1c26f1dfc4310afa9d613cafb93",
-        ".runa/schemas/jsf-0.82.schema.json": "8bae002c25e723db7ee1f26afde680ae1a2b1a8f6b4b4b0fd65dc3becb090aae",
-        ".runa/schemas/spdx.schema.json": "baa9d3bd1ed57b6751b0887edead6b5063ff53ff7429cf85d476c6c94af0166e",
+        ".cuna/schemas/cyclonedx-1.6.schema.json": "3e92dddbc30cf7f6a02b80f0942b1a4cfd4fb1c26f1dfc4310afa9d613cafb93",
+        ".cuna/schemas/jsf-0.82.schema.json": "8bae002c25e723db7ee1f26afde680ae1a2b1a8f6b4b4b0fd65dc3becb090aae",
+        ".cuna/schemas/spdx.schema.json": "baa9d3bd1ed57b6751b0887edead6b5063ff53ff7429cf85d476c6c94af0166e",
       },
       spec_version: "1.6", status: "PASS",
       tool: {
@@ -365,6 +365,38 @@ test("tampered SHA, detached signature, and legacy embedded envelopes are reject
   }, fixture.trust, "approval", Date.parse("2026-08-02T12:10:00.000Z"), {
     requiredSchemaVersion: 2,
   }), undefined);
+});
+
+test("legacy authority repository is rejected even when its detached statement is valid", () => {
+  const fixture = signedAssets();
+  const assets = new Map(fixture.assets);
+  const detached = JSON.parse(assets.get("release-authority-bundle.json.sig"));
+  const { signature: _signature, ...statement } = detached;
+  statement.authority_repository = "Runa-Laboratories/runa-release-authority";
+  const legacyDetached = {
+    ...statement,
+    signature: sign(null, jcsBytes(statement), fixture.privateKey).toString("base64"),
+  };
+  assets.set("release-authority-bundle.json.sig",
+    Buffer.from(`${JSON.stringify(legacyDetached, null, 2)}\n`));
+  const legacyRun = {
+    ...validRun(),
+    repository: {
+      full_name: "Runa-Laboratories/runa-release-authority",
+      private: false,
+    },
+  };
+  assert.throws(() => verifyAuthorityAssets(
+    assets, fixture.trust, Date.parse("2026-08-02T12:10:00.000Z"), legacyRun,
+  ), /not accepted/u);
+
+  const attackerRun = {
+    ...legacyRun,
+    repository: { full_name: "attacker/release-authority", private: false },
+  };
+  assert.throws(() => verifyAuthorityAssets(
+    assets, fixture.trust, Date.parse("2026-08-02T12:10:00.000Z"), attackerRun,
+  ), /not accepted/u);
 });
 
 test("detached v2 authenticates raw bytes and rejects duplicate JSON keys", () => {

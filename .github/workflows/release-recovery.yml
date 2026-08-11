@@ -55,26 +55,26 @@ jobs:
           github-token: ${{ github.token }}
       - name: Bind recovery to candidate source commit and exact historical tag
         env:
-          RUNA_REQUESTED_VERSION: ${{ inputs.version }}
+          CUNA_REQUESTED_VERSION: ${{ inputs.version }}
         run: |
-          RUNA_SOURCE_COMMIT="$(node -p 'require("./release-artifacts/candidate.json").source_commit')"
-          test "$(git rev-list -n 1 "ts-v$RUNA_REQUESTED_VERSION")" = "$RUNA_SOURCE_COMMIT"
-          test "$(node -p 'require("./release-artifacts/candidate.json").version')" = "$RUNA_REQUESTED_VERSION"
-          echo "RUNA_SOURCE_COMMIT=$RUNA_SOURCE_COMMIT" >> "$GITHUB_ENV"
+          CUNA_SOURCE_COMMIT="$(node -p 'require("./release-artifacts/candidate.json").source_commit')"
+          test "$(git rev-list -n 1 "ts-v$CUNA_REQUESTED_VERSION")" = "$CUNA_SOURCE_COMMIT"
+          test "$(node -p 'require("./release-artifacts/candidate.json").version')" = "$CUNA_REQUESTED_VERSION"
+          echo "CUNA_SOURCE_COMMIT=$CUNA_SOURCE_COMMIT" >> "$GITHUB_ENV"
       - name: Verify original successful candidate CI run
         run: node scripts/verify-ci-run.mjs
         env:
           GH_TOKEN: ${{ github.token }}
-          RUNA_CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
-          RUNA_SOURCE_COMMIT: ${{ env.RUNA_SOURCE_COMMIT }}
+          CUNA_CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
+          CUNA_SOURCE_COMMIT: ${{ env.CUNA_SOURCE_COMMIT }}
       - name: Verify immutable historical tag identity
         run: node scripts/verify-release-tag.mjs
         env:
-          RUNA_RELEASE_TAG: ts-v${{ inputs.version }}
-          RUNA_RELEASE_COMMIT: ${{ env.RUNA_SOURCE_COMMIT }}
+          CUNA_RELEASE_TAG: ts-v${{ inputs.version }}
+          CUNA_RELEASE_COMMIT: ${{ env.CUNA_SOURCE_COMMIT }}
       - name: Verify registry, provenance, envelope, and exact immutable release assets
         run: npm run release:recovery:verify
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          RUNA_RELEASE_TAG: ts-v${{ inputs.version }}
+          CUNA_RELEASE_TAG: ts-v${{ inputs.version }}

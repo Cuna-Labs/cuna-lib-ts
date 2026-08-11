@@ -58,24 +58,24 @@ const startupResult = spawnSync(process.execPath, [
 assert.equal(startupResult.status, 0, "R-050-09: startup measurement failed");
 const startup = JSON.parse(startupResult.stdout);
 
-const workspace = await mkdtemp(path.join(tmpdir(), "runa-ts050-profile-"));
+const workspace = await mkdtemp(path.join(tmpdir(), "cuna-ts050-profile-"));
 const cache = path.join(workspace, "cache");
 let releasePrivateFactory;
 try {
   await mkdir(cache);
   await writeFile(path.join(workspace, "package.json"), `${JSON.stringify({
-    name: "runa-ts050-profile",
+    name: "cuna-ts050-profile",
     version: "0.0.0",
     private: true,
     type: "module",
-    dependencies: { "@runa_laboratories/sdk": `file:${artifactPath.replaceAll("\\", "/")}` },
+    dependencies: { "@cuna_labs/sdk": `file:${artifactPath.replaceAll("\\", "/")}` },
   })}\n`);
   const install = npmSpawnSync([
     "install", "--ignore-scripts", "--offline", "--cache", cache,
     "--no-audit", "--no-fund",
   ], { cwd: workspace });
   assert.equal(install.status, 0, "R-050-03: isolated profile install failed");
-  const packageRoot = path.join(workspace, "node_modules", "@runa_laboratories", "sdk");
+  const packageRoot = path.join(workspace, "node_modules", "@cuna_labs", "sdk");
   const sdk = await import(pathToFileURL(path.join(packageRoot, "dist", "index.js")));
   const seam = await import(pathToFileURL(
     path.join(packageRoot, "dist", "internal", "performance-seam.js"),
@@ -91,7 +91,7 @@ try {
   releasePrivateFactory = seam.installPrivateTransportFactory(
     () => new OverheadBoundaryTransport(),
   );
-  const key = ["runa", "sk", "synthetic"].join("_");
+  const key = ["cuna", "sk", "synthetic"].join("_");
   const requestSamples = [];
   const allocationSamples = [];
   for (
@@ -99,17 +99,17 @@ try {
     warmup < catalog.profile.request_warmup_invocations;
     warmup += 1
   ) {
-    const client = new sdk.Runa({
+    const client = new sdk.Cuna({
       apiKey: key,
-      baseUrl: "https://api.runacode.io",
+      baseUrl: "https://api.getcuna.com",
     });
     await client.sessions.list();
     await client.close();
   }
   for (let sample = 0; sample < 20; sample += 1) {
-    const client = new sdk.Runa({
+    const client = new sdk.Cuna({
       apiKey: key,
-      baseUrl: "https://api.runacode.io",
+      baseUrl: "https://api.getcuna.com",
     });
     const before = process.memoryUsage().heapUsed;
     const started = performance.now();
@@ -127,7 +127,7 @@ try {
     closeCalls = 0;
     closed = false;
     constructor(config) {
-      assert.equal(config.baseUrl, "https://api.runacode.io");
+      assert.equal(config.baseUrl, "https://api.getcuna.com");
     }
     async execute(operationKey) {
       assert.equal(operationKey, "sessions.list");
@@ -147,9 +147,9 @@ try {
     return transport;
   });
 
-  const reuseClient = new sdk.Runa({
+  const reuseClient = new sdk.Cuna({
     apiKey: key,
-    baseUrl: "https://api.runacode.io",
+    baseUrl: "https://api.getcuna.com",
   });
   const reuseTransportStart = observedTransports.length;
   for (let call = 0; call < 10; call += 1) await reuseClient.sessions.list();
@@ -162,13 +162,13 @@ try {
   assert.equal(reuseTransport.closeCalls, 1);
   assert.equal(reuseTransport.closed, true);
 
-  const firstOriginClient = new sdk.Runa({
+  const firstOriginClient = new sdk.Cuna({
     apiKey: key,
-    baseUrl: "https://api.runacode.io",
+    baseUrl: "https://api.getcuna.com",
   });
-  const secondOriginClient = new sdk.Runa({
+  const secondOriginClient = new sdk.Cuna({
     apiKey: key,
-    baseUrl: "https://api.runacode.io",
+    baseUrl: "https://api.getcuna.com",
   });
   const isolationStart = observedTransports.length;
   await firstOriginClient.sessions.list();
@@ -180,9 +180,9 @@ try {
   await secondOriginClient.close();
 
   let injectedCalls = 0;
-  const injectedClient = new sdk.Runa({
+  const injectedClient = new sdk.Cuna({
     apiKey: key,
-    baseUrl: "https://api.runacode.io",
+    baseUrl: "https://api.getcuna.com",
     fetch: async () => {
       injectedCalls += 1;
       return new Response("[]", {
@@ -209,9 +209,9 @@ try {
     const heapBefore = process.memoryUsage().heapUsed;
     const batchStart = observedTransports.length;
     for (let cycle = 0; cycle < 100; cycle += 1) {
-      const client = new sdk.Runa({
+      const client = new sdk.Cuna({
         apiKey: key,
-        baseUrl: "https://api.runacode.io",
+        baseUrl: "https://api.getcuna.com",
       });
       await client.sessions.list();
       await client.close();
@@ -281,7 +281,7 @@ try {
     assert.equal(value.ownership.client_isolation, "PASS", "R-050-11: client isolation");
     assert.equal(value.ownership.injected_transport, "caller", "R-050-12: injected ownership");
     assert.equal(value.ownership.cleanup_idempotence, "PASS", "R-050-12: cleanup idempotence");
-    assert.equal(/runa_sk_|Authorization\s*:|__runa\/auth\?t=/i.test(JSON.stringify(value)), false,
+    assert.equal(/(?:cuna|runa)_sk_|Authorization\s*:|__runa\/auth\?t=/i.test(JSON.stringify(value)), false,
       "R-050-14: protected evidence");
     return true;
   };
@@ -403,7 +403,7 @@ try {
     blocker: {
       id: "TS-050-AUTH-001",
       decision: "Approve exact six-cell execution, the security-remediated Vitest substitution, and bootstrap baseline promotion.",
-      owner: "Runa SDK technical and release owners",
+      owner: "Cuna SDK technical and release owners",
     },
     artifact_sha256: artifactSha256,
     catalog_sha256: catalogSha256,

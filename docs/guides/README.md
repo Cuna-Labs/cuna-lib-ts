@@ -13,3 +13,5 @@
 11. [Errors](errors.md)
 12. [Cleanup](cleanup.md)
 13. [Troubleshooting](troubleshooting.md)
+14. [Agent sessions](agent-sessions.md)
+15. [Workspace synchronization](workspace-sync.md)

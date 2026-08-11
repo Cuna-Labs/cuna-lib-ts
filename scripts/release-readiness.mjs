@@ -22,7 +22,7 @@ import {
 import { loadCanonicalContractIdentity } from "./canonical-contract-identity.mjs";
 
 const blockers = [];
-const releasePolicy = JSON.parse(await readFile(".runa/release-policy.json", "utf8"));
+const releasePolicy = JSON.parse(await readFile(".cuna/release-policy.json", "utf8"));
 if (releasePolicy.postPublishRecovery?.status !== "configured" ||
     releasePolicy.postPublishRecovery?.mode !== "withdrawal-only-audit" ||
     releasePolicy.postPublishRecovery?.resumeAfterUpload !== false) {

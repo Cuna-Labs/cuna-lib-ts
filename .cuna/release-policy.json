@@ -1,13 +1,13 @@
 {
   "packageMetadata": {
-    "repository": "https://github.com/Runa-Laboratories/runa-lib-ts",
+    "repository": "https://github.com/Cuna-Labs/cuna-lib-ts",
     "repositoryVisibility": "public",
     "packageAccess": "public"
   },
   "releaseAuthority": {
     "status": "configured",
     "authority": {
-      "repository": "Runa-Laboratories/runa-release-authority",
+      "repository": "Cuna-Labs/cuna-release-authority",
       "workflow": ".github/workflows/release-authority.yml",
       "artifact": "release-authority-bundle",
       "branch": "main",
@@ -22,7 +22,7 @@
   },
   "provenance": {
     "attestation": "actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d",
-    "verifier": "gh attestation verify <artifact> --repo Runa-Laboratories/runa-lib-ts --signer-workflow Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml"
+    "verifier": "gh attestation verify <artifact> --repo Cuna-Labs/cuna-lib-ts --signer-workflow Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml"
   },
   "publisher": {
     "ci": {
@@ -35,31 +35,31 @@
     }
   },
   "registry": {
-    "package": "@runa_laboratories/sdk",
+    "package": "@cuna_labs/sdk",
     "url": "https://registry.npmjs.org/",
-    "verificationPath": "GET https://registry.npmjs.org/@runa_laboratories%2fsdk/${version}"
+    "verificationPath": "GET https://registry.npmjs.org/@cuna_labs%2fsdk/${version}"
   },
   "sbom": {
     "format": "CycloneDX 1.6 JSON",
-    "schemaPath": ".runa/schemas/cyclonedx-1.6.schema.json",
+    "schemaPath": ".cuna/schemas/cyclonedx-1.6.schema.json",
     "verifier": "cyclonedx-cli@0.32.0 validate --input-format json --input-version v1_6"
   },
   "sourceControl": {
     "branchProtection": {
       "directPushes": false,
       "dismissStaleApprovals": true,
-      "requireCodeOwnerReviews": true,
+      "requireCodeOwnerReviews": false,
       "requiredApprovingReviews": 0,
-      "requiredStatusChecks": ["ts-quality-gates", "release-admission"]
+      "requiredStatusChecks": ["ts-quality-gates", "release-admission", "CodeQL"]
     },
     "provider": "github",
     "releaseBranch": "main",
-    "repository": "Runa-Laboratories/runa-lib-ts",
-    "repositoryUri": "https://github.com/Runa-Laboratories/runa-lib-ts"
+    "repository": "Cuna-Labs/cuna-lib-ts",
+    "repositoryUri": "https://github.com/Cuna-Labs/cuna-lib-ts"
   },
   "tag": {
     "signature": {
-      "certificateIdentity": "https://github.com/Runa-Laboratories/runa-lib-ts/.github/workflows/release.yml@refs/heads/main",
+      "certificateIdentity": "https://github.com/Cuna-Labs/cuna-lib-ts/.github/workflows/release.yml@refs/heads/main",
       "issuer": "https://token.actions.githubusercontent.com",
       "technology": "sigstore-keyless"
     },
@@ -70,9 +70,9 @@
     "audience": "npm:registry.npmjs.org",
     "environment": "npm",
     "issuer": "https://token.actions.githubusercontent.com",
-    "organization": "Runa-Laboratories",
-    "repository": "runa-lib-ts",
-    "subject": "repo:Runa-Laboratories/runa-lib-ts:environment:npm",
+    "organization": "Cuna-Labs",
+    "repository": "cuna-lib-ts",
+    "subject": "repo:Cuna-Labs/cuna-lib-ts:environment:npm",
     "workflow": "release.yml"
   }
 }

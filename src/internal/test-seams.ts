@@ -35,14 +35,14 @@ export function nowMs(): number {
 export function wait(delayMs: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     if (signal?.aborted === true) {
-      reject(new DOMException("The Runa request was cancelled.", "AbortError"));
+      reject(new DOMException("The Cuna request was cancelled.", "AbortError"));
       return;
     }
     let timer: ReturnType<typeof setTimeout>;
     const onAbort = () => {
       clearTimeout(timer);
       signal?.removeEventListener("abort", onAbort);
-      reject(new DOMException("The Runa request was cancelled.", "AbortError"));
+      reject(new DOMException("The Cuna request was cancelled.", "AbortError"));
     };
     timer = setTimeout(() => {
       signal?.removeEventListener("abort", onAbort);

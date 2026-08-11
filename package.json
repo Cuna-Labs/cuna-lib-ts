@@ -1,11 +1,16 @@
 {
-  "name": "@runa_laboratories/sdk",
+  "name": "@cuna_labs/sdk",
   "version": "0.1.0",
-  "description": "The official TypeScript SDK for Runa.",
+  "description": "The official TypeScript SDK for Cuna.",
+  "author": "Cuna Labs",
+  "homepage": "https://getcuna.com",
+  "bugs": {
+    "url": "https://getcuna.com/support"
+  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Runa-Laboratories/runa-lib-ts.git"
+    "url": "git+https://github.com/Cuna-Labs/cuna-lib-ts.git"
   },
   "publishConfig": {
     "access": "public",
@@ -83,5 +88,8 @@
     "typedoc": "0.28.20",
     "typescript": "5.8.3",
     "vitest": "3.2.7"
+  },
+  "overrides": {
+    "nanoid": "3.3.17"
   }
 }

@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { validateCiRunIdentity } from "./ci-run-policy.mjs";
 
 const repository = process.env.GITHUB_REPOSITORY;
-const runId = process.env.RUNA_CANDIDATE_RUN_ID;
-const sourceCommit = process.env.RUNA_SOURCE_COMMIT ?? process.env.GITHUB_SHA;
+const runId = process.env.CUNA_CANDIDATE_RUN_ID;
+const sourceCommit = process.env.CUNA_SOURCE_COMMIT ?? process.env.GITHUB_SHA;
 const token = process.env.GH_TOKEN;
 assert.match(repository ?? "", /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/);
 assert.match(runId ?? "", /^\d+$/);

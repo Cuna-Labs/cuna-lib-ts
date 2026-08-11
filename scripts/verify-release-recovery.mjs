@@ -15,10 +15,10 @@ import {
 } from "./postpublish-policy.mjs";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
-const tag = process.env.RUNA_RELEASE_TAG;
+const tag = process.env.CUNA_RELEASE_TAG;
 const repository = process.env.GITHUB_REPOSITORY;
 assert.match(tag ?? "", /^ts-v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/u);
-assert.equal(repository, "Runa-Laboratories/runa-lib-ts");
+assert.equal(repository, "Cuna-Labs/cuna-lib-ts");
 const candidate = JSON.parse(await readFile("release-artifacts/candidate.json", "utf8"));
 assert.equal(tag, `ts-v${candidate.version}`);
 assert.equal(execFileSync("git", ["rev-list", "-n", "1", tag], {
@@ -106,11 +106,11 @@ try {
   const attestation = spawnSync("gh", [
     "attestation", "verify", path.join(directory, candidate.filename),
     "--repo", repository,
-    "--signer-workflow", "Runa-Laboratories/runa-lib-ts/.github/workflows/ci.yml",
+    "--signer-workflow", "Cuna-Labs/cuna-lib-ts/.github/workflows/ci.yml",
   ], { encoding: "utf8" });
   assert.equal(attestation.status, 0, attestation.stderr);
   const metadataResponse = await fetch(
-    `${mapping.registry.replace(/\/$/u, "")}/@runa_laboratories%2fsdk/${candidate.version}`,
+    `${mapping.registry.replace(/\/$/u, "")}/@cuna_labs%2fsdk/${candidate.version}`,
     { redirect: "error" },
   );
   assert.equal(metadataResponse.status, 200);
@@ -122,7 +122,7 @@ try {
   assert.equal(hash(Buffer.from(await registryResponse.arrayBuffer())), candidate.sha256);
   const channel = resolveReleaseChannel(mapping, candidate.version);
   const tagsResponse = await fetch(
-    `${mapping.registry.replace(/\/$/u, "")}/-/package/@runa_laboratories/sdk/dist-tags`,
+    `${mapping.registry.replace(/\/$/u, "")}/-/package/@cuna_labs/sdk/dist-tags`,
     { redirect: "error" },
   );
   assert.equal(tagsResponse.status, 200);

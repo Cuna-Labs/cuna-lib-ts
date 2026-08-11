@@ -16,7 +16,7 @@ let denied: DeniedNetworkMechanism[] = [];
 
 const reject = (mechanism: DeniedNetworkMechanism): never => {
   denied.push(mechanism);
-  throw new TypeError("Real network access is disabled by the Runa test harness.");
+  throw new TypeError("Real network access is disabled by the Cuna test harness.");
 };
 
 export function installNetworkSentinel(): void {

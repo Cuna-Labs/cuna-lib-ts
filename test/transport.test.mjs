@@ -1,12 +1,11 @@
 import assert from "node:assert/strict";
 import { test } from "vitest";
 
-import { ApiError, Runa } from "../dist/index.js";
+import { ApiError, Cuna } from "../dist/index.js";
 import {
   API_KEY,
   RECORD_ID,
   SESSION_ID,
-  agentAuthenticationFixture,
   jsonResponse,
   meFixture,
   openUrl,
@@ -40,17 +39,14 @@ function operationFetch(captures) {
     if (path.endsWith("/checkpoint") || init.method === "DELETE") {
       return jsonResponse({ ok: true });
     }
-    if (path.endsWith("/agent-auth")) {
-      return jsonResponse(agentAuthenticationFixture());
-    }
     if (path.endsWith("/open")) return jsonResponse({ url: openUrl() });
     return jsonResponse(sessionFixture());
   };
 }
 
-test("PRD-021/025/028-037 dispatch exactly 14 canonical operations", async () => {
+test("PRD-021/025/028-037 dispatch the canonical legacy session operations", async () => {
   const captures = [];
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: operationFetch(captures),
@@ -77,14 +73,9 @@ test("PRD-021/025/028-037 dispatch exactly 14 canonical operations", async () =>
   assert.equal(exec.exitCode, 7);
   await session.checkpoint("checkpoint name");
   await session.open();
-  assert.deepEqual(await session.authenticationStatus(), {
-    agent: "codex",
-    method: "interactive_login",
-    state: "authenticated",
-  });
   await session.delete();
 
-  assert.equal(captures.length, 14);
+  assert.equal(captures.length, 13);
   assert.deepEqual(
     captures.map(({ target, init }) => `${init.method} ${target.pathname}`),
     [
@@ -100,17 +91,16 @@ test("PRD-021/025/028-037 dispatch exactly 14 canonical operations", async () =>
       `POST /v1/sessions/${SESSION_ID}/exec`,
       `POST /v1/sessions/${SESSION_ID}/checkpoint`,
       `POST /v1/sessions/${SESSION_ID}/open`,
-      `GET /v1/sessions/${SESSION_ID}/agent-auth`,
       `DELETE /v1/sessions/${SESSION_ID}`,
     ],
   );
   for (const { target, init } of captures) {
     assert.equal(target.origin, "https://api.runacode.io");
     assert.equal(init.redirect, "manual");
-    assert.equal(init.headers.Accept, "application/json");
+    assert.equal(init.headers.Accept, "application/json, application/problem+json");
     assert.equal(init.headers.Authorization, `Bearer ${API_KEY}`);
     assert.match(init.headers["User-Agent"], /^runa-sdk-typescript\//);
-    assert.equal("X-Runa-Request-Id" in init.headers, false);
+    assert.equal("X-Cuna-Request-Id" in init.headers, false);
     assert.equal(
       init.body === undefined,
       init.headers["Content-Type"] === undefined,
@@ -120,7 +110,6 @@ test("PRD-021/025/028-037 dispatch exactly 14 canonical operations", async () =>
   assert.deepEqual(createBody, {
     name: "worker",
     agent: "codex",
-    background: true,
     vcpus: 2,
     memory_mib: 4096,
     allowed_hosts: ["example.invalid"],
@@ -140,75 +129,25 @@ test("PRD-021/025/028-037 dispatch exactly 14 canonical operations", async () =>
   await runa.close();
 });
 
-test("interactive creates default to background and preserve explicit control", async () => {
+test("SDK create never serializes console-only background", async () => {
   const bodies = [];
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (_url, init) => {
-      if (init.method === "GET") {
-        return jsonResponse(sessionFixture({ status: "running" }));
-      }
       bodies.push(JSON.parse(init.body));
-      return jsonResponse(sessionFixture({ status: "creating" }), 201);
+      return jsonResponse(sessionFixture({ status: "running" }), 201);
     },
   });
 
-  const codex = await runa.sessions.create("codex", { agent: "codex" });
-  const claude = await runa.sessions.create("claude", { agent: "claude-code" });
-  await runa.sessions.create("legacy", { agent: "codex", background: false });
+  await runa.sessions.create("codex", { agent: "codex" });
+  await runa.sessions.create("claude", { agent: "claude-code" });
   await runa.sessions.create("openclaw", { agent: "openclaw" });
 
-  assert.equal(codex.snapshot.status, "creating");
-  assert.equal(claude.snapshot.status, "creating");
   assert.deepEqual(bodies, [
-    { name: "codex", agent: "codex", background: true },
-    { name: "claude", agent: "claude-code", background: true },
-    { name: "legacy", agent: "codex", background: false },
+    { name: "codex", agent: "codex" },
+    { name: "claude", agent: "claude-code" },
     { name: "openclaw", agent: "openclaw" },
   ]);
-  assert.equal(await codex.refresh(), codex);
-  assert.equal(codex.snapshot.status, "running");
-  await runa.close();
-});
-
-test("agent authentication status is closed, strict, and secret-free", async () => {
-  const invalid = [
-    agentAuthenticationFixture({ method: "oauth" }),
-    agentAuthenticationFixture({ state: "unknown" }),
-    agentAuthenticationFixture({ method: "api_key", state: "authenticated" }),
-    agentAuthenticationFixture({ method: "interactive_login", state: "configured" }),
-    agentAuthenticationFixture({ method: "none", state: "installing" }),
-    agentAuthenticationFixture({ agent: "other" }),
-    agentAuthenticationFixture({ token: "must-not-be-exposed" }),
-    { method: "none", state: "not_applicable" },
-  ];
-  for (const payload of invalid) {
-    const runa = new Runa({
-      apiKey: API_KEY,
-      fetch: async (url) => new URL(url).pathname.endsWith("/agent-auth")
-        ? jsonResponse(payload)
-        : jsonResponse(sessionFixture()),
-    });
-    const session = await runa.sessions.get(SESSION_ID);
-    await assert.rejects(
-      session.authenticationStatus(),
-      (error) => error instanceof ApiError && error.code === "malformed_response",
-    );
-    await runa.close();
-  }
-
-  const runa = new Runa({
-    apiKey: API_KEY,
-    fetch: async (url) => new URL(url).pathname.endsWith("/agent-auth")
-      ? jsonResponse({ agent: null, method: "none", state: "not_applicable" })
-      : jsonResponse(sessionFixture()),
-  });
-  const session = await runa.sessions.get(SESSION_ID);
-  assert.deepEqual(await session.authenticationStatus(), {
-    agent: null,
-    method: "none",
-    state: "not_applicable",
-  });
   await runa.close();
 });
 
@@ -239,7 +178,7 @@ test("PRD-024/025 map exact status, media, redirect and errors", async () => {
     },
   ];
   for (const scenario of scenarios) {
-    const runa = new Runa({
+    const runa = new Cuna({
       apiKey: API_KEY,
       baseUrl: "https://api.runacode.io",
       fetch: async () => scenario.response,
@@ -262,20 +201,20 @@ test("TC-025-02 selects the exact global fetch when no callable is injected", as
     injectedCalls += 1;
     return jsonResponse(meFixture());
   };
-  const injectedClient = new Runa({ apiKey: API_KEY, fetch: injected });
+  const injectedClient = new Cuna({ apiKey: API_KEY, fetch: injected });
   await injectedClient.me();
   assert.equal(injectedCalls, 1);
   await injectedClient.close();
   let calls = 0;
   const selected = async (url, init) => {
     calls += 1;
-    assert.equal(new URL(url).origin, "https://api.runacode.io");
+    assert.equal(new URL(url).origin, "https://api.getcuna.com");
     assert.equal(init.method, "GET");
     return jsonResponse(meFixture());
   };
   globalThis.fetch = selected;
   try {
-    const runa = new Runa({ apiKey: API_KEY });
+    const runa = new Cuna({ apiKey: API_KEY });
     assert.equal((await runa.me()).email, "sdk@example.invalid");
     assert.equal(calls, 1);
     await runa.close();
@@ -302,7 +241,7 @@ test("TC-040-02 rejects hostile redirects with one request and no exposure", asy
         return new Promise(() => {});
       },
     });
-    const runa = new Runa({
+    const runa = new Cuna({
       apiKey: API_KEY,
       baseUrl: "https://api.runacode.io",
       fetch: async () => {
@@ -322,7 +261,7 @@ test("TC-040-02 rejects hostile redirects with one request and no exposure", asy
 });
 
 test("PRD-025/040 enforce the response cap and invalid UTF-8", async () => {
-  const over = new Uint8Array(8_388_609);
+  const over = new Uint8Array(16_777_217);
   over.fill(0x20);
   for (const response of [
     new Response(over, {
@@ -334,7 +273,7 @@ test("PRD-025/040 enforce the response cap and invalid UTF-8", async () => {
       headers: { "content-type": "application/json" },
     }),
   ]) {
-    const runa = new Runa({
+    const runa = new Cuna({
       apiKey: API_KEY,
       baseUrl: "https://api.runacode.io",
       fetch: async () => response,
@@ -351,14 +290,14 @@ test("PRD-025/026 overflow remains terminal when stream cancellation never settl
   let cancellations = 0;
   const body = new ReadableStream({
     start(controller) {
-      controller.enqueue(new Uint8Array(8_388_609));
+      controller.enqueue(new Uint8Array(16_777_217));
     },
     cancel() {
       cancellations += 1;
       return new Promise(() => {});
     },
   });
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async () => new Response(body, {
@@ -366,14 +305,10 @@ test("PRD-025/026 overflow remains terminal when stream cancellation never settl
       headers: { "content-type": "application/json" },
     }),
   });
-  let outcome;
-  void runa.me().then(
-    () => { outcome = "resolved"; },
-    (error) => { outcome = error; },
-  );
-  for (let turn = 0; turn < 10 && outcome === undefined; turn += 1) {
-    await new Promise((resolve) => setImmediate(resolve));
-  }
+  const outcome = await Promise.race([
+    runa.me().then(() => "resolved", (error) => error),
+    new Promise((resolve) => setTimeout(() => resolve("timed-out"), 1_000)),
+  ]);
   assert(outcome instanceof ApiError);
   assert.equal(outcome.code, "malformed_response");
   assert.equal(cancellations, 1);
@@ -382,7 +317,7 @@ test("PRD-025/026 overflow remains terminal when stream cancellation never settl
 
 test("TC-025-07 rejects local invalid values before I/O", async () => {
   let dispatches = 0;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch: async () => {
@@ -416,7 +351,7 @@ test("TC-025-07 rejects local invalid values before I/O", async () => {
     ["ok", { outboundPolicy: { mode: "denylist", hosts: ["example.com", "example.com"] } }],
     ["ok", { outboundPolicy: { mode: "denylist", hosts: Array(129).fill("example.invalid") } }],
     ["ok", { runtimePort: 65_536 }],
-    ["ok", { background: "true" }],
+    ["ok", { background: true }],
     ["ok", { unknown: true }],
   ]) {
     await assert.rejects(runa.sessions.create(name, options), TypeError);
@@ -435,7 +370,7 @@ test("PRD-028 snapshots caller-owned create arrays before dispatch", async () =>
     });
     return jsonResponse(sessionFixture(), 201);
   };
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io",
     fetch,
@@ -455,7 +390,7 @@ test("PRD-028 snapshots caller-owned create arrays before dispatch", async () =>
 
 test("serializes explicit outbound allow and deny policies without provider fields", async () => {
   const bodies = [];
-  const runa = new Runa({ apiKey: API_KEY, fetch: async (_url, init) => {
+  const runa = new Cuna({ apiKey: API_KEY, fetch: async (_url, init) => {
     bodies.push(JSON.parse(init.body));
     return jsonResponse(sessionFixture(), 201);
   } });
@@ -472,7 +407,7 @@ test("serializes explicit outbound allow and deny policies without provider fiel
 
 test("TC-033-05 accepts only integer timeoutSecs from 1 through 600", async () => {
   let dispatches = 0;
-  const runa = new Runa({
+  const runa = new Cuna({
     apiKey: API_KEY,
     fetch: async (url) => {
       dispatches += 1;

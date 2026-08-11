@@ -5,26 +5,22 @@ can use the user's provider subscription through an interactive login. The SDK
 does not accept or embed a provider API key for this flow.
 
 ```ts
-const session = await runa.sessions.create("interactive", {
-  agent: "claude-code",
-});
+const agentSession = await cuna.agentSessions.get(
+  "22222222-2222-4222-8222-222222222222",
+);
+const authentication = await cuna.agentSessions.agentAuth(agentSession);
 
-while (session.snapshot.status === "creating") {
-  await new Promise((resolve) => setTimeout(resolve, 2_000));
-  await session.refresh();
-}
-
-const authentication = await session.authenticationStatus();
 if (authentication.state === "login_required") {
-  const handoff = await session.open();
-  // Open handoff.url for the user. Never log, persist, or prefetch it.
+  // Present the product's terminal sign-in flow. Never infer authentication
+  // from terminal text and never cache this short-lived observation.
 }
 ```
 
-The create call sends `background: true` automatically for `"claude-code"`
-and `"codex"`. Pass `background: false` to request synchronous creation, or
-set it explicitly for another agent. A background create may return status
-`"creating"`; `refresh()` is the supported polling mechanism.
+Auth evidence belongs to an exact AgentSession and process epoch. Pass the
+already admitted `AgentSession` object to `agentAuth`; the SDK rejects a
+sibling ID, a changed process epoch or auth mode, stale observations, and
+responses that are not marked `Cache-Control: no-store`. No provider secrets,
+terminal output, account identity, or machine-level shortcut are exposed.
 
 Synchronous creation can legitimately use the platform's 25-minute durable
 provisioning lease and its five-minute recovery window. The SDK therefore

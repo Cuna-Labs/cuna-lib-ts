@@ -2,7 +2,7 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import { createPrivateKey, sign } from "node:crypto";
 import path from "node:path";
 
-const handoffRoot = process.env.RUNA_HANDOFF_ROOT ?? ".";
+const handoffRoot = process.env.CUNA_HANDOFF_ROOT ?? ".";
 const catalog = JSON.parse(await readFile("compatibility/ts-050-evidence-v1.json", "utf8"));
 const candidate = JSON.parse(await readFile(
   path.join(handoffRoot, "release-artifacts/candidate.json"), "utf8"));
@@ -31,8 +31,8 @@ const payload = {
   issued_at: issuedAt.toISOString(),
   expires_at: new Date(issuedAt.getTime() + 60 * 60 * 1_000).toISOString()
 };
-const keyId = process.env.RUNA_COMPAT_SIGNING_KEY_ID;
-const privateKeyPem = process.env.RUNA_COMPAT_SIGNING_KEY_PEM;
+const keyId = process.env.CUNA_COMPAT_SIGNING_KEY_ID;
+const privateKeyPem = process.env.CUNA_COMPAT_SIGNING_KEY_PEM;
 if (typeof keyId !== "string" || typeof privateKeyPem !== "string") {
   throw new Error("Trusted compatibility signer is not configured.");
 }

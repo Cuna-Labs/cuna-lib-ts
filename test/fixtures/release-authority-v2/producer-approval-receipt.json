@@ -7,7 +7,7 @@
   "candidate_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "expires_at": "2026-08-02T12:30:00.000Z",
   "issued_at": "2026-08-02T12:00:00.000Z",
-  "policy_id": "RUNA-RELEASE-V1",
+  "policy_id": "CUNA-RELEASE-V1",
   "release_manifest_core_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
   "status": "PASS"
 }

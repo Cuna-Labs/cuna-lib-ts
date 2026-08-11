@@ -8,8 +8,8 @@ import {
   ApiError,
   CommandError,
   ConfigError,
-  Runa,
-  RunaError,
+  Cuna,
+  CunaError,
   Session,
   stderrText,
   stdoutText,
@@ -35,11 +35,13 @@ import {
 } from "./helpers.mjs";
 
 test("PRD-023 resolves terminal precedence and strict files", () => {
+  const priorCanonicalKey = process.env.CUNA_API_KEY;
   const priorKey = process.env.RUNA_API_KEY;
   const priorUrl = process.env.RUNA_BASE_URL;
   const directory = mkdtempSync(join(tmpdir(), "runa-config-"));
   const file = join(directory, "config.json");
   try {
+    process.env.CUNA_API_KEY = "cuna_sk_environment";
     process.env.RUNA_API_KEY = [API_KEY, "environment"].join("_");
     process.env.RUNA_BASE_URL = "https://api.runacode.io/";
     writeFileSync(
@@ -74,11 +76,31 @@ test("PRD-023 resolves terminal precedence and strict files", () => {
       ConfigError,
     );
   } finally {
+    if (priorCanonicalKey === undefined) delete process.env.CUNA_API_KEY;
+    else process.env.CUNA_API_KEY = priorCanonicalKey;
     if (priorKey === undefined) delete process.env.RUNA_API_KEY;
     else process.env.RUNA_API_KEY = priorKey;
     if (priorUrl === undefined) delete process.env.RUNA_BASE_URL;
     else process.env.RUNA_BASE_URL = priorUrl;
     rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("canonical CUNA_API_KEY outranks legacy environment and fails closed", () => {
+  const priorCanonical = process.env.CUNA_API_KEY;
+  const priorLegacy = process.env.RUNA_API_KEY;
+  try {
+    process.env.CUNA_API_KEY = "cuna_sk_canonical";
+    process.env.RUNA_API_KEY = "runa_sk_legacy";
+    assert.equal(resolveConfig().apiKey, "cuna_sk_canonical");
+    process.env.CUNA_API_KEY = "invalid";
+    assert.throws(() => resolveConfig(), ConfigError);
+    assert.equal(resolveConfig({ apiKey: "cuna_sk_constructor" }).apiKey, "cuna_sk_constructor");
+  } finally {
+    if (priorCanonical === undefined) delete process.env.CUNA_API_KEY;
+    else process.env.CUNA_API_KEY = priorCanonical;
+    if (priorLegacy === undefined) delete process.env.RUNA_API_KEY;
+    else process.env.RUNA_API_KEY = priorLegacy;
   }
 });
 
@@ -143,7 +165,7 @@ test("PRD-001/023 reject prohibited hosts including trailing dot", () => {
   );
 });
 
-test("PRD-023 accepts only the canonical Runa API origin", () => {
+test("PRD-023 accepts canonical Cuna and legacy Cuna API origins", () => {
   for (const baseUrl of [
     "https://example.invalid",
     "https://api.runacode.io.example.invalid",
@@ -157,21 +179,26 @@ test("PRD-023 accepts only the canonical Runa API origin", () => {
     apiKey: API_KEY,
     baseUrl: "https://api.runacode.io/",
   }).baseUrl, "https://api.runacode.io");
+  assert.equal(resolveConfig({ apiKey: API_KEY }).baseUrl, "https://api.getcuna.com");
+  assert.equal(resolveConfig({
+    apiKey: API_KEY,
+    baseUrl: "https://api.getcuna.com/",
+  }).baseUrl, "https://api.getcuna.com");
 });
 
 test("PRD-024 exposes the closed error surface", () => {
   const config = new ConfigError();
-  assert.equal(config.message, "Runa SDK configuration is invalid.");
+  assert.equal(config.message, "Cuna SDK configuration is invalid.");
   assert(config instanceof Error);
-  assert(config instanceof RunaError);
+  assert(config instanceof CunaError);
 
   const api = new ApiError(409);
   assert.equal(api.code, "api_error");
   assert.equal(api.status, 409);
-  assert.equal(api.message, "The Runa API request failed.");
+  assert.equal(api.message, "The Cuna API request failed.");
 
   const malformed = new ApiError(200, "malformed_response");
-  assert.equal(malformed.message, "The Runa API returned an invalid response.");
+  assert.equal(malformed.message, "The Cuna API returned an invalid response.");
   assert.throws(() => new CommandError(), TypeError);
   assert.throws(() => new Session(), TypeError);
   assert.deepEqual(Reflect.ownKeys(Session), [
@@ -187,8 +214,8 @@ test("PRD-024 exposes the closed error surface", () => {
       ApiError,
       CommandError,
       ConfigError,
-      Runa,
-      RunaError,
+      Cuna,
+      CunaError,
       Session,
       stderrText,
       stdoutText,
@@ -197,8 +224,8 @@ test("PRD-024 exposes the closed error surface", () => {
       "ApiError",
       "CommandError",
       "ConfigError",
-      "Runa",
-      "RunaError",
+      "Cuna",
+      "CunaError",
       "Session",
       "stderrText",
       "stdoutText",
