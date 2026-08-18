@@ -99,7 +99,11 @@ test("PRD-021/025/028-037 dispatch the canonical legacy session operations", asy
     assert.equal(init.redirect, "manual");
     assert.equal(init.headers.Accept, "application/json, application/problem+json");
     assert.equal(init.headers.Authorization, `Bearer ${API_KEY}`);
-    assert.match(init.headers["User-Agent"], /^runa-sdk-typescript\//);
+    // Literal oracle: the product token is asserted as an exact string, not
+    // compared against anything the transport builds, so reverting the brand
+    // turns this red. The version is shape-checked so a release bump does not.
+    assert.equal(init.headers["User-Agent"].split("/")[0], "cuna-sdk-typescript");
+    assert.match(init.headers["User-Agent"], /^cuna-sdk-typescript\/\d+\.\d+\.\d+$/u);
     assert.equal("X-Cuna-Request-Id" in init.headers, false);
     assert.equal(
       init.body === undefined,

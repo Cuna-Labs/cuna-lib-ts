@@ -9,7 +9,7 @@ import type {
   SessionSnapshot,
 } from "./types.js";
 
-const SESSION_CAPABILITY = Symbol("runa.session.capability");
+const SESSION_CAPABILITY = Symbol("cuna.session.capability");
 
 function malformed(): never {
   throw new ApiError(200, "malformed_response");

@@ -198,7 +198,7 @@ function prepare(
     headers: Object.freeze({
       Accept: "application/json, application/problem+json",
       Authorization: `Bearer ${config.apiKey}`,
-      "User-Agent": `runa-sdk-typescript/${SDK_VERSION}`,
+      "User-Agent": `cuna-sdk-typescript/${SDK_VERSION}`,
       ...(input.idempotencyKey === undefined
         ? {}
         : { "Idempotency-Key": input.idempotencyKey }),
@@ -486,7 +486,7 @@ const PRODUCTION_RUNTIME: TransportRuntime = Object.freeze({
   },
   sleep: productionSleep,
   randomUint32: () => randomBytes(4).readUInt32BE(0),
-  requestId: () => `runa_req_${randomBytes(16).toString("hex")}`,
+  requestId: () => `cuna_req_${randomBytes(16).toString("hex")}`,
 });
 
 export class FetchTransport {
