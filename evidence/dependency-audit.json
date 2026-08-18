@@ -4,6 +4,7 @@
   "runtime_dependency_count": 0,
   "exact_dev_pins": true,
   "vitest_security_floor": "3.2.7",
+  "vitest_pin": "3.2.7",
   "vitest_lock_exact": true,
   "licenses": {
     "status": "PASS",
