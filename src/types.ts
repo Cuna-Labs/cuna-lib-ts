@@ -395,7 +395,7 @@ export interface TraceSpan {
 
 export interface TraceSink {
   startSpan(
-    name: "runa.sdk.operation",
+    name: "cuna.sdk.operation",
     attributes: TraceStartAttributes,
   ): TraceSpan;
 }

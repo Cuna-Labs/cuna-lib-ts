@@ -39,7 +39,7 @@ function deterministicRuntime(randomValues = []) {
         now += delay;
       },
       randomUint32: () => randomValues[index++] ?? 0,
-      requestId: () => `runa_req_${"0".repeat(32)}`,
+      requestId: () => `cuna_req_${"0".repeat(32)}`,
     },
   };
 }
@@ -184,8 +184,12 @@ test("PRD-039 emits exact safe retry order and isolates failing hooks", async ()
     "operation.end",
   ]);
   assert.equal(events.every(Object.isFrozen), true);
-  assert.equal(events.every((event) => event.request_id === `runa_req_${"0".repeat(32)}`), true);
+  assert.equal(events.every((event) => event.request_id === `cuna_req_${"0".repeat(32)}`), true);
   assert.equal(events.some((event) => "url" in event || "headers" in event || "body" in event), false);
+  // The span NAME, not just the call kind. The deepEqual below maps entry[0]
+  // and discards entry[1], so without this line the emitted span name is
+  // asserted nowhere and renaming it back would keep the suite green.
+  assert.equal(trace[0][1], "cuna.sdk.operation");
   assert.deepEqual(trace.map((entry) => entry[0]), [
     "startSpan",
     "addEvent",
@@ -195,6 +199,27 @@ test("PRD-039 emits exact safe retry order and isolates failing hooks", async ()
     "addEvent",
     "end",
   ]);
+});
+
+test("the default runtime mints cuna_req_ correlation identifiers", async () => {
+  // Every other test in this file injects its own `requestId` factory, so the
+  // prefix the SHIPPED runtime mints is observed by none of them: flipping it
+  // back would leave the suite green. This constructs FetchTransport with the
+  // default runtime argument omitted, which is the only way to reach
+  // PRODUCTION_RUNTIME, and asserts the prefix as an exact literal.
+  const events = [];
+  const transport = new FetchTransport(
+    config(async () => jsonResponse(meFixture()), {
+      diagnostics: { emit: (event) => void events.push(event) },
+    }),
+  );
+  await transport.execute("me.get");
+  assert.equal(events.length > 0, true);
+  for (const event of events) {
+    assert.equal(event.request_id.slice(0, 9), "cuna_req_");
+    assert.match(event.request_id, /^cuna_req_[0-9a-f]{32}$/u);
+  }
+  assert.equal(new Set(events.map((event) => event.request_id)).size, 1);
 });
 
 test("PRD-008 deadline remains authoritative while streaming a response", async () => {
@@ -210,7 +235,7 @@ test("PRD-008 deadline remains authoritative while streaming a response", async 
     },
     sleep: async () => {},
     randomUint32: () => 0,
-    requestId: () => `runa_req_${"0".repeat(32)}`,
+    requestId: () => `cuna_req_${"0".repeat(32)}`,
   };
   const transport = new FetchTransport(
     config(async (_url, init) => {
@@ -257,7 +282,7 @@ test("PRD-008 timeout cancels a response body that hangs after headers", async (
     },
     sleep: async () => {},
     randomUint32: () => 0,
-    requestId: () => `runa_req_${"0".repeat(32)}`,
+    requestId: () => `cuna_req_${"0".repeat(32)}`,
   };
   const transport = new FetchTransport(
     config(async () => ({

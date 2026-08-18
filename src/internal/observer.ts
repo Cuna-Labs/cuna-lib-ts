@@ -84,7 +84,7 @@ export class OperationObserver {
     if (this.#tracing !== undefined) {
       try {
         this.#span = this.#tracing.startSpan(
-          "runa.sdk.operation",
+          "cuna.sdk.operation",
           Object.freeze({ ...this.#base() }),
         );
       } catch {
