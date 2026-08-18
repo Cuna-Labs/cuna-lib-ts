@@ -27,7 +27,7 @@ test("release trust is pinned to one accepted Ed25519 root for every authority r
   assert.equal(policy.maximum_validity_ms, 3_600_000);
   assert.deepEqual(policy.keys.map((key) => key.role).sort(), expectedRoles);
   assert(policy.keys.every((key) =>
-    key.key_id === "runa-release-authority-2026-08-02-v1" &&
+    key.key_id === "release-authority-ed25519-v1" &&
     key.algorithm === "Ed25519" &&
     key.public_key_pem === policy.keys[0].public_key_pem
   ));

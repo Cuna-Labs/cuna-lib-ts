@@ -29,7 +29,7 @@ for (const key of trust.keys) {
     "algorithm", "key_id", "public_key_pem", "role",
   ].sort());
   assert.equal(key.algorithm, "Ed25519");
-  assert.equal(key.key_id, "runa-release-authority-2026-08-02-v1");
+  assert.equal(key.key_id, "release-authority-ed25519-v1");
   assert.equal(createHash("sha256").update(key.public_key_pem).digest("hex"),
     "fe7d7259281d512d4f17ef1a0afed3e9b613105ab1a3304e129130b194aa8000");
 }
